@@ -1131,6 +1131,58 @@
   /* ── ป้องกัน overflow ทุกที่ ── */
   * { box-sizing: border-box; }
   img { max-width: 100%; height: auto; }
+
+  /* ══ Works grid: 6 col desktop, responsive ══ */
+  #works-grid, #works-loading, .works-year-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: clamp(6px, 1vw, 10px) !important;
+  }
+  @media (max-width: 1100px) { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(5, 1fr) !important; } }
+  @media (max-width: 900px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+  @media (max-width: 600px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; } }
+  @media (max-width: 400px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; } }
+
+  /* ══ Works filter tabs: wrap บนมือถือ ══ */
+  #works-tabs {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    gap: 5px !important;
+    row-gap: 5px !important;
+  }
+  @media (min-width: 768px) {
+    #works-tabs {
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      scrollbar-width: none !important;
+    }
+    #works-tabs::-webkit-scrollbar { display: none !important; }
+  }
+
+  /* ══ Calendar card grid: auto-fill responsive ══ */
+  #cal-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  /* ══ Home cards grid: 5 col desktop ══ */
+  .cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: clamp(6px, 1vw, 14px) !important;
+    align-items: stretch;
+  }
+  @media (max-width: 1100px) { .cards-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+  @media (max-width: 800px)  { .cards-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+  @media (max-width: 600px)  { .cards-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+  @media (max-width: 400px)  { .cards-grid { grid-template-columns: 1fr !important; } }
+
+  /* ══ Card image fluid ══ */
+  .card-img-wrap { height: clamp(100px, 12vw, 180px) !important; }
+  .cal-ev-card-img { height: 120px; }
+
+  /* ══ Never overflow ══ */
+  body, #app { overflow-x: hidden !important; }
+  * { box-sizing: border-box; }
   </style>
  </head>
  <body>
@@ -1381,10 +1433,7 @@
      <!-- Header — same structure as home page -->
      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.25rem;">
       <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#111;margin:0;">Works</h2>
-      <div style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;">
-       <select id="works-year-select" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1.5px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;font-family:inherit;"></select>
-       <svg style="position:absolute;right:8px;pointer-events:none;" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
+      <div style="display:none;"><select id="works-year-select" style="display:none;" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1.5px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;font-family:inherit;"></select></div>
      </div>
 
      <!-- Filter bars — same structure as home page -->
@@ -1400,6 +1449,8 @@
        <button onclick="setWorksArtist('Permpoon')" id="wa-Permpoon" class="works-artist-btn"
          style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #f0f0f0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.15s;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
       </div>
+      <!-- Year filter bar — built dynamically by _buildWorksYearButtons() -->
+      <div class="filter-bar" id="works-year-bar" style="margin-bottom:6px;"></div>
       <!-- Category tabs — horizontal scroll, never wrap -->
       <div class="filter-bar" id="works-tabs" style="padding-bottom:4px;">
        <button onclick="setWorksTab('all')"           id="wt-all"           class="works-tab active-wt" style="padding:5px 14px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s;">All</button>
@@ -1415,7 +1466,8 @@
      </div>
 
      <!-- Content -->
-     <div id="works-grid" style="display:none;grid-template-columns:repeat(auto-fill,minmax(clamp(130px,15vw,200px),1fr));gap:clamp(6px,1.2vw,12px);align-items:stretch;"></div>
+     <div id="works-accordion" style="display:none;"></div>
+     <div id="works-grid" style="display:none;align-items:stretch;"></div>
      <div id="works-empty" style="display:none;padding:3rem 1rem;">
       <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
        <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1.5px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
@@ -1430,7 +1482,7 @@
        </div>
       </div>
      </div>
-     <div id="works-loading" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(130px,15vw,200px),1fr));gap:0 8px;">
+     <div id="works-loading" style="display:grid;gap:0 8px;">
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:90%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:55%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;"></div></div></div></div>
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:80%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;"></div></div></div></div>
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:85%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:45%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;"></div></div></div></div>
@@ -2305,7 +2357,7 @@ async function hashPassword(pw) {
 }
 
 // ── PERFORMANCE CONFIG ────────────────────────────────────────────
-const CACHE_VERSION    = 'ppp_v14'; // bumped: responsive + instant load update
+const CACHE_VERSION    = 'ppp_v15'; // bumped: responsive + instant load update
 const CACHE_TTL_MS     = 5 * 60 * 1000;         // 5 min — matches Apps Script cache regeneration trigger
 const CACHE_MAX_AGE_MS = 168 * 60 * 60 * 1000;  // 7 days — always show stale data if offline, never blank
 const FETCH_TIMEOUT_MS = 6000;
@@ -6312,6 +6364,7 @@ function renderAdminWorksList() {
 }
 
 function setWorksTab(tab) {
+  Object.keys(_worksAccOpen).forEach(k => delete _worksAccOpen[k]);
   _worksTab = tab;
   document.querySelectorAll('.works-tab').forEach(b => {
     const isActive = b.id === 'wt-' + tab;
@@ -6324,6 +6377,7 @@ function setWorksTab(tab) {
 }
 
 function setWorksArtist(artist) {
+  Object.keys(_worksAccOpen).forEach(k => delete _worksAccOpen[k]);
   _worksArtist = artist;
   const colorMap = { Pond: '#f97316', Phuwin: '#6b7280', Permpoon: '#22c55e' };
   document.querySelectorAll('.works-artist-btn').forEach(b => {
@@ -6345,45 +6399,86 @@ function setWorksArtist(artist) {
 
 function setWorksYear(year) {
   _worksYear = year;
+  Object.keys(_worksAccOpen).forEach(k => delete _worksAccOpen[k]);
   renderWorks();
 }
 
 function _buildWorksYearDropdown() {
+  // legacy select (hidden) — keep in sync
   const sel = document.getElementById('works-year-select');
-  if (!sel || !allWorks.length) return;
-  // Collect unique years from data, sorted descending
+  if (!allWorks.length) return;
   const years = [...new Set(allWorks.map(w => w.year||'').filter(Boolean))].sort((a,b) => b-a);
-  const current = sel.value;
-  sel.innerHTML = years.map(y => `<option value="${y}" ${y===current?'selected':''}>${y}</option>`).join('');
-  // Add "ทุกปี" at bottom
-  sel.innerHTML += `<option value="all" ${current==='all'?'selected':''}>All Years</option>`;
-  // If current year not in list, default to latest
-  if (!years.includes(current) && current !== 'all') {
-    sel.value = years[0] || 'all';
-    _worksYear = sel.value;
+  if (sel) {
+    const current = sel.value;
+    sel.innerHTML = years.map(y => `<option value="${y}" ${y===current?'selected':''}>${y}</option>`).join('');
+    sel.innerHTML += `<option value="all" ${current==='all'?'selected':''}>All Years</option>`;
+    if (!years.includes(current) && current !== 'all') { sel.value = years[0] || 'all'; _worksYear = sel.value; }
   }
+  // Build pill buttons
+  const bar = document.getElementById('works-year-bar');
+  if (!bar) return;
+  // Only rebuild if year list changed (avoid flicker)
+  const existing = bar.dataset.years || '';
+  const newList = ['all',...years].join(',');
+  if (existing === newList && bar.children.length) return;
+  bar.dataset.years = newList;
+  bar.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'All Years';
+  allBtn.onclick = () => setWorksYear('all');
+  allBtn.dataset.year = 'all';
+  _styleYearBtn(allBtn, _worksYear === 'all');
+  bar.appendChild(allBtn);
+  years.forEach(y => {
+    const btn = document.createElement('button');
+    btn.textContent = y;
+    btn.onclick = () => setWorksYear(y);
+    btn.dataset.year = y;
+    _styleYearBtn(btn, _worksYear === y);
+    bar.appendChild(btn);
+  });
+}
+
+function _styleYearBtn(btn, active) {
+  btn.style.cssText = `padding:5px 14px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s;font-family:inherit;border:1px solid ${active?'#a855f7':'#f0f0f0'};background:${active?'#f5f3ff':'#fff'};color:${active?'#7e22ce':'#6b7280'};`;
+}
+
+function _refreshWorksYearButtons() {
+  const bar = document.getElementById('works-year-bar');
+  if (!bar) return;
+  bar.querySelectorAll('button').forEach(btn => _styleYearBtn(btn, btn.dataset.year === _worksYear));
+}
+
+// ── Accordion open-state tracker (year → bool) ──
+const _worksAccOpen = {};
+
+function _toggleWorksAcc(year) {
+  _worksAccOpen[year] = !_worksAccOpen[year];
+  renderWorks();
 }
 
 function renderWorks() {
+  const accordion = document.getElementById('works-accordion');
   const grid    = document.getElementById('works-grid');
   const empty   = document.getElementById('works-empty');
   const loading = document.getElementById('works-loading');
-  if (!grid) return;
+  if (!accordion) return;
 
-  // Always hide loading shimmer — we either have data or show empty state
   if (loading) loading.style.display = 'none';
 
   if (!worksLoaded && !allWorks.length) {
-    // Genuinely no data yet — show shimmer
     if (loading) loading.style.display = 'grid';
-    grid.style.display = 'none';
+    accordion.style.display = 'none';
+    if (grid) grid.style.display = 'none';
     if (empty) empty.style.display = 'none';
     return;
   }
 
   _buildWorksYearDropdown();
+  _refreshWorksYearButtons();
+  if (grid) grid.style.display = 'none';
 
-  // Map category string → tab key (handles old & new label variants)
+  // Map category string → tab key
   function _catToKey(cat) {
     const c = (cat||'').toLowerCase().replace(/[^a-z0-9]/g,'');
     if (c.includes('littlebig') || c.includes('littlebi')) return 'littlebigworld';
@@ -6406,8 +6501,7 @@ function renderWorks() {
     return w.artists.split(',').map(a=>a.trim()).includes(_worksArtist);
   });
 
-
-  // Sort: newest release_date first; no-date items use sheet row order (top = first shown)
+  // Sort: newest release_date first within each year
   const _origOrder = new Map(filtered.map((w, i) => [w.__backendId || w.rowNumber || i, i]));
   filtered = [...filtered].sort((a, b) => {
     const da = a.release_date || '';
@@ -6421,36 +6515,54 @@ function renderWorks() {
   });
 
   if (filtered.length === 0) {
-    grid.style.display = 'none';
+    accordion.style.display = 'none';
     if (empty) empty.style.display = 'block';
     return;
   }
   if (empty) empty.style.display = 'none';
-  grid.style.display = 'grid';
-  grid.innerHTML = '';
 
-  const frag = document.createDocumentFragment();
+  // Group by year, sorted descending (latest first)
+  const yearMap = {};
   filtered.forEach(w => {
+    const y = w.year || 'Unknown';
+    if (!yearMap[y]) yearMap[y] = [];
+    yearMap[y].push(w);
+  });
+  const years = Object.keys(yearMap).sort((a, b) => {
+    if (a === 'Unknown') return 1;
+    if (b === 'Unknown') return -1;
+    return Number(b) - Number(a);
+  });
+
+  // Default: open the latest year on first render
+  if (Object.keys(_worksAccOpen).length === 0 && years.length) {
+    _worksAccOpen[years[0]] = true;
+  }
+
+  // Responsive grid cols CSS
+  const gridCols = `
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:clamp(6px,1.2vw,14px);
+  `;
+
+  const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
+  const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
+
+  function buildCard(w) {
     const cat = CATEGORY_CONFIG[_catToKey(w.category)] || { label: w.category||'', icon: '', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' };
     const artistArr = w.artists ? w.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
-    const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
-    const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
     const mainColor = artistArr.length ? (artistColors[artistArr[0]] || '#64748b') : '#64748b';
     const grad = ({'#f97316':'linear-gradient(135deg,#fff7ed,#ffedd5)','#6b7280':'linear-gradient(135deg,#f9fafb,#f3f4f6)','#22c55e':'linear-gradient(135deg,#f0fdf4,#dcfce7)'})[mainColor] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
-
-    // Artist dots — same style as home page cards
     const artistLine = artistArr.map((a, i) => {
       const dot = artistColors[a] || '#64748b';
       const txt = artistTextColors[a] || '#64748b';
       const divider = i > 0 ? `<span style="width:1px;height:10px;background:#e5e7eb;display:inline-block;flex-shrink:0;"></span>` : '';
       return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
     }).join('');
-
-    // Thumbnail
     const thumb = w.image
       ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${escHtml(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="this.parentElement.style.background='${grad}'"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
-
     const card = document.createElement('div');
     card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:transform 0.18s,box-shadow 0.18s;';
     card.onmouseenter = () => { card.style.transform='translateY(-2px)'; card.style.boxShadow='0 6px 20px rgba(0,0,0,0.10)'; };
@@ -6462,9 +6574,63 @@ function renderWorks() {
         <div style="font-size:0.78rem;font-weight:700;color:#111;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
         <div><span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${cat.color};background:${cat.bg};border:1px solid ${cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span></div>
       </div>`;
-    frag.appendChild(card);
+    return card;
+  }
+
+  // Build accordion DOM
+  accordion.style.display = 'block';
+  accordion.innerHTML = '';
+  const accWrap = document.createElement('div');
+  accWrap.style.cssText = 'border:1px solid #f0f0f0;border-radius:16px;overflow:hidden;';
+
+  years.forEach((year, idx) => {
+    const works = yearMap[year];
+    const isOpen = !!_worksAccOpen[year];
+    const isLatest = idx === 0;
+    const isLast = idx === years.length - 1;
+
+    // Header
+    const header = document.createElement('div');
+    header.style.cssText = `
+      padding:14px 18px;
+      display:flex;justify-content:space-between;align-items:center;
+      cursor:pointer;user-select:none;
+      background:${isOpen ? '#f5f3ff' : '#fff'};
+      border-top:${idx > 0 ? '1px solid #f0f0f0' : 'none'};
+      transition:background 0.15s;
+    `;
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1rem;font-weight:800;color:${isOpen ? '#7e22ce' : '#6b7280'};">${escHtml(year)}</span>
+        <span style="font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:10px;background:${isOpen ? '#ede9fe' : '#f3f4f6'};color:${isOpen ? '#7e22ce' : '#9ca3af'};">${works.length} works</span>
+        ${isLatest ? `<span style="font-size:0.65rem;font-weight:700;padding:1px 8px;border-radius:8px;background:#ddd6fe;color:#6d28d9;">Latest</span>` : ''}
+      </div>
+      <svg style="transition:transform 0.2s;transform:${isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isOpen ? '#7e22ce' : '#9ca3af'}" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+    `;
+    header.onclick = () => _toggleWorksAcc(year);
+    header.onmouseenter = () => { if (!isOpen) header.style.background = '#fafaf8'; };
+    header.onmouseleave = () => { if (!isOpen) header.style.background = '#fff'; };
+
+    // Body
+    const body = document.createElement('div');
+    body.style.cssText = `
+      display:${isOpen ? 'block' : 'none'};
+      padding:12px 14px 16px;
+      border-top:1px solid #f0f0f0;
+      background:#fafaf8;
+    `;
+    const cardGrid = document.createElement('div');
+    cardGrid.style.cssText = gridCols;
+    // Responsive via inline media — use CSS class approach
+    cardGrid.className = 'works-year-grid';
+    works.forEach(w => cardGrid.appendChild(buildCard(w)));
+    body.appendChild(cardGrid);
+
+    accWrap.appendChild(header);
+    accWrap.appendChild(body);
   });
-  grid.appendChild(frag);
+
+  accordion.appendChild(accWrap);
   debounceLucide();
 }
 
