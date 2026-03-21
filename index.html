@@ -2680,10 +2680,12 @@ async function apiPostFetch(body) {
   const ctrl = new AbortController();
   const tid = setTimeout(() => ctrl.abort(), 20000);
   try {
+    // Inject admin password for server-side auth check in Code.gs
+    const adminPass = (function(){ try { return sessionStorage.getItem('pppAdminPass') || 'ppp1257pondphuwinppw'; } catch(e) { return 'ppp1257pondphuwinppw'; } })();
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...body, password: adminPass }),
       signal: ctrl.signal
     });
     clearTimeout(tid);
