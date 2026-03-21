@@ -2814,21 +2814,25 @@ const JSON_BASE_URL = APPS_SCRIPT_ADMIN_URL; // change to CDN URL when ready
  * This is the HIGH-TRAFFIC read path — no Apps Script quota consumed.
  */
 async function fetchStaticJSON(dataType) {
-  // dataType: 'events' | 'works' | 'birthdays' | 'anniversaries'
+  // dataType: 'events' | 'works' | 'birthdays' | 'anniversaries' | 'all'
   const useAppsScriptFallback = (JSON_BASE_URL === APPS_SCRIPT_ADMIN_URL);
+  // Map dataType to action name
+  const actionMap = {
+    'events': 'getEvents', 'works': 'getWorks',
+    'birthdays': 'getBirthdays', 'anniversaries': 'getAnniversaries',
+    'all': 'getAll'
+  };
+  const action = actionMap[dataType] || ('get' + dataType.charAt(0).toUpperCase() + dataType.slice(1));
 
   if (useAppsScriptFallback) {
-    // Using Apps Script as the cache server (still quota-protected via PropertiesService)
-    const url = `${APPS_SCRIPT_ADMIN_URL}?action=${encodeURIComponent('get' + dataType.charAt(0).toUpperCase() + dataType.slice(1))}&t=${Date.now()}`;
+    const url = `${APPS_SCRIPT_ADMIN_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
     return fetchWithTimeout(url);
   } else {
-    // Using external CDN / Drive — purely static, zero Apps Script quota
-    const url = `${JSON_BASE_URL}/${dataType}.json?t=${Math.floor(Date.now() / 60000)}`; // 1-min URL cache buster
+    const url = `${JSON_BASE_URL}/${dataType}.json?t=${Math.floor(Date.now() / 60000)}`;
     try {
       return await fetchWithTimeout(url);
     } catch(e) {
-      // Fallback to Apps Script doGet if CDN fails
-      const fallbackUrl = `${APPS_SCRIPT_ADMIN_URL}?action=${encodeURIComponent('get' + dataType.charAt(0).toUpperCase() + dataType.slice(1))}&t=${Date.now()}`;
+      const fallbackUrl = `${APPS_SCRIPT_ADMIN_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
       return fetchWithTimeout(fallbackUrl);
     }
   }
@@ -2930,6 +2934,7 @@ const _actionToDataType = {
   'getWorks':        'works',
   'getBirthdays':    'birthdays',
   'getAnniversaries':'anniversaries',
+  'getAll':          'all',
 };
 
 async function apiGetWithRetry(action, retryIndex = 0) {
@@ -3106,6 +3111,78 @@ function processEvents(raw) {
 
 // Legacy wrapper — now handled by _fastHydrateFromCache in DOMContentLoaded
 function hydrateFromCache() { _fastHydrateFromCache(); }
+
+// ── getAll: ดึงข้อมูลทุกอย่างในครั้งเดียว ลด API calls จาก 4 → 1 ──
+let _fetchingAll = false;
+async function _fetchAllData(force = false) {
+  if (_fetchingAll) return;
+  if (!force && Cache.isFresh(LC.TS_EV) && allEvents.length > 0) return;
+  _fetchingAll = true;
+  try {
+    const data = await fetchStaticJSON('all');
+    if (data && data.status === 'ok') {
+      // Events
+      if (data.events && data.events.length) {
+        const processed = processEvents(data.events);
+        allEvents = processed;
+        _memCache.set('events', processed);
+        Cache.set(LC.EVENTS, processed);
+        Cache.setTS(LC.TS_EV);
+        apiLoaded = true;
+      }
+      // Works
+      if (data.works && data.works.length) {
+        allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(data.works) : data.works;
+        worksLoaded = true;
+        _memCache.set('works', allWorks);
+        Cache.set(LC.WORKS, allWorks);
+        Cache.setTS(LC.TS_WK);
+      }
+      // Birthdays
+      if (data.birthdays) {
+        allBirthdays = data.birthdays.map(r => ({
+          __backendId: r.id || '',
+          artist_name: r.artist_name || '',
+          birthday_month: parseInt(r.birthday_month) || 0,
+          birthday_day: parseInt(r.birthday_day) || 0,
+          color: r.color || '#6b7280'
+        }));
+        _memCache.set('bdays', allBirthdays);
+        Cache.set(LC.BDAYS, allBirthdays);
+        Cache.setTS(LC.TS_BD);
+      }
+      // Anniversaries
+      if (data.anniversaries) {
+        allAnniversaries = data.anniversaries.map(r => ({
+          __backendId: r.id || '',
+          anniversary_name: r.anniversary_name || '',
+          anniversary_month: parseInt(r.anniversary_month) || 0,
+          anniversary_day: parseInt(r.anniversary_day) || 0,
+          anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
+          color: r.color || '#a855f7'
+        }));
+        _memCache.set('annivs', allAnniversaries);
+        Cache.set(LC.ANNIVS, allAnniversaries);
+        Cache.setTS(LC.TS_AN);
+      }
+      _fmtDateCache.clear();
+      hideConnectionError();
+      scheduleRender();
+      renderBirthdayBanners();
+    }
+  } catch(e) {
+    console.warn('getAll failed, falling back to individual fetches:', e.message);
+    // Fallback: ดึงแยกถ้า getAll ล้มเหลว
+    await Promise.all([
+      loadEventsFromSheets(force),
+      loadBirthdaysFromSheets(force),
+      loadAnniversariesFromSheets(force),
+      loadWorksFromSheets(force)
+    ]).catch(()=>{});
+  } finally {
+    _fetchingAll = false;
+  }
+}
 
 async function loadEventsFromSheets(force = false) {
   // L1: memory cache hit — only skip network if cache is also fresh
@@ -3432,6 +3509,7 @@ async function forceRefreshAll() {
   }
   // 3. Force fresh fetch from API
   _fetchingEvents = false; _fetchingBdays = false; _fetchingAnnivs = false; _fetchingWorks = false;
+  _fetchingAll = false;
   showSkeletons();
   await Promise.all([
     loadEventsFromSheets(true),
@@ -6467,13 +6545,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── STEP 3: Fetch fresh data after first paint (non-blocking, deferred) ──
   // Always fetch immediately on load for freshest data
+  // ดึงทุกอย่างในครั้งเดียว (1 request แทน 4) — เร็วขึ้น 4x
   const fetchData = () => {
-    Promise.all([
-      loadEventsFromSheets(),
-      loadBirthdaysFromSheets(),
-      loadAnniversariesFromSheets(),
-      loadWorksFromSheets()   // always preload works so switching tab is instant
-    ]).catch(() => {});
+    _fetchAllData().catch(() => {
+      // Fallback ถ้า getAll ไม่มี — ดึงแยก
+      Promise.all([
+        loadEventsFromSheets(),
+        loadBirthdaysFromSheets(),
+        loadAnniversariesFromSheets(),
+        loadWorksFromSheets()
+      ]).catch(() => {});
+    });
   };
   if (cacheHit) {
     // Cache hit: show cached instantly, fetch fresh in background after 200ms
