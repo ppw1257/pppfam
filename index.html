@@ -6545,17 +6545,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── STEP 3: Fetch fresh data after first paint (non-blocking, deferred) ──
   // Always fetch immediately on load for freshest data
-  // ดึงทุกอย่างในครั้งเดียว (1 request แทน 4) — เร็วขึ้น 4x
   const fetchData = () => {
-    _fetchAllData().catch(() => {
-      // Fallback ถ้า getAll ไม่มี — ดึงแยก
-      Promise.all([
-        loadEventsFromSheets(),
-        loadBirthdaysFromSheets(),
-        loadAnniversariesFromSheets(),
-        loadWorksFromSheets()
-      ]).catch(() => {});
-    });
+    Promise.all([
+      loadEventsFromSheets(),
+      loadBirthdaysFromSheets(),
+      loadAnniversariesFromSheets(),
+      loadWorksFromSheets()
+    ]).catch(() => {});
   };
   if (cacheHit) {
     // Cache hit: show cached instantly, fetch fresh in background after 200ms
