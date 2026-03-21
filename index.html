@@ -2857,7 +2857,7 @@ const APPS_SCRIPT_ADMIN_URL = 'https://script.google.com/macros/s/AKfycbwOqV8FAz
 // Base URL where your JSON files are served (used for READ operations)
 // If using Apps Script doGet as fallback: set same as APPS_SCRIPT_ADMIN_URL
 // If using Drive/CDN: set to the folder/base path URL
-const JSON_BASE_URL = '/data'; // static JSON served from Cloudflare CDN
+const JSON_BASE_URL = APPS_SCRIPT_ADMIN_URL; // temporary: revert to Apps Script while export is not ready
 
 // ── STATIC JSON FETCH HELPERS ─────────────────────────────────────
 
