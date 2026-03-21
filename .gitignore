@@ -1,0 +1,18 @@
+# Node
+node_modules/
+.npm
+
+# Wrangler
+.wrangler/
+.dev.vars
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
