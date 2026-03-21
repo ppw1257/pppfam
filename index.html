@@ -6452,9 +6452,13 @@ function renderWorks() {
       section.appendChild(header);
       // Grid per year
       const yearGrid = document.createElement('div');
-      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(6px,1.5vw,12px);';
-      if (window.innerWidth <= 600) yearGrid.style.gridTemplateColumns = 'repeat(2,1fr)';
-      if (window.innerWidth <= 360) yearGrid.style.gridTemplateColumns = '1fr';
+      // คอลัมน์ตามขนาดหน้าจอ
+      let cols = 6;
+      if (window.innerWidth <= 1100) cols = 5;
+      if (window.innerWidth <= 900) cols = 4;
+      if (window.innerWidth <= 600) cols = 3;
+      if (window.innerWidth <= 400) cols = 2;
+      yearGrid.style.cssText = `display:grid;grid-template-columns:repeat(${cols},1fr);gap:clamp(6px,1vw,10px);`;
       byYear[yr].forEach(w => _renderWorkCard(w, yearGrid, _catToKey));
       section.appendChild(yearGrid);
       container.appendChild(section);
