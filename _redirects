@@ -1,4 +1,0 @@
-# Cloudflare Workers / Pages — Redirects
-# ทุก URL ให้ชี้กลับมาที่ index.html (SPA routing)
-
-/*    /index.html    200
