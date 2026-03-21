@@ -1131,6 +1131,58 @@
   /* ── ป้องกัน overflow ทุกที่ ── */
   * { box-sizing: border-box; }
   img { max-width: 100%; height: auto; }
+
+  /* ══ Works grid: 6 col desktop, responsive ══ */
+  #works-grid, #works-loading, .works-year-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: clamp(6px, 1vw, 10px) !important;
+  }
+  @media (max-width: 1100px) { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(5, 1fr) !important; } }
+  @media (max-width: 900px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+  @media (max-width: 600px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; } }
+  @media (max-width: 400px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; } }
+
+  /* ══ Works filter tabs: wrap บนมือถือ ══ */
+  #works-tabs {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    gap: 5px !important;
+    row-gap: 5px !important;
+  }
+  @media (min-width: 768px) {
+    #works-tabs {
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      scrollbar-width: none !important;
+    }
+    #works-tabs::-webkit-scrollbar { display: none !important; }
+  }
+
+  /* ══ Calendar card grid: auto-fill responsive ══ */
+  #cal-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  /* ══ Home cards grid: 5 col desktop ══ */
+  .cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: clamp(6px, 1vw, 14px) !important;
+    align-items: stretch;
+  }
+  @media (max-width: 1100px) { .cards-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+  @media (max-width: 800px)  { .cards-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+  @media (max-width: 600px)  { .cards-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+  @media (max-width: 400px)  { .cards-grid { grid-template-columns: 1fr !important; } }
+
+  /* ══ Card image fluid ══ */
+  .card-img-wrap { height: clamp(100px, 12vw, 180px) !important; }
+  .cal-ev-card-img { height: 120px; }
+
+  /* ══ Never overflow ══ */
+  body, #app { overflow-x: hidden !important; }
+  * { box-sizing: border-box; }
   </style>
  </head>
  <body>
@@ -1381,10 +1433,7 @@
      <!-- Header — same structure as home page -->
      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.25rem;">
       <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#111;margin:0;">Works</h2>
-      <div style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;">
-       <select id="works-year-select" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1.5px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;font-family:inherit;"></select>
-       <svg style="position:absolute;right:8px;pointer-events:none;" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
+      <div style="display:none;"><select id="works-year-select" style="display:none;" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1.5px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;font-family:inherit;"></select></div>
      </div>
 
      <!-- Filter bars — same structure as home page -->
@@ -1415,7 +1464,7 @@
      </div>
 
      <!-- Content -->
-     <div id="works-grid" style="display:none;grid-template-columns:repeat(auto-fill,minmax(clamp(130px,15vw,200px),1fr));gap:clamp(6px,1.2vw,12px);align-items:stretch;"></div>
+     <div id="works-grid" style="display:none;align-items:stretch;"></div>
      <div id="works-empty" style="display:none;padding:3rem 1rem;">
       <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
        <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1.5px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
@@ -1430,7 +1479,7 @@
        </div>
       </div>
      </div>
-     <div id="works-loading" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(130px,15vw,200px),1fr));gap:0 8px;">
+     <div id="works-loading" style="display:grid;gap:0 8px;">
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:90%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:55%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;"></div></div></div></div>
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:80%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;"></div></div></div></div>
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:85%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:45%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px;"></div></div></div></div>
@@ -2305,7 +2354,7 @@ async function hashPassword(pw) {
 }
 
 // ── PERFORMANCE CONFIG ────────────────────────────────────────────
-const CACHE_VERSION    = 'ppp_v14'; // bumped: responsive + instant load update
+const CACHE_VERSION    = 'ppp_v15'; // bumped: responsive + instant load update
 const CACHE_TTL_MS     = 5 * 60 * 1000;         // 5 min — matches Apps Script cache regeneration trigger
 const CACHE_MAX_AGE_MS = 168 * 60 * 60 * 1000;  // 7 days — always show stale data if offline, never blank
 const FETCH_TIMEOUT_MS = 6000;
@@ -6446,10 +6495,11 @@ function renderWorks() {
       return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
     }).join('');
 
-    // Thumbnail
+    // Thumbnail + ปีบนการ์ด
+    const yearBadge = w.year ? `<span style="position:absolute;top:5px;right:5px;background:rgba(0,0,0,0.5);color:#fff;font-size:0.6rem;font-weight:700;padding:2px 6px;border-radius:4px;z-index:2;">${escHtml(w.year)}</span>` : '';
     const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${escHtml(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="this.parentElement.style.background='${grad}'"></div>`
-      : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
+      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${yearBadge}<img src="${escHtml(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="this.parentElement.style.background='${grad}'"></div>`
+      : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">${yearBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
 
     const card = document.createElement('div');
     card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:transform 0.18s,box-shadow 0.18s;';
