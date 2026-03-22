@@ -2857,7 +2857,7 @@ const APPS_SCRIPT_ADMIN_URL = 'https://script.google.com/macros/s/AKfycbwOqV8FAz
 // Base URL where your JSON files are served (used for READ operations)
 // If using Apps Script doGet as fallback: set same as APPS_SCRIPT_ADMIN_URL
 // If using Drive/CDN: set to the folder/base path URL
-const JSON_BASE_URL = APPS_SCRIPT_ADMIN_URL; // temporary: revert to Apps Script while export is not ready
+const JSON_BASE_URL = 'https://ppw1257.github.io/pppfam/data'; // GitHub Pages static JSON
 
 // ── STATIC JSON FETCH HELPERS ─────────────────────────────────────
 
@@ -3165,67 +3165,76 @@ function processEvents(raw) {
 // Legacy wrapper — now handled by _fastHydrateFromCache in DOMContentLoaded
 function hydrateFromCache() { _fastHydrateFromCache(); }
 
-// ── getAll: ดึงข้อมูลทุกอย่างในครั้งเดียว ลด API calls จาก 4 → 1 ──
+// ── getAll: fetch 4 ไฟล์จาก GitHub Pages แบบ parallel ──
 let _fetchingAll = false;
 async function _fetchAllData(force = false) {
   if (_fetchingAll) return;
-  if (!force && Cache.isFresh(LC.TS_EV) && allEvents.length > 0) return;
+  if (!force && Cache.isFresh(LC.TS_EV) && Cache.isFresh(LC.TS_WK) && allEvents.length > 0 && allWorks.length > 0) return;
   _fetchingAll = true;
   try {
-    const data = await fetchStaticJSON('all');
-    if (data && data.status === 'ok') {
-      // Events
-      if (data.events && data.events.length) {
-        const processed = processEvents(data.events);
-        allEvents = processed;
-        _memCache.set('events', processed);
-        Cache.set(LC.EVENTS, processed);
-        Cache.setTS(LC.TS_EV);
-        apiLoaded = true;
-      }
-      // Works
-      if (data.works && data.works.length) {
-        allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(data.works) : data.works;
-        worksLoaded = true;
-        _memCache.set('works', allWorks);
-        Cache.set(LC.WORKS, allWorks);
-        Cache.setTS(LC.TS_WK);
-      }
-      // Birthdays
-      if (data.birthdays) {
-        allBirthdays = data.birthdays.map(r => ({
-          __backendId: r.id || '',
-          artist_name: r.artist_name || '',
-          birthday_month: parseInt(r.birthday_month) || 0,
-          birthday_day: parseInt(r.birthday_day) || 0,
-          color: r.color || '#6b7280'
-        }));
-        _memCache.set('bdays', allBirthdays);
-        Cache.set(LC.BDAYS, allBirthdays);
-        Cache.setTS(LC.TS_BD);
-      }
-      // Anniversaries
-      if (data.anniversaries) {
-        allAnniversaries = data.anniversaries.map(r => ({
-          __backendId: r.id || '',
-          anniversary_name: r.anniversary_name || '',
-          anniversary_month: parseInt(r.anniversary_month) || 0,
-          anniversary_day: parseInt(r.anniversary_day) || 0,
-          anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
-          color: r.color || '#a855f7'
-        }));
-        _memCache.set('annivs', allAnniversaries);
-        Cache.set(LC.ANNIVS, allAnniversaries);
-        Cache.setTS(LC.TS_AN);
-      }
-      _fmtDateCache.clear();
-      hideConnectionError();
-      scheduleRender();
-      renderBirthdayBanners();
+    const t = Math.floor(Date.now() / 60000);
+    const base = JSON_BASE_URL;
+    const [evRes, wkRes, bdRes, anRes] = await Promise.all([
+      fetchWithTimeout(`${base}/events.json?t=${t}`),
+      fetchWithTimeout(`${base}/works.json?t=${t}`),
+      fetchWithTimeout(`${base}/birthdays.json?t=${t}`),
+      fetchWithTimeout(`${base}/anniversaries.json?t=${t}`),
+    ]);
+    // Events
+    const evData = evRes.events || evRes;
+    if (Array.isArray(evData) && evData.length) {
+      const processed = processEvents(evData);
+      allEvents = processed;
+      _memCache.set('events', processed);
+      Cache.set(LC.EVENTS, processed);
+      Cache.setTS(LC.TS_EV);
+      apiLoaded = true;
     }
+    // Works
+    const wkData = wkRes.works || wkRes;
+    if (Array.isArray(wkData) && wkData.length) {
+      allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      worksLoaded = true;
+      _memCache.set('works', allWorks);
+      Cache.set(LC.WORKS, allWorks);
+      Cache.setTS(LC.TS_WK);
+    }
+    // Birthdays
+    const bdData = bdRes.birthdays || bdRes;
+    if (Array.isArray(bdData)) {
+      allBirthdays = bdData.map(r => ({
+        __backendId: r.id || '',
+        artist_name: r.artist_name || '',
+        birthday_month: parseInt(r.birthday_month) || 0,
+        birthday_day: parseInt(r.birthday_day) || 0,
+        color: r.color || '#6b7280'
+      }));
+      _memCache.set('bdays', allBirthdays);
+      Cache.set(LC.BDAYS, allBirthdays);
+      Cache.setTS(LC.TS_BD);
+    }
+    // Anniversaries
+    const anData = anRes.anniversaries || anRes;
+    if (Array.isArray(anData)) {
+      allAnniversaries = anData.map(r => ({
+        __backendId: r.id || '',
+        anniversary_name: r.anniversary_name || '',
+        anniversary_month: parseInt(r.anniversary_month) || 0,
+        anniversary_day: parseInt(r.anniversary_day) || 0,
+        anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
+        color: r.color || '#a855f7'
+      }));
+      _memCache.set('annivs', allAnniversaries);
+      Cache.set(LC.ANNIVS, allAnniversaries);
+      Cache.setTS(LC.TS_AN);
+    }
+    _fmtDateCache.clear();
+    hideConnectionError();
+    scheduleRender();
+    renderBirthdayBanners();
+    _scheduleEventStartTimers();
   } catch(e) {
-    console.warn('getAll failed, falling back to individual fetches:', e.message);
-    // Fallback: ดึงแยกถ้า getAll ล้มเหลว
+    console.warn('GitHub fetch failed, falling back to Apps Script:', e.message);
     await Promise.all([
       loadEventsFromSheets(force),
       loadBirthdaysFromSheets(force),
@@ -3271,6 +3280,7 @@ async function loadEventsFromSheets(force = false) {
       _escCache.clear();
       hideConnectionError();
       scheduleRender();
+      _scheduleEventStartTimers();
     }
   } catch(e) {
     console.warn('Events load failed:', e.message);
@@ -3411,6 +3421,82 @@ function scheduleAutoRefresh() {
       loadWorksFromSheets().catch(() => {});
     }
   }, 60 * 1000 + jitter); // check every 60s, fetch only if stale
+
+  // ── Precise midnight timer: fires exactly at 00:00:00 BKK ──
+  _scheduleMidnightTimer();
+
+  // ── Precise event-start timers: fires exactly when each event starts ──
+  _scheduleEventStartTimers();
+}
+
+function _scheduleMidnightTimer() {
+  if (window._midnightTimer) clearTimeout(window._midnightTimer);
+  // คำนวณ ms จนถึง midnight BKK (GMT+7) ด้วย offset math ตรงๆ (แม่นยำกว่า toLocaleString)
+  const nowMs = Date.now();
+  const BKK_OFFSET_MS = 7 * 60 * 60 * 1000;
+  const bkkMsIntoDay = (nowMs + BKK_OFFSET_MS) % (24 * 60 * 60 * 1000);
+  const msUntilMidnight = (24 * 60 * 60 * 1000) - bkkMsIntoDay;
+  window._midnightTimer = setTimeout(() => {
+    // Flush today-string cache ก่อน เพื่อให้ isEventPast() ใช้วันใหม่ทันที
+    _todayStrCache = '';
+    _todayStrDate  = 0;
+    try {
+      localStorage.removeItem(CACHE_VERSION + '_ts_events');
+      localStorage.removeItem(CACHE_VERSION + '_ts_works');
+    } catch(_) {}
+    _refreshIsPast();
+    _scheduleEventStartTimers(); // re-schedule timers สำหรับงานวันใหม่
+    scheduleRender();
+    renderBirthdayBanners();
+    Promise.all([
+      loadEventsFromSheets(true),
+      loadBirthdaysFromSheets(true),
+      loadAnniversariesFromSheets(true),
+    ]).catch(() => {});
+    _scheduleMidnightTimer();
+  }, msUntilMidnight + 50); // +50ms buffer ให้แน่ใจว่าผ่านเที่ยงคืนแล้ว
+}
+
+function _scheduleEventStartTimers() {
+  // Clear any existing event-start timers
+  if (window._eventStartTimers) {
+    window._eventStartTimers.forEach(t => clearTimeout(t));
+  }
+  window._eventStartTimers = [];
+  if (!allEvents || !allEvents.length) return;
+  const nowMs = Date.now();
+  const BKK_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+  allEvents.forEach(ev => {
+    if (!ev.dateStart || ev._isPast) return;
+
+    let targetMs;
+    if (ev.startTime) {
+      // มี startTime → ยิงตอนงานเริ่มพอดี
+      const target = _parseEventTarget(ev.dateStart, ev.startTime);
+      if (isNaN(target.getTime())) return;
+      targetMs = target.getTime();
+    } else {
+      // ไม่มี startTime → ยิงตอน midnight BKK ของวันนั้น
+      const dateParts = ev.dateStart.split('-').map(Number);
+      targetMs = Date.UTC(dateParts[0], dateParts[1]-1, dateParts[2]) - BKK_OFFSET_MS;
+    }
+
+    const ms = targetMs - nowMs;
+    if (ms <= 0) return; // already past
+
+    const t = setTimeout(() => {
+      // Flush today-string cache ก่อนเสมอ
+      _todayStrCache = '';
+      _todayStrDate  = 0;
+      // Re-compute _isPast ทุก event พร้อมกัน
+      _refreshIsPast();
+      // Re-schedule timers ใหม่สำหรับงานที่ยังเหลือ
+      _scheduleEventStartTimers();
+      scheduleRender();
+    }, ms);
+    window._eventStartTimers.push(t);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -3462,7 +3548,7 @@ let _todayStrCache = '';
 let _todayStrDate  = 0;
 function _getTodayStr() {
   const now = Date.now();
-  if (now - _todayStrDate > 60000) {
+  if (now - _todayStrDate > 5000) { // ลดจาก 60s → 5s
     _todayStrCache = _todayInBKK();
     _todayStrDate  = now;
   }
@@ -4206,9 +4292,7 @@ function buildDateBadge(ev, color) {
 // NOTE: for rendering use ev._daysUntil when available (precomputed in processEvents)
 function _todayInBKK() {
   // Returns "YYYY-MM-DD" in GMT+7 regardless of viewer's local timezone
-  const now = new Date();
-  const bkk = new Date(now.getTime() + (7 * 3600000) + now.getTimezoneOffset() * 60000);
-  return bkk.toISOString().slice(0, 10);
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' });
 }
 function daysUntilEvent(dateStr) {
   if (!dateStr) return null;
@@ -4245,7 +4329,7 @@ function buildCountdownImgBadge(ev, inline = false) {
   if (!ev.dateStart) return '';
   if (isEventPast(ev)) return '';
   const days = daysUntilEvent(ev.dateStart);
-  if (days === null || days < 0 || days > 7 || days <= 1) return '';
+  if (days === null || days < 0 || days > 7) return '';
   const styles = [
     'background:linear-gradient(135deg,#ef4444,#f97316);',   // TODAY
     'background:linear-gradient(135deg,#f97316,#fbbf24);',   // 1 DAY
