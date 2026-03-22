@@ -43,18 +43,12 @@
     // bfcache fix — when user navigates back/forward, always refresh data
     window.addEventListener('pageshow', function(e) {
       if (e.persisted) {
-        if (typeof loadEventsFromSheets === 'function') {
-          // Invalidate timestamps so fresh data is fetched
+        if (typeof _fetchAllData === 'function') {
           try {
             localStorage.removeItem(CACHE_VERSION + '_ts_events');
             localStorage.removeItem(CACHE_VERSION + '_ts_works');
           } catch(_) {}
-          Promise.all([
-            loadEventsFromSheets(true),
-            loadBirthdaysFromSheets(true),
-            loadAnniversariesFromSheets(true),
-            loadWorksFromSheets(true)
-          ]).catch(() => {});
+          _fetchAllData(true).catch(() => {});
         } else {
           window.location.reload();
         }
@@ -3409,18 +3403,13 @@ async function deleteAnniversaryInSheets(id) {
 // ═══════════════════════════════════════════════════════════════════
 function scheduleAutoRefresh() {
   clearInterval(_refreshTimer);
-  const jitter = Math.random() * 3000; // 0–3s jitter to avoid thundering herd
+  const jitter = Math.random() * 5000;
   _refreshTimer = setInterval(() => {
-    if (document.hidden) return; // don't fetch when tab is hidden
-    if (!Cache.isFresh(LC.TS_EV) && !_fetchingEvents) {
-      loadEventsFromSheets().catch(() => {});
-      loadBirthdaysFromSheets().catch(() => {});
-      loadAnniversariesFromSheets().catch(() => {});
+    if (document.hidden) return;
+    if (!Cache.isFresh(LC.TS_EV) && !_fetchingAll) {
+      _fetchAllData(false).catch(() => {});
     }
-    if (!Cache.isFresh(LC.TS_WK) && !_fetchingWorks) {
-      loadWorksFromSheets().catch(() => {});
-    }
-  }, 60 * 1000 + jitter); // check every 60s, fetch only if stale
+  }, 5 * 60 * 1000 + jitter); // ทุก 5 นาที ตรงกับ cache TTL
 
   // ── Precise midnight timer: fires exactly at 00:00:00 BKK ──
   _scheduleMidnightTimer();
@@ -5008,11 +4997,8 @@ function renderCalendarCardGrid(monthEvents) {
   if (noEv) noEv.style.display = 'none';
 
   const todayStr = _todayInBKK();
-  const CAL_PAGE = 50;
-  const firstBatch = eventsToShow.slice(0, CAL_PAGE);
-  const remaining  = eventsToShow.slice(CAL_PAGE);
-
-  grid.innerHTML = firstBatch.map(ev => {
+  // ✅ render ทุก event ในครั้งเดียว ใช้ content-visibility:auto แทน batch
+  grid.innerHTML = eventsToShow.map(ev => {
     const color = getArtistColor(ev.artists);
     const past = isEventPast(ev);
     const days2 = daysUntilEvent(ev.dateStart);
@@ -5047,7 +5033,7 @@ function renderCalendarCardGrid(monthEvents) {
     const imgThumb = ev.image
       ? `<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;flex-shrink:0;" onerror="this.style.display='none'">`
       : `<div style="width:72px;height:72px;border-radius:10px;flex-shrink:0;background:${grad};display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>`;
-    return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;contain:layout style;" onclick="openDetailModal('${ev.__backendId}')" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'">
+    return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;content-visibility:auto;contain-intrinsic-size:0 90px;" onclick="openDetailModal('${ev.__backendId}')" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'">
       <div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
       <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}${badge?`<span style="margin-left:auto;">${badge}</span>`:''}</div>
@@ -5062,35 +5048,8 @@ function renderCalendarCardGrid(monthEvents) {
     </div>`;
   }).join('');
 
-  // Append remaining items if any (avoids blocking main thread for huge lists)
-  if (remaining.length > 0) {
-    requestAnimationFrame(() => {
-      const moreHtml = remaining.map(ev => {
-        const color = getArtistColor(ev.artists);
-        const past = isEventPast(ev);
-        const calDays = daysUntilEvent(ev.dateStart);
-        const calIsToday = calDays === 0 && !isEventPast(ev);
-        const grad = ({'#f97316':'linear-gradient(135deg,#fff7ed,#ffedd5)','#6b7280':'linear-gradient(135deg,#f9fafb,#f3f4f6)','#22c55e':'linear-gradient(135deg,#f0fdf4,#dcfce7)','#a855f7':'linear-gradient(135deg,#faf5ff,#f3e8ff)','#3b82f6':'linear-gradient(135deg,#eff6ff,#dbeafe)','#ef4444':'linear-gradient(135deg,#fef2f2,#fee2e2)','#ec4899':'linear-gradient(135deg,#fdf2f8,#fce7f3)'})[color] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
-        const artistArr = ev.artists ? ev.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
-        const artistDots = artistArr.map(a => { const ac = getArtistColor(a); return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.6rem;font-weight:700;color:${past?'#9ca3af':ac};"><span style="width:5px;height:5px;border-radius:50%;background:${past?'#d1d5db':ac};display:inline-block;"></span>${a}</span>`; }).join('<span style="color:#e5e7eb;margin:0 2px;">·</span>');
-        const loc = [ev.location, ev.city].filter(Boolean).join(', ');
-        return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;contain:layout style;" onclick="openDetailModal('${ev.__backendId}')" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'">
-          <div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
-          <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
-            <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}</div>
-            <div style="font-size:0.85rem;font-weight:700;color:${past?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div>
-            <div style="font-size:0.68rem;color:#9ca3af;margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;">${ev.dateStart?`<span>${fmtDate(ev.dateStart)}</span>`:''}${ev.startTime?`<span style="color:#d1d5db;">·</span><span>${fmtTime(ev.startTime)}</span>`:''}${loc?`<span style="color:#d1d5db;">·</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(loc)}</span>`:''}</div>
-          </div>
-        </div>`;
-      }).join('');
-      grid.insertAdjacentHTML('beforeend', moreHtml);
-      _observeLazyImages(grid);
-    });
-  }
   // ── Start live countdown tickers for calendar cards ──
   startCardCountdowns();
-  // ── Lazy load images in calendar cards ──
-  _observeLazyImages(grid);
 }
 
 function scrollToEventCard(dateStr) {
@@ -6250,23 +6209,30 @@ async function loadWorksFromSheets(force = false) {
   if (!force && Cache.isFresh(LC.TS_WK) && allWorks.length > 0) return;
   if (_fetchingWorks) return;
   _fetchingWorks = true;
-  const _processWorks = (res) => {
-    if (res && res.status === 'ok' && res.works) {
-      allWorks = _ensureWorksBackendId(res.works.filter(w => w.title));
+  try {
+    const t = Math.floor(Date.now() / 60000);
+    const res = await fetchWithTimeout(`${JSON_BASE_URL}/works.json?t=${t}`);
+    const raw = res.works || res;
+    if (Array.isArray(raw) && raw.length) {
+      allWorks = _ensureWorksBackendId(raw.filter(w => w.title));
       worksLoaded = true;
       _memCache.set('works', allWorks);
       Cache.set(LC.WORKS, allWorks);
       Cache.setTS(LC.TS_WK);
       if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
     }
-  };
-  try {
-    const res = await fetchWithTimeout(API_URL + '?action=getWorks&t=' + Date.now());
-    _processWorks(res);
   } catch(e) {
+    // Fallback to Apps Script if GitHub fails
     try {
-      const res = await fetchJSONP(API_URL + '?action=getWorks&t=' + Date.now());
-      _processWorks(res);
+      const res = await fetchWithTimeout(API_URL + '?action=getWorks&t=' + Date.now());
+      if (res && res.works) {
+        allWorks = _ensureWorksBackendId(res.works.filter(w => w.title));
+        worksLoaded = true;
+        _memCache.set('works', allWorks);
+        Cache.set(LC.WORKS, allWorks);
+        Cache.setTS(LC.TS_WK);
+        if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
+      }
     } catch(e2) { console.warn('Works load failed:', e2.message); }
   } finally { _fetchingWorks = false; }
 }
@@ -6632,7 +6598,7 @@ function renderWorks() {
       ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${escHtml(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="this.parentElement.style.background='${grad}'"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
-    card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:transform 0.18s,box-shadow 0.18s;';
+    card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:transform 0.18s,box-shadow 0.18s;content-visibility:auto;contain-intrinsic-size:0 220px;';
     card.onmouseenter = () => { card.style.transform='translateY(-2px)'; card.style.boxShadow='0 6px 20px rgba(0,0,0,0.10)'; };
     card.onmouseleave = () => { card.style.transform=''; card.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)'; };
     if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
@@ -6728,13 +6694,8 @@ document.addEventListener('visibilitychange', () => {
     const age = Date.now() - Cache.getTS(LC.TS_EV);
     const evStale = age > 60000; // refresh if older than 1 minute
     const wkStale = !Cache.isFresh(LC.TS_WK);
-    if (evStale) {
-      loadEventsFromSheets(true).catch(()=>{});
-      loadBirthdaysFromSheets(true).catch(()=>{});
-      loadAnniversariesFromSheets(true).catch(()=>{});
-    }
-    if (wkStale && !_fetchingWorks) {
-      loadWorksFromSheets(true).catch(()=>{});
+    if (evStale && !_fetchingAll) {
+      _fetchAllData(true).catch(()=>{});
     }
   }
 });
@@ -6780,29 +6741,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ── STEP 3: Fetch fresh data after first paint (non-blocking, deferred) ──
-  // Always fetch immediately on load for freshest data
-  const fetchData = () => {
-    Promise.all([
-      loadEventsFromSheets(),
-      loadBirthdaysFromSheets(),
-      loadAnniversariesFromSheets(),
-      loadWorksFromSheets()
-    ]).catch(() => {});
-  };
+  // ── STEP 3: Fetch fresh data — 1 request (all.json parallel fetch) ──
+  const fetchData = (force = false) => _fetchAllData(force).catch(() => {});
   if (cacheHit) {
-    // Cache hit: show cached instantly, fetch fresh in background after 200ms
-    setTimeout(fetchData, 200);
+    setTimeout(() => fetchData(false), 300);
   } else {
-    // No cache: show skeletons briefly, fetch immediately
     showSkeletons();
     debounceLucide();
-    fetchData();
+    fetchData(false);
   }
-  // Always schedule a background refresh 30s after load
-  setTimeout(() => {
-    if (!document.hidden) fetchData();
-  }, 30000);
+  setTimeout(() => { if (!document.hidden) fetchData(false); }, 45000);
 
   // ── STEP 4: Schedule recurring 5-minute background refresh ──
   scheduleAutoRefresh();
