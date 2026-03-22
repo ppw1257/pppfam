@@ -43,18 +43,12 @@
     // bfcache fix — when user navigates back/forward, always refresh data
     window.addEventListener('pageshow', function(e) {
       if (e.persisted) {
-        if (typeof loadEventsFromSheets === 'function') {
-          // Invalidate timestamps so fresh data is fetched
+        if (typeof _fetchAllData === 'function') {
           try {
             localStorage.removeItem(CACHE_VERSION + '_ts_events');
             localStorage.removeItem(CACHE_VERSION + '_ts_works');
           } catch(_) {}
-          Promise.all([
-            loadEventsFromSheets(true),
-            loadBirthdaysFromSheets(true),
-            loadAnniversariesFromSheets(true),
-            loadWorksFromSheets(true)
-          ]).catch(() => {});
+          _fetchAllData(true).catch(() => {});
         } else {
           window.location.reload();
         }
@@ -2857,7 +2851,7 @@ const APPS_SCRIPT_ADMIN_URL = 'https://script.google.com/macros/s/AKfycbwOqV8FAz
 // Base URL where your JSON files are served (used for READ operations)
 // If using Apps Script doGet as fallback: set same as APPS_SCRIPT_ADMIN_URL
 // If using Drive/CDN: set to the folder/base path URL
-const JSON_BASE_URL = '/data'; // static JSON served from Cloudflare CDN
+const JSON_BASE_URL = 'https://ppw1257.github.io/pppfam/data'; // GitHub Pages static JSON
 
 // ── STATIC JSON FETCH HELPERS ─────────────────────────────────────
 
@@ -3165,67 +3159,76 @@ function processEvents(raw) {
 // Legacy wrapper — now handled by _fastHydrateFromCache in DOMContentLoaded
 function hydrateFromCache() { _fastHydrateFromCache(); }
 
-// ── getAll: ดึงข้อมูลทุกอย่างในครั้งเดียว ลด API calls จาก 4 → 1 ──
+// ── getAll: fetch 4 ไฟล์จาก GitHub Pages แบบ parallel ──
 let _fetchingAll = false;
 async function _fetchAllData(force = false) {
   if (_fetchingAll) return;
-  if (!force && Cache.isFresh(LC.TS_EV) && allEvents.length > 0) return;
+  if (!force && Cache.isFresh(LC.TS_EV) && Cache.isFresh(LC.TS_WK) && allEvents.length > 0 && allWorks.length > 0) return;
   _fetchingAll = true;
   try {
-    const data = await fetchStaticJSON('all');
-    if (data && data.status === 'ok') {
-      // Events
-      if (data.events && data.events.length) {
-        const processed = processEvents(data.events);
-        allEvents = processed;
-        _memCache.set('events', processed);
-        Cache.set(LC.EVENTS, processed);
-        Cache.setTS(LC.TS_EV);
-        apiLoaded = true;
-      }
-      // Works
-      if (data.works && data.works.length) {
-        allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(data.works) : data.works;
-        worksLoaded = true;
-        _memCache.set('works', allWorks);
-        Cache.set(LC.WORKS, allWorks);
-        Cache.setTS(LC.TS_WK);
-      }
-      // Birthdays
-      if (data.birthdays) {
-        allBirthdays = data.birthdays.map(r => ({
-          __backendId: r.id || '',
-          artist_name: r.artist_name || '',
-          birthday_month: parseInt(r.birthday_month) || 0,
-          birthday_day: parseInt(r.birthday_day) || 0,
-          color: r.color || '#6b7280'
-        }));
-        _memCache.set('bdays', allBirthdays);
-        Cache.set(LC.BDAYS, allBirthdays);
-        Cache.setTS(LC.TS_BD);
-      }
-      // Anniversaries
-      if (data.anniversaries) {
-        allAnniversaries = data.anniversaries.map(r => ({
-          __backendId: r.id || '',
-          anniversary_name: r.anniversary_name || '',
-          anniversary_month: parseInt(r.anniversary_month) || 0,
-          anniversary_day: parseInt(r.anniversary_day) || 0,
-          anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
-          color: r.color || '#a855f7'
-        }));
-        _memCache.set('annivs', allAnniversaries);
-        Cache.set(LC.ANNIVS, allAnniversaries);
-        Cache.setTS(LC.TS_AN);
-      }
-      _fmtDateCache.clear();
-      hideConnectionError();
-      scheduleRender();
-      renderBirthdayBanners();
+    const t = Math.floor(Date.now() / 60000);
+    const base = JSON_BASE_URL;
+    const [evRes, wkRes, bdRes, anRes] = await Promise.all([
+      fetchWithTimeout(`${base}/events.json?t=${t}`),
+      fetchWithTimeout(`${base}/works.json?t=${t}`),
+      fetchWithTimeout(`${base}/birthdays.json?t=${t}`),
+      fetchWithTimeout(`${base}/anniversaries.json?t=${t}`),
+    ]);
+    // Events
+    const evData = evRes.events || evRes;
+    if (Array.isArray(evData) && evData.length) {
+      const processed = processEvents(evData);
+      allEvents = processed;
+      _memCache.set('events', processed);
+      Cache.set(LC.EVENTS, processed);
+      Cache.setTS(LC.TS_EV);
+      apiLoaded = true;
     }
+    // Works
+    const wkData = wkRes.works || wkRes;
+    if (Array.isArray(wkData) && wkData.length) {
+      allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      worksLoaded = true;
+      _memCache.set('works', allWorks);
+      Cache.set(LC.WORKS, allWorks);
+      Cache.setTS(LC.TS_WK);
+    }
+    // Birthdays
+    const bdData = bdRes.birthdays || bdRes;
+    if (Array.isArray(bdData)) {
+      allBirthdays = bdData.map(r => ({
+        __backendId: r.id || '',
+        artist_name: r.artist_name || '',
+        birthday_month: parseInt(r.birthday_month) || 0,
+        birthday_day: parseInt(r.birthday_day) || 0,
+        color: r.color || '#6b7280'
+      }));
+      _memCache.set('bdays', allBirthdays);
+      Cache.set(LC.BDAYS, allBirthdays);
+      Cache.setTS(LC.TS_BD);
+    }
+    // Anniversaries
+    const anData = anRes.anniversaries || anRes;
+    if (Array.isArray(anData)) {
+      allAnniversaries = anData.map(r => ({
+        __backendId: r.id || '',
+        anniversary_name: r.anniversary_name || '',
+        anniversary_month: parseInt(r.anniversary_month) || 0,
+        anniversary_day: parseInt(r.anniversary_day) || 0,
+        anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
+        color: r.color || '#a855f7'
+      }));
+      _memCache.set('annivs', allAnniversaries);
+      Cache.set(LC.ANNIVS, allAnniversaries);
+      Cache.setTS(LC.TS_AN);
+    }
+    _fmtDateCache.clear();
+    hideConnectionError();
+    scheduleRender();
+    renderBirthdayBanners();
+    _scheduleEventStartTimers();
   } catch(e) {
-    console.warn('getAll failed, falling back to individual fetches:', e.message);
-    // Fallback: ดึงแยกถ้า getAll ล้มเหลว
+    console.warn('GitHub fetch failed, falling back to Apps Script:', e.message);
     await Promise.all([
       loadEventsFromSheets(force),
       loadBirthdaysFromSheets(force),
@@ -3271,6 +3274,7 @@ async function loadEventsFromSheets(force = false) {
       _escCache.clear();
       hideConnectionError();
       scheduleRender();
+      _scheduleEventStartTimers();
     }
   } catch(e) {
     console.warn('Events load failed:', e.message);
@@ -3399,18 +3403,89 @@ async function deleteAnniversaryInSheets(id) {
 // ═══════════════════════════════════════════════════════════════════
 function scheduleAutoRefresh() {
   clearInterval(_refreshTimer);
-  const jitter = Math.random() * 3000; // 0–3s jitter to avoid thundering herd
+  const jitter = Math.random() * 5000;
   _refreshTimer = setInterval(() => {
-    if (document.hidden) return; // don't fetch when tab is hidden
-    if (!Cache.isFresh(LC.TS_EV) && !_fetchingEvents) {
-      loadEventsFromSheets().catch(() => {});
-      loadBirthdaysFromSheets().catch(() => {});
-      loadAnniversariesFromSheets().catch(() => {});
+    if (document.hidden) return;
+    if (!Cache.isFresh(LC.TS_EV) && !_fetchingAll) {
+      _fetchAllData(false).catch(() => {});
     }
-    if (!Cache.isFresh(LC.TS_WK) && !_fetchingWorks) {
-      loadWorksFromSheets().catch(() => {});
+  }, 5 * 60 * 1000 + jitter); // ทุก 5 นาที ตรงกับ cache TTL
+
+  // ── Precise midnight timer: fires exactly at 00:00:00 BKK ──
+  _scheduleMidnightTimer();
+
+  // ── Precise event-start timers: fires exactly when each event starts ──
+  _scheduleEventStartTimers();
+}
+
+function _scheduleMidnightTimer() {
+  if (window._midnightTimer) clearTimeout(window._midnightTimer);
+  // คำนวณ ms จนถึง midnight BKK (GMT+7) ด้วย offset math ตรงๆ (แม่นยำกว่า toLocaleString)
+  const nowMs = Date.now();
+  const BKK_OFFSET_MS = 7 * 60 * 60 * 1000;
+  const bkkMsIntoDay = (nowMs + BKK_OFFSET_MS) % (24 * 60 * 60 * 1000);
+  const msUntilMidnight = (24 * 60 * 60 * 1000) - bkkMsIntoDay;
+  window._midnightTimer = setTimeout(() => {
+    // Flush today-string cache ก่อน เพื่อให้ isEventPast() ใช้วันใหม่ทันที
+    _todayStrCache = '';
+    _todayStrDate  = 0;
+    try {
+      localStorage.removeItem(CACHE_VERSION + '_ts_events');
+      localStorage.removeItem(CACHE_VERSION + '_ts_works');
+    } catch(_) {}
+    _refreshIsPast();
+    _scheduleEventStartTimers(); // re-schedule timers สำหรับงานวันใหม่
+    scheduleRender();
+    renderBirthdayBanners();
+    Promise.all([
+      loadEventsFromSheets(true),
+      loadBirthdaysFromSheets(true),
+      loadAnniversariesFromSheets(true),
+    ]).catch(() => {});
+    _scheduleMidnightTimer();
+  }, msUntilMidnight + 50); // +50ms buffer ให้แน่ใจว่าผ่านเที่ยงคืนแล้ว
+}
+
+function _scheduleEventStartTimers() {
+  // Clear any existing event-start timers
+  if (window._eventStartTimers) {
+    window._eventStartTimers.forEach(t => clearTimeout(t));
+  }
+  window._eventStartTimers = [];
+  if (!allEvents || !allEvents.length) return;
+  const nowMs = Date.now();
+  const BKK_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+  allEvents.forEach(ev => {
+    if (!ev.dateStart || ev._isPast) return;
+
+    let targetMs;
+    if (ev.startTime) {
+      // มี startTime → ยิงตอนงานเริ่มพอดี
+      const target = _parseEventTarget(ev.dateStart, ev.startTime);
+      if (isNaN(target.getTime())) return;
+      targetMs = target.getTime();
+    } else {
+      // ไม่มี startTime → ยิงตอน midnight BKK ของวันนั้น
+      const dateParts = ev.dateStart.split('-').map(Number);
+      targetMs = Date.UTC(dateParts[0], dateParts[1]-1, dateParts[2]) - BKK_OFFSET_MS;
     }
-  }, 60 * 1000 + jitter); // check every 60s, fetch only if stale
+
+    const ms = targetMs - nowMs;
+    if (ms <= 0) return; // already past
+
+    const t = setTimeout(() => {
+      // Flush today-string cache ก่อนเสมอ
+      _todayStrCache = '';
+      _todayStrDate  = 0;
+      // Re-compute _isPast ทุก event พร้อมกัน
+      _refreshIsPast();
+      // Re-schedule timers ใหม่สำหรับงานที่ยังเหลือ
+      _scheduleEventStartTimers();
+      scheduleRender();
+    }, ms);
+    window._eventStartTimers.push(t);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -3462,7 +3537,7 @@ let _todayStrCache = '';
 let _todayStrDate  = 0;
 function _getTodayStr() {
   const now = Date.now();
-  if (now - _todayStrDate > 60000) {
+  if (now - _todayStrDate > 5000) { // ลดจาก 60s → 5s
     _todayStrCache = _todayInBKK();
     _todayStrDate  = now;
   }
@@ -4206,9 +4281,7 @@ function buildDateBadge(ev, color) {
 // NOTE: for rendering use ev._daysUntil when available (precomputed in processEvents)
 function _todayInBKK() {
   // Returns "YYYY-MM-DD" in GMT+7 regardless of viewer's local timezone
-  const now = new Date();
-  const bkk = new Date(now.getTime() + (7 * 3600000) + now.getTimezoneOffset() * 60000);
-  return bkk.toISOString().slice(0, 10);
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' });
 }
 function daysUntilEvent(dateStr) {
   if (!dateStr) return null;
@@ -4245,7 +4318,7 @@ function buildCountdownImgBadge(ev, inline = false) {
   if (!ev.dateStart) return '';
   if (isEventPast(ev)) return '';
   const days = daysUntilEvent(ev.dateStart);
-  if (days === null || days < 0 || days > 7 || days <= 1) return '';
+  if (days === null || days < 0 || days > 7) return '';
   const styles = [
     'background:linear-gradient(135deg,#ef4444,#f97316);',   // TODAY
     'background:linear-gradient(135deg,#f97316,#fbbf24);',   // 1 DAY
@@ -4924,11 +4997,8 @@ function renderCalendarCardGrid(monthEvents) {
   if (noEv) noEv.style.display = 'none';
 
   const todayStr = _todayInBKK();
-  const CAL_PAGE = 50;
-  const firstBatch = eventsToShow.slice(0, CAL_PAGE);
-  const remaining  = eventsToShow.slice(CAL_PAGE);
-
-  grid.innerHTML = firstBatch.map(ev => {
+  // ✅ render ทุก event ในครั้งเดียว ใช้ content-visibility:auto แทน batch
+  grid.innerHTML = eventsToShow.map(ev => {
     const color = getArtistColor(ev.artists);
     const past = isEventPast(ev);
     const days2 = daysUntilEvent(ev.dateStart);
@@ -4963,7 +5033,7 @@ function renderCalendarCardGrid(monthEvents) {
     const imgThumb = ev.image
       ? `<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;flex-shrink:0;" onerror="this.style.display='none'">`
       : `<div style="width:72px;height:72px;border-radius:10px;flex-shrink:0;background:${grad};display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>`;
-    return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;contain:layout style;" onclick="openDetailModal('${ev.__backendId}')" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'">
+    return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;content-visibility:auto;contain-intrinsic-size:0 90px;" onclick="openDetailModal('${ev.__backendId}')" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'">
       <div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
       <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}${badge?`<span style="margin-left:auto;">${badge}</span>`:''}</div>
@@ -4978,35 +5048,8 @@ function renderCalendarCardGrid(monthEvents) {
     </div>`;
   }).join('');
 
-  // Append remaining items if any (avoids blocking main thread for huge lists)
-  if (remaining.length > 0) {
-    requestAnimationFrame(() => {
-      const moreHtml = remaining.map(ev => {
-        const color = getArtistColor(ev.artists);
-        const past = isEventPast(ev);
-        const calDays = daysUntilEvent(ev.dateStart);
-        const calIsToday = calDays === 0 && !isEventPast(ev);
-        const grad = ({'#f97316':'linear-gradient(135deg,#fff7ed,#ffedd5)','#6b7280':'linear-gradient(135deg,#f9fafb,#f3f4f6)','#22c55e':'linear-gradient(135deg,#f0fdf4,#dcfce7)','#a855f7':'linear-gradient(135deg,#faf5ff,#f3e8ff)','#3b82f6':'linear-gradient(135deg,#eff6ff,#dbeafe)','#ef4444':'linear-gradient(135deg,#fef2f2,#fee2e2)','#ec4899':'linear-gradient(135deg,#fdf2f8,#fce7f3)'})[color] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
-        const artistArr = ev.artists ? ev.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
-        const artistDots = artistArr.map(a => { const ac = getArtistColor(a); return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.6rem;font-weight:700;color:${past?'#9ca3af':ac};"><span style="width:5px;height:5px;border-radius:50%;background:${past?'#d1d5db':ac};display:inline-block;"></span>${a}</span>`; }).join('<span style="color:#e5e7eb;margin:0 2px;">·</span>');
-        const loc = [ev.location, ev.city].filter(Boolean).join(', ');
-        return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;contain:layout style;" onclick="openDetailModal('${ev.__backendId}')" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.09)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'">
-          <div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
-          <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
-            <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}</div>
-            <div style="font-size:0.85rem;font-weight:700;color:${past?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div>
-            <div style="font-size:0.68rem;color:#9ca3af;margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;">${ev.dateStart?`<span>${fmtDate(ev.dateStart)}</span>`:''}${ev.startTime?`<span style="color:#d1d5db;">·</span><span>${fmtTime(ev.startTime)}</span>`:''}${loc?`<span style="color:#d1d5db;">·</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(loc)}</span>`:''}</div>
-          </div>
-        </div>`;
-      }).join('');
-      grid.insertAdjacentHTML('beforeend', moreHtml);
-      _observeLazyImages(grid);
-    });
-  }
   // ── Start live countdown tickers for calendar cards ──
   startCardCountdowns();
-  // ── Lazy load images in calendar cards ──
-  _observeLazyImages(grid);
 }
 
 function scrollToEventCard(dateStr) {
@@ -6166,23 +6209,30 @@ async function loadWorksFromSheets(force = false) {
   if (!force && Cache.isFresh(LC.TS_WK) && allWorks.length > 0) return;
   if (_fetchingWorks) return;
   _fetchingWorks = true;
-  const _processWorks = (res) => {
-    if (res && res.status === 'ok' && res.works) {
-      allWorks = _ensureWorksBackendId(res.works.filter(w => w.title));
+  try {
+    const t = Math.floor(Date.now() / 60000);
+    const res = await fetchWithTimeout(`${JSON_BASE_URL}/works.json?t=${t}`);
+    const raw = res.works || res;
+    if (Array.isArray(raw) && raw.length) {
+      allWorks = _ensureWorksBackendId(raw.filter(w => w.title));
       worksLoaded = true;
       _memCache.set('works', allWorks);
       Cache.set(LC.WORKS, allWorks);
       Cache.setTS(LC.TS_WK);
       if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
     }
-  };
-  try {
-    const res = await fetchWithTimeout(API_URL + '?action=getWorks&t=' + Date.now());
-    _processWorks(res);
   } catch(e) {
+    // Fallback to Apps Script if GitHub fails
     try {
-      const res = await fetchJSONP(API_URL + '?action=getWorks&t=' + Date.now());
-      _processWorks(res);
+      const res = await fetchWithTimeout(API_URL + '?action=getWorks&t=' + Date.now());
+      if (res && res.works) {
+        allWorks = _ensureWorksBackendId(res.works.filter(w => w.title));
+        worksLoaded = true;
+        _memCache.set('works', allWorks);
+        Cache.set(LC.WORKS, allWorks);
+        Cache.setTS(LC.TS_WK);
+        if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
+      }
     } catch(e2) { console.warn('Works load failed:', e2.message); }
   } finally { _fetchingWorks = false; }
 }
@@ -6548,7 +6598,7 @@ function renderWorks() {
       ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${escHtml(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="this.parentElement.style.background='${grad}'"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
-    card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:transform 0.18s,box-shadow 0.18s;';
+    card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:transform 0.18s,box-shadow 0.18s;content-visibility:auto;contain-intrinsic-size:0 220px;';
     card.onmouseenter = () => { card.style.transform='translateY(-2px)'; card.style.boxShadow='0 6px 20px rgba(0,0,0,0.10)'; };
     card.onmouseleave = () => { card.style.transform=''; card.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)'; };
     if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
@@ -6644,13 +6694,8 @@ document.addEventListener('visibilitychange', () => {
     const age = Date.now() - Cache.getTS(LC.TS_EV);
     const evStale = age > 60000; // refresh if older than 1 minute
     const wkStale = !Cache.isFresh(LC.TS_WK);
-    if (evStale) {
-      loadEventsFromSheets(true).catch(()=>{});
-      loadBirthdaysFromSheets(true).catch(()=>{});
-      loadAnniversariesFromSheets(true).catch(()=>{});
-    }
-    if (wkStale && !_fetchingWorks) {
-      loadWorksFromSheets(true).catch(()=>{});
+    if (evStale && !_fetchingAll) {
+      _fetchAllData(true).catch(()=>{});
     }
   }
 });
@@ -6696,29 +6741,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ── STEP 3: Fetch fresh data after first paint (non-blocking, deferred) ──
-  // Always fetch immediately on load for freshest data
-  const fetchData = () => {
-    Promise.all([
-      loadEventsFromSheets(),
-      loadBirthdaysFromSheets(),
-      loadAnniversariesFromSheets(),
-      loadWorksFromSheets()
-    ]).catch(() => {});
-  };
+  // ── STEP 3: Fetch fresh data — 1 request (all.json parallel fetch) ──
+  const fetchData = (force = false) => _fetchAllData(force).catch(() => {});
   if (cacheHit) {
-    // Cache hit: show cached instantly, fetch fresh in background after 200ms
-    setTimeout(fetchData, 200);
+    setTimeout(() => fetchData(false), 300);
   } else {
-    // No cache: show skeletons briefly, fetch immediately
     showSkeletons();
     debounceLucide();
-    fetchData();
+    fetchData(false);
   }
-  // Always schedule a background refresh 30s after load
-  setTimeout(() => {
-    if (!document.hidden) fetchData();
-  }, 30000);
+  setTimeout(() => { if (!document.hidden) fetchData(false); }, 45000);
 
   // ── STEP 4: Schedule recurring 5-minute background refresh ──
   scheduleAutoRefresh();
