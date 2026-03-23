@@ -5209,80 +5209,22 @@ function startCountdown(dateStr, timeStr) {
   if (_countdownTimer) clearInterval(_countdownTimer);
   const cdEl = document.getElementById('bento-countdown');
   if (!dateStr) return;
-
   let target = _parseEventTarget(dateStr, timeStr);
-
-  if (target <= new Date() || isNaN(target.getTime())) {
+  if (!target || isNaN(target.getTime()) || target <= new Date()) {
     if (cdEl) cdEl.style.display = 'none';
-    clearInterval(_countdownTimer);
-    scheduleRender();
     return;
   }
   _countdownTarget = target;
-  function tick() {
-    const now  = new Date();
-    const diff = target - now;
-    if (diff <= 0) {
-      if (cdEl) cdEl.style.display = 'none';
-      clearInterval(_countdownTimer);
-      _vsLastFingerprint = ''; // force grid re-render so new event shows up
-      scheduleRender();
-      return;
-    }
-    // Only update DOM if element is visible
-    if (cdEl && cdEl.style.display !== 'none') {
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000)  / 60000);
-      const s = Math.floor((diff % 60000)    / 1000);
-      document.getElementById('cd-days').textContent  = d;
-      document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
-      document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
-      document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
-    }
-  }
-  if (cdEl) cdEl.style.display = 'flex';
-  tick();
-  _countdownTimer = setInterval(tick, 1000);
+  // ✅ FIX: ซ่อน countdown — ไม่ run setInterval เพื่อลด CPU บนมือถือ
+  if (cdEl) cdEl.style.display = 'none';
+  // แค่ schedule re-render ตอนงานเริ่ม (ผ่าน _scheduleEventStartTimers แล้ว)
 }
 
 function startCountdown2(dateStr, timeStr) {
   if (window._countdownTimer2) clearInterval(window._countdownTimer2);
   const cdEl = document.getElementById('bento-countdown2');
-  if (!dateStr) return;
-
-  let target = _parseEventTarget(dateStr, timeStr);
-
-  if (target <= new Date() || isNaN(target.getTime())) {
-    if (cdEl) cdEl.style.display = 'none';
-    clearInterval(window._countdownTimer2);
-    scheduleRender();
-    return;
-  }
-  function tick2() {
-    const now  = new Date();
-    const diff = target - now;
-    if (diff <= 0) {
-      if (cdEl) cdEl.style.display = 'none';
-      clearInterval(window._countdownTimer2);
-      _vsLastFingerprint = ''; // force grid re-render so new event shows up
-      scheduleRender();
-      return;
-    }
-    if (cdEl && cdEl.style.display !== 'none') {
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000)  / 60000);
-      const s = Math.floor((diff % 60000)    / 1000);
-      document.getElementById('cd2-days').textContent  = d;
-      document.getElementById('cd2-hours').textContent = String(h).padStart(2,'0');
-      document.getElementById('cd2-mins').textContent  = String(m).padStart(2,'0');
-      document.getElementById('cd2-secs').textContent  = String(s).padStart(2,'0');
-    }
-  }
-  if (cdEl) cdEl.style.display = 'flex';
-  tick2();
-  window._countdownTimer2 = setInterval(tick2, 1000);
+  // ✅ FIX: ซ่อน countdown2 — ไม่ run setInterval เพื่อลด CPU บนมือถือ
+  if (cdEl) cdEl.style.display = 'none';
 }
 
 function previewWorksImg() {
