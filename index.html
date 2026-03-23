@@ -441,8 +441,12 @@
     #form-preview-col { border-left: none !important; border-top: 1px solid #f0f0f0; }
   }
   /* ── Admin tab panels: fade-in ป้องกันกระตุก ── */
+  .admin-tab-panel {
+    position: relative;
+    pointer-events: auto;
+  }
   .admin-tab-panel.tab-active {
-    animation: pageIn 0.18s ease both;
+    animation: pageIn 0.18s ease forwards;
   }
   .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:0.82rem;position:relative; }
   .bday-today { }
