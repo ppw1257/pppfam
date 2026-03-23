@@ -58,17 +58,20 @@
   </script>
   <style>
   :root {
-    --color-pond: #f97316;
-    --color-phuwin: #6b7280;
-    --color-permpoon: #22c55e;
-    --color-pondphuwin: #a855f7;
-    --color-pondpermpoon: #3b82f6;
-    --color-phuwinpermpoon: #ef4444;
-    --color-pondphuwinpermpoon: #ec4899;
-    --radius-card: 14px;
-    --shadow-card: 0 4px 16px rgba(0,0,0,0.09);
+    --color-pond: #f4845f;
+    --color-phuwin: #8fa3b1;
+    --color-permpoon: #5fad8e;
+    --color-pondphuwin: #b09be0;
+    --color-pondpermpoon: #7bafd4;
+    --color-phuwinpermpoon: #e08fa0;
+    --color-pondphuwinpermpoon: #e08fb5;
+    --radius-card: 16px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
     --border-card: none;
-    --color-accent: #111;
+    --color-accent: #2d2d2d;
+    /* Soft pastel accent */
+    --accent-primary: #f4845f;
+    --accent-gradient: linear-gradient(135deg, #f4845f 0%, #d98fcc 100%);
     /* Fluid spacing */
     --page-pad-x: clamp(10px, 3vw, 2rem);
     --page-pad-y: clamp(1rem, 2.5vw, 2rem);
@@ -84,7 +87,7 @@
   }
   * { font-family: 'K2D', sans-serif; -webkit-tap-highlight-color: transparent; }
   html { height: 100%; overflow: hidden; font-size: 105%; }
-  body { height: 100%; background: #f7f7f5; background-attachment: fixed; color: #111; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
+  body { height: 100%; background: #faf9f7; background-attachment: fixed; color: #2d2d2d; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
   #app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .page { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; }
   .page.active {
@@ -99,10 +102,10 @@
   }
   .nav-link { cursor: pointer; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 99px; color: #6b7280; letter-spacing: 0.01em; transition: color 0.15s, background 0.15s; }
   .nav-link:hover { color: #111; background: #f3f3f1; }
-  .nav-link.active { color: #fff; background: linear-gradient(135deg, #ff5c35, #c026d3); border-radius: 99px; font-weight: 700; box-shadow: 0 2px 10px rgba(192,38,211,0.28); }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1.5px solid #ebebeb; box-shadow: 0 2px 8px rgba(0,0,0,0.05); height: 100%; position: relative; transition: box-shadow 0.2s, transform 0.15s; }
+  .nav-link.active { color: #fff; background: var(--accent-gradient); border-radius: 99px; font-weight: 700; box-shadow: 0 2px 10px rgba(212,130,160,0.25); }
+  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1.5px solid #f0ede8; box-shadow: 0 1px 6px rgba(0,0,0,0.04); height: 100%; position: relative; transition: box-shadow 0.2s, transform 0.15s; }
   .month-group { }
-  .event-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #d4d4d4; }
+  .event-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-3px); border-color: #e0dcd8; }
   .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.75);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;z-index:5; }
   .event-card:hover .card-hover-overlay { opacity:1; }
   .card-hover-overlay .oh-title { font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4; }
@@ -117,13 +120,13 @@
   .timeline-dow { font-size:0.58rem;font-weight:700;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase; }
   .timeline-circle { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1; }
   .timeline-circle span { font-size:0.82rem;font-weight:900;color:#fff; }
-  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.05);cursor:pointer;border-left:3px solid #ff5c35;border:1.5px solid #ebebeb;border-left:3px solid #ff5c35;transition:box-shadow 0.2s; }
+  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);cursor:pointer;border-left:3px solid #f4845f;border:1.5px solid #f0ede8;border-left:3px solid #f4845f;transition:box-shadow 0.2s; }
   .timeline-card:hover { box-shadow:0 4px 14px rgba(0,0,0,0.10); }
   .timeline-card-top { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
   .timeline-card-title { font-size:0.85rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:4px; }
   .timeline-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;gap:8px;flex-wrap:wrap; }
   /* list view */
-  .list-card { background:#fff;border-radius:var(--radius-card);border:1.5px solid #ebebeb;box-shadow:0 1px 4px rgba(0,0,0,0.04);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:border-color 0.15s; }
+  .list-card { background:#fff;border-radius:var(--radius-card);border:1.5px solid #f0ede8;box-shadow:0 1px 4px rgba(0,0,0,0.03);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:border-color 0.15s; }
   .list-card:hover { }
   .list-card-img { width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f3f4f6; }
   .list-card-body { flex:1;min-width:0; }
@@ -134,10 +137,10 @@
   .card-countdown { display:none !important; }
   .count-box { background:rgba(0,0,0,0.08); color:#111; padding:4px 6px; border-radius:6px; font-size:0.65rem; font-weight:800; text-align:center; line-height:1.2; min-width:34px; letter-spacing:0.02em; }
   .count-box span { display:block; font-size:0.5rem; font-weight:600; color:#9ca3af; margin-top:1px; letter-spacing:0.06em; }
-  .today-badge { background:#ff5c35; color:#fff; font-weight:800; padding:3px 9px; border-radius:5px; position:absolute; top:8px; left:8px; font-size:0.62rem; letter-spacing:0.06em; box-shadow:0 2px 6px rgba(255,92,53,0.4); z-index:4; }
-  .next-event-label { font-size:0.58rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#ff5c35; margin-top:6px; margin-bottom:2px; }
+  .today-badge { background:#f4845f; color:#fff; font-weight:800; padding:3px 9px; border-radius:5px; position:absolute; top:8px; left:8px; font-size:0.62rem; letter-spacing:0.06em; box-shadow:0 2px 6px rgba(244,132,95,0.35); z-index:4; }
+  .next-event-label { font-size:0.58rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#f4845f; margin-top:6px; margin-bottom:2px; }
   @media (max-width:480px) { .count-box { font-size:0.6rem; padding:3px 5px; min-width:28px; } }
-  .card-img-placeholder { width: 100%; height: 160px; background: #f0efeb; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card-img-placeholder { width: 100%; height: 160px; background: #f5f2ee; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   /* ── Card image wrapper: fixed height, never expands ── */
   .card-img-wrap {
     width: 100%;
@@ -145,7 +148,7 @@
     flex-shrink: 0;
     overflow: hidden;
     position: relative;
-    background: #f0efeb;
+    background: #f5f2ee;
     border-radius: var(--radius-card) var(--radius-card) 0 0;
   }
   .card-img {
@@ -162,15 +165,15 @@
   /* ── CALENDAR ── */
   .cal-day { width:66px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;box-sizing:border-box;position:relative;border:none;padding:0; }
   .cal-day:hover { background: #f3f4f6; }
-  .cal-day-selected { background: #ff5c35 !important; box-shadow: 0 2px 8px rgba(255,92,53,0.35); }
+  .cal-day-selected { background: #f4845f !important; box-shadow: 0 2px 8px rgba(244,132,95,0.3); }
   .cal-day-has-event::after { content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#6b7280; }
   .cal-day-selected.cal-day-has-event::after { background:#fff; }
   .cal-events-wrap { display:none; }
   .cal-event-dot { display:none; }
   .cal-event-dot-circle { display:none; }
   /* event list right side */
-  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;border:1.5px solid #ebebeb;box-shadow:none;cursor:pointer;transition:border-color 0.15s,transform 0.15s; }
-  .cal-list-item:hover { border-color:#d0d0cc; transform:translateY(-1px); }
+  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;border:1.5px solid #f0ede8;box-shadow:none;cursor:pointer;transition:border-color 0.15s,transform 0.15s; }
+  .cal-list-item:hover { border-color: #e0d8d0; transform:translateY(-1px); }
   .cal-list-date { flex-shrink:0;width:48px;text-align:center; }
   .cal-list-dow { font-size:0.68rem;font-weight:700;color:#9ca3af;letter-spacing:0.07em;text-transform:uppercase; }
   .cal-list-num { font-size:1.3rem;font-weight:700;color:#111;line-height:1.1; }
@@ -250,18 +253,18 @@
     transition: all 0.15s;
   }
   .artist-filter-btn.active {
-    background: #ff5c35 !important;
-    border-color: #ff5c35 !important;
+    background: #f4845f !important;
+    border-color: #f4845f !important;
     color: #fff !important;
-    box-shadow: 0 2px 8px rgba(255,92,53,0.3) !important;
+    box-shadow: 0 2px 8px rgba(244,132,95,0.25) !important;
   }
   .filter-bar .flex-spacer { display: none !important; }
   .filter-bar > div:last-child { flex-shrink: 0; }
   .cal-month-strip { display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none; }
   .cal-month-strip::-webkit-scrollbar { display:none; }
-  .cal-month-pill { padding:6px 16px;border-radius:99px;font-size:0.82rem;font-weight:600;color:#6b7280;background:#f0efeb;cursor:pointer;white-space:nowrap;border:1.5px solid transparent;font-family:inherit;transition:all 0.15s; }
-  .cal-month-pill:hover { background:#e5e7eb;color:#111; }
-  .cal-month-pill.active { background:#ff5c35;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(255,92,53,0.28); }
+  .cal-month-pill { padding:6px 16px;border-radius:99px;font-size:0.82rem;font-weight:600;color:#6b7280;background:#f5f2ee;cursor:pointer;white-space:nowrap;border:1.5px solid transparent;font-family:inherit;transition:all 0.15s; }
+  .cal-month-pill:hover { background:#ede9e3;color:#2d2d2d; }
+  .cal-month-pill.active { background:#f4845f;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(244,132,95,0.25); }
   /* date strip */
   /* cal-date-strip: controlled by inline style per context */
   .cal-date-strip::-webkit-scrollbar { display:none; }
@@ -276,20 +279,20 @@
   .cal-date-chip-dot { width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0; }
   /* card grid */
   .cal-card-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px; }
-  .cal-ev-card { background:#fff;border-radius:14px;border:1.5px solid #ebebeb;box-shadow:none;overflow:hidden;cursor:pointer;transition:border-color 0.15s,transform 0.15s; }
-  .cal-ev-card:hover { border-color:#c8c8c4;transform:translateY(-2px); }
+  .cal-ev-card { background:#fff;border-radius:16px;border:1.5px solid #f0ede8;box-shadow:none;overflow:hidden;cursor:pointer;transition:border-color 0.15s,transform 0.15s; }
+  .cal-ev-card:hover { border-color:#e0d8d0;transform:translateY(-2px); }
   .cal-ev-card-img { width:100%;height:120px;object-fit:cover;object-position:top;display:block;background:#f3f4f6; }
   .cal-ev-card-img-placeholder { width:100%;height:120px;display:flex;align-items:center;justify-content:center; }
   .cal-ev-card-body { padding:10px 12px; }
   .cal-ev-card-title { font-size:clamp(0.78rem,1.2vw,0.88rem);font-weight:700;color:#111;line-height:1.35;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical; }
   .cal-ev-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;align-items:center;gap:5px;flex-wrap:wrap; }
   .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
-  .modal-box { background: #fff; border-radius: 16px; max-width: 860px; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.12); margin: auto; border: 1.5px solid #e5e5e5; }
+  .modal-box { background: #fff; border-radius: 20px; max-width: 860px; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.10); margin: auto; border: 1.5px solid #f0ede8; }
   .form-input { width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.7rem 0.95rem; font-size: 1rem; outline: none;  background: #fff; box-sizing: border-box; }
-  .form-input:focus { border-color: #ff5c35; box-shadow: 0 0 0 3px rgba(255,92,53,0.1); }
+  .form-input:focus { border-color: #f4845f; box-shadow: 0 0 0 3px rgba(244,132,95,0.12); }
   .form-label { font-size: 0.9rem; font-weight: 600; color: #374151; margin-bottom: 0.3rem; display: block; }
-  .btn-primary { background: #ff5c35; color: #fff; border: none; border-radius: 8px; padding: 0.7rem 1.35rem; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 10px rgba(255,92,53,0.28); transition: background 0.15s, box-shadow 0.15s; }
-  .btn-primary:hover:not(:disabled) { background: #e84e28; box-shadow: 0 4px 16px rgba(255,92,53,0.38); }
+  .btn-primary { background: var(--accent-gradient); color: #fff; border: none; border-radius: 10px; padding: 0.7rem 1.35rem; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 10px rgba(244,132,95,0.25); transition: opacity 0.15s, box-shadow 0.15s; }
+  .btn-primary:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 4px 16px rgba(244,132,95,0.35); }
   .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
   .btn-secondary { background: #fff; color: #374151; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 0.7rem 1.35rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
   .btn-secondary:hover { background: #f5f5f3; border-color: #c8c8c4; }
@@ -462,7 +465,7 @@
   .month-group-header-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .month-group-header-label { font-size: 1.3rem; font-weight: 800; color: #111; letter-spacing: -0.03em; }
   .month-group-header-line { flex: 1; height: 1px; background: #e8e8e4; border-radius: 99px; }
-  .month-group-header-count { font-size: 0.78rem; font-weight: 700; color: #ff5c35; background: #fff3f0; border-radius: 6px; padding: 3px 10px; border: 1.5px solid #ffd4c5; }
+  .month-group-header-count { font-size: 0.78rem; font-weight: 700; color: #f4845f; background: #fff5f1; border-radius: 6px; padding: 3px 10px; border: 1.5px solid #fad4c4; }
   /* Map embed */
   .map-embed-wrap { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
   .map-embed-wrap iframe { width: 100%; height: 300px; border: 0; display: block; }
@@ -767,10 +770,10 @@
   ══════════════════════════════════════════════ */
   #main-nav {
     background: #fff;
-    border-bottom: 2.5px solid transparent;
-    border-image: linear-gradient(90deg, #ff5c35 0%, #ff3d6b 40%, #c026d3 80%, #7c3aed 100%) 1;
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(90deg, #f4845f 0%, #e08fa0 50%, #b09be0 100%) 1;
     flex-shrink: 0;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
   }
   .nav-inner {
     width: 100%;
@@ -798,7 +801,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background: linear-gradient(90deg, #ff5c35, #c026d3);
+    background: linear-gradient(90deg, #f4845f, #b09be0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1534,7 +1537,7 @@
 
       <!-- Tab bar -->
       <div style="display:flex;gap:3px;background:#f0efeb;border-radius:10px;padding:3px;width:fit-content;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;" id="admin-tab-bar">
-       <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:#ff5c35;color:#fff;font-family:inherit;">
+       <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:#f4845f;color:#fff;font-family:inherit;">
         <i data-lucide="calendar" style="width:13px;height:13px;"></i>Events
        </button>
        <button class="admin-tab-btn" id="atb-works" onclick="switchAdminTab('works')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
@@ -5415,7 +5418,7 @@ function switchAdminTab(tab) {
   requestAnimationFrame(() => {
     document.querySelectorAll('.admin-tab-btn').forEach(b => {
       const isActive = b.id === 'atb-' + tab;
-      b.style.background = isActive ? '#ff5c35' : 'transparent';
+      b.style.background = isActive ? '#f4845f' : 'transparent';
       b.style.color = isActive ? '#fff' : '#6b7280';
     });
     document.querySelectorAll('.admin-tab-panel').forEach(p => {
@@ -6112,6 +6115,9 @@ async function handleEventFormSubmit() {
     Cache.clearAll(); _fetchingEvents = false;
     await loadEventsFromSheets(true);
     if (isAdmin) renderAdminList();
+    // ── Re-render ทุกหน้าทันทีหลัง save ──
+    scheduleRender();
+    if (worksLoaded) {} // works ไม่เปลี่ยน ไม่ต้อง reload
   }
 }
 
@@ -6431,6 +6437,9 @@ async function handleWorksFormSubmit() {
     worksLoaded = false;
     await loadWorksFromSheets(true);
     renderAdminWorksList();
+    // ── Render หน้า Works ทันที ──
+    _worksLastFP = ''; // force re-render
+    renderWorks();
   } catch(err) {
     showToast('❌ Error: ' + (err.message || 'Failed to save work'));
     console.error('[handleWorksFormSubmit]', err);
@@ -6719,28 +6728,28 @@ function _buildWorksYearDropdown() {
   // legacy select (hidden) — keep in sync
   const sel = document.getElementById('works-year-select');
   if (!allWorks.length) return;
-  const years = [...new Set(allWorks.map(w => w.year||'').filter(Boolean))].sort((a,b) => b-a);
+  const currentYear = new Date().getFullYear();
+  const allYears = [...new Set(allWorks.map(w => w.year||'').filter(Boolean))].sort((a,b) => b-a);
+  // แสดงเฉพาะปีปัจจุบันและอนาคต (ไม่เอาปีเก่า)
+  const years = allYears.filter(y => Number(y) >= currentYear);
   if (sel) {
     const current = sel.value;
     sel.innerHTML = years.map(y => `<option value="${y}" ${y===current?'selected':''}>${y}</option>`).join('');
-    sel.innerHTML += `<option value="all" ${current==='all'?'selected':''}>All Years</option>`;
-    if (!years.includes(current) && current !== 'all') { sel.value = years[0] || 'all'; _worksYear = sel.value; }
+    if (!years.includes(current)) { sel.value = years[0] || ''; _worksYear = sel.value; }
   }
-  // Build pill buttons
+  // ถ้า _worksYear เป็นปีเก่า ให้ reset เป็นปีล่าสุดที่แสดง
+  if (_worksYear !== 'all' && _worksYear && Number(_worksYear) < currentYear) {
+    _worksYear = years[0] || String(currentYear);
+  }
+  // Build pill buttons (ไม่มีปุ่ม All Years)
   const bar = document.getElementById('works-year-bar');
   if (!bar) return;
   // Only rebuild if year list changed (avoid flicker)
   const existing = bar.dataset.years || '';
-  const newList = ['all',...years].join(',');
+  const newList = years.join(',');
   if (existing === newList && bar.children.length) return;
   bar.dataset.years = newList;
   bar.innerHTML = '';
-  const allBtn = document.createElement('button');
-  allBtn.textContent = 'All Years';
-  allBtn.onclick = () => setWorksYear('all');
-  allBtn.dataset.year = 'all';
-  _styleYearBtn(allBtn, _worksYear === 'all');
-  bar.appendChild(allBtn);
   years.forEach(y => {
     const btn = document.createElement('button');
     btn.textContent = y;
@@ -6750,7 +6759,6 @@ function _buildWorksYearDropdown() {
     bar.appendChild(btn);
   });
 }
-
 function _styleYearBtn(btn, active) {
   btn.style.cssText = `padding:5px 14px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;border:1px solid ${active?'#a855f7':'#f0f0f0'};background:${active?'#f5f3ff':'#fff'};color:${active?'#7e22ce':'#6b7280'};`;
 }
@@ -6806,9 +6814,9 @@ function renderWorks() {
     return c;
   }
 
-  // ถ้า All Years และไม่มี filter อื่น → แสดงเฉพาะปีปัจจุบัน (ปีที่เริ่มใช้งาน)
+  // Default ไปที่ปีปัจจุบันถ้า _worksYear เป็น 'all' หรือปีเก่า
   const _currentYear = String(new Date().getFullYear());
-  const _effectiveYear = (_worksYear === 'all' && _worksTab === 'all' && _worksArtist === 'all')
+  const _effectiveYear = (!_worksYear || _worksYear === 'all' || Number(_worksYear) < Number(_currentYear))
     ? _currentYear
     : _worksYear;
 
