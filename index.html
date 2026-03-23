@@ -1529,7 +1529,7 @@
       </div>
 
       <!-- Tab bar -->
-      <div style="display:flex;gap:3px;background:#f0efeb;border-radius:10px;padding:3px;width:fit-content;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;position:relative;z-index:10;" id="admin-tab-bar">
+      <div style="display:flex;gap:3px;background:#f0efeb;border-radius:10px;padding:3px;width:fit-content;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;" id="admin-tab-bar">
        <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:#ff5c35;color:#fff;font-family:inherit;">
         <i data-lucide="calendar" style="width:13px;height:13px;"></i>Events
        </button>
@@ -1567,7 +1567,7 @@
       </div>
 
       <!-- TAB: Works -->
-      <div id="admin-tab-works" class="admin-tab-panel" style="display:none;position:relative;z-index:1;">
+      <div id="admin-tab-works" class="admin-tab-panel" style="display:none;">
        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
         <p style="font-size:0.78rem;color:#9ca3af;">Manage artist works — series, music, magazine, brand &amp; more</p>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -6195,13 +6195,14 @@ function bentoNextClick2() {
   if (el && el.dataset.id) openDetailModal(el.dataset.id);
 }
 
-function debounceLucide() {
+function debounceLucide(scope) {
   if (typeof lucide === 'undefined') return;
   clearTimeout(_lucideTimer);
+  const root = scope || document;
   if (typeof requestIdleCallback !== 'undefined') {
-    _lucideTimer = requestIdleCallback(() => lucide.createIcons(), { timeout: 300 });
+    _lucideTimer = requestIdleCallback(() => lucide.createIcons({ nameAttr: 'data-lucide', attrs: {}, root }), { timeout: 300 });
   } else {
-    _lucideTimer = setTimeout(() => lucide.createIcons(), 80);
+    _lucideTimer = setTimeout(() => lucide.createIcons({ nameAttr: 'data-lucide', attrs: {}, root }), 80);
   }
 }
 function showToast(msg) {
@@ -6500,7 +6501,7 @@ function renderAdminWorksList() {
 
     // ── ROW — same style as Events tab rows ──────────────────
     const row = document.createElement('div');
-    row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;position:relative;z-index:1;';
+    row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;';
 
     // Info block
     const info = document.createElement('div');
@@ -6549,12 +6550,12 @@ function renderAdminWorksList() {
     const btnWrap = document.createElement('div');
     btnWrap.style.cssText = 'display:flex;gap:6px;align-items:center;flex-shrink:0;';
 
-    // Edit button — same style as Events tab
+    // Edit button — inline SVG (ไม่ใช้ data-lucide เพื่อป้องกัน createIcons() ลบ event listener)
     const editBtn = document.createElement('button');
     editBtn.className = 'btn-secondary';
     editBtn.setAttribute('data-wid', wid);
     editBtn.style.cssText = 'font-size:0.8rem;padding:6px 10px;display:inline-flex;align-items:center;gap:4px;';
-    editBtn.innerHTML = '<i data-lucide="edit-2" style="width:13px;height:13px;"></i>Edit';
+    editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Edit';
     editBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const key = this.getAttribute('data-wid');
@@ -6564,13 +6565,13 @@ function renderAdminWorksList() {
     });
     btnWrap.appendChild(editBtn);
 
-    // Delete button — same style as Events tab
+    // Delete button — inline SVG (ไม่ใช้ data-lucide เพื่อป้องกัน createIcons() ลบ event listener)
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-danger';
     delBtn.setAttribute('data-wid', wid);
     delBtn.setAttribute('data-title', w.title || '');
     delBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;';
-    delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>Delete';
+    delBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>Delete';
     delBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const key = this.getAttribute('data-wid');
@@ -6586,8 +6587,7 @@ function renderAdminWorksList() {
 
   list.innerHTML = '';
   list.appendChild(frag);
-  // Re-init Lucide icons for the newly created Edit/Delete buttons
-  debounceLucide();
+  // ไม่เรียก debounceLucide() เพราะปุ่มใช้ inline SVG แล้ว ไม่มี data-lucide
 }
 
 function setWorksTab(tab) {
