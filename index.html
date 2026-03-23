@@ -6242,7 +6242,7 @@ let worksLoaded    = false;
 let _fetchingWorks = false;
 let _worksTab      = 'all';
 let _worksArtist   = 'all';
-let _worksYear     = 'all';
+let _worksYear     = '2026'; // default เริ่มที่ปี 2026
 
 const CATEGORY_CONFIG = {
   littlebigworld: { label: 'Little Big World', icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', color: '#7c3aed', bg: '#faf5ff', border: '#ddd6fe' },
@@ -6720,8 +6720,17 @@ function renderWorks() {
     return c;
   }
 
+  // ถ้า All Years และไม่มี filter อื่น → แสดงเฉพาะปีปัจจุบัน (ปีที่เริ่มใช้งาน)
+  const _currentYear = String(new Date().getFullYear());
+  const _effectiveYear = (_worksYear === 'all' && _worksTab === 'all' && _worksArtist === 'all')
+    ? _currentYear
+    : _worksYear;
+
   let filtered = allWorks;
-  if (_worksYear !== 'all') filtered = filtered.filter(w => (w.year||'') === _worksYear);
+  // กรองปีเฉพาะเมื่อ: เลือกปีและไม่มี filter tab/artist อื่น
+  if (_effectiveYear !== 'all' && _worksTab === 'all' && _worksArtist === 'all') {
+    filtered = filtered.filter(w => (w.year||'') === _effectiveYear);
+  }
   if (_worksTab !== 'all') filtered = filtered.filter(w => _catToKey(w.category) === _worksTab);
   if (_worksArtist !== 'all') filtered = filtered.filter(w => {
     if (!w.artists) return false;
@@ -6801,8 +6810,8 @@ function renderWorks() {
   // Build ลง fragment ก่อน swap ครั้งเดียว — ไม่มี blank flash
   const _wFrag = document.createDocumentFragment();
 
-  // เลือกปีเฉพาะ → การ์ดตรงๆ ไม่มี divider ไม่มี badge
-  if (_worksYear !== 'all') {
+  // เลือกปีเฉพาะ หรือ All Years โดยไม่มี filter อื่น → การ์ดตรงๆ ไม่มี divider
+  if (_effectiveYear !== 'all' && _worksTab === 'all' && _worksArtist === 'all') {
     const cardGrid = document.createElement('div');
     cardGrid.style.cssText = gridCols;
     cardGrid.className = 'works-year-grid';
@@ -6815,7 +6824,7 @@ function renderWorks() {
     return;
   }
 
-  // All Years → แสดง divider แยกปีเสมอ (ไม่ว่า category/artist จะเป็นอะไร)
+  // ทุกกรณีอื่น (All Years, หรือมี filter tab/artist) → แสดง divider แยกปีเสมอ
 
   years.forEach((year, idx) => {
     const works = yearMap[year];
