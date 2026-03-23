@@ -88,10 +88,10 @@
   #app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .page { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; }
   .page.active { display: flex; flex-direction: column; }
-  .nav-link { cursor: pointer; transition: all 0.15s; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 99px; color: #9ca3af; letter-spacing: 0.01em; }
+  .nav-link { cursor: pointer; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 99px; color: #9ca3af; letter-spacing: 0.01em; }
   .nav-link:hover { color: #111; background: rgba(0,0,0,0.06); }
   .nav-link.active { color: #111; background: #e5e7eb; border-radius: 99px; font-weight: 600; }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; transition: transform 0.18s ease, box-shadow 0.18s ease; cursor: pointer; display: flex; flex-direction: column; border: none; box-shadow: var(--shadow-card); height: 100%; position: relative; content-visibility: auto; contain-intrinsic-size: 0 300px; }
+  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; transition: transform 0.18s ease; cursor: pointer; display: flex; flex-direction: column; border: none; box-shadow: var(--shadow-card); height: 100%; position: relative; content-visibility: auto; contain-intrinsic-size: 0 300px; }
   .month-group { content-visibility: auto; contain-intrinsic-size: 0 400px; }
   .event-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
   .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.75);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:5; }
@@ -114,13 +114,13 @@
   .timeline-card-title { font-size:0.85rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:4px; }
   .timeline-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;gap:8px;flex-wrap:wrap; }
   /* list view */
-  .list-card { background:#fff;border-radius:var(--radius-card);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:all 0.15s; }
-  .list-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.10);transform:translateY(-1px); }
+  .list-card { background:#fff;border-radius:var(--radius-card);border:none;box-shadow:var(--shadow-card);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer; }
+  .list-card:hover { }
   .list-card-img { width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f3f4f6; }
   .list-card-body { flex:1;min-width:0; }
   .list-card-title { font-size:0.85rem;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px; }
   .list-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;gap:8px;flex-wrap:wrap; }
-  .event-card:active { transform: translateY(-1px) scale(1.002); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .event-card:active { transform: translateY(-1px); }
   /* ── Card countdown timer ── */
   .card-countdown { display:none !important; }
   .count-box { background:rgba(0,0,0,0.08); color:#111; padding:4px 6px; border-radius:6px; font-size:0.65rem; font-weight:800; text-align:center; line-height:1.2; min-width:34px; letter-spacing:0.02em; }
@@ -151,7 +151,7 @@
   .card-img.img-loaded  { opacity: 1; transition: opacity 0.25s ease; }
   .artist-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
   /* ── CALENDAR ── */
-  .cal-day { width:66px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;transition:background 0.15s;box-sizing:border-box;position:relative;border:none;padding:0; }
+  .cal-day { width:66px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;box-sizing:border-box;position:relative;border:none;padding:0; }
   .cal-day:hover { background: #f3f4f6; }
   .cal-day-selected { background: #111 !important; }
   .cal-day-has-event::after { content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#6b7280; }
@@ -160,7 +160,7 @@
   .cal-event-dot { display:none; }
   .cal-event-dot-circle { display:none; }
   /* event list right side */
-  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;box-shadow:var(--shadow-card);cursor:pointer;transition:box-shadow 0.15s; }
+  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;box-shadow:var(--shadow-card);cursor:pointer; }
   .cal-list-item:hover { box-shadow:0 4px 14px rgba(0,0,0,0.10); }
   .cal-list-date { flex-shrink:0;width:48px;text-align:center; }
   .cal-list-dow { font-size:0.68rem;font-weight:700;color:#9ca3af;letter-spacing:0.07em;text-transform:uppercase; }
@@ -260,7 +260,7 @@
   .cal-date-chip-dot { width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0; }
   /* card grid */
   .cal-card-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px; }
-  .cal-ev-card { background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s; }
+  .cal-ev-card { background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;transition:transform 0.15s; }
   .cal-ev-card:hover { transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.10); }
   .cal-ev-card-img { width:100%;height:120px;object-fit:cover;object-position:top;display:block;background:#f3f4f6; }
   .cal-ev-card-img-placeholder { width:100%;height:120px;display:flex;align-items:center;justify-content:center; }
@@ -335,7 +335,7 @@
   .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; border: 1.5px solid #e5e7eb; font-size: 0.82rem; font-weight: 600; color: #374151; text-decoration: none; transition: all 0.15s; }
   .link-btn:hover { background: #f9f9f9; border-color: #d1d5db; }
   footer { background: #fff; border-top: 1px solid #f0f0f0; margin-top: auto; flex-shrink: 0; }
-  .blink-heart { color: #00e5ff; animation: blink-pulse 1.5s infinite; display:inline-block; }
+  .blink-heart { color: #00e5ff; display:inline-block; }
   @keyframes blink-pulse { 0%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.2)} 100%{opacity:1;transform:scale(1)} }
   @media (max-width: 640px) {
     .cal-event-dot { font-size: 0.68rem; padding: 2px 4px; }
@@ -425,7 +425,7 @@
     #form-preview-col { border-left: none !important; border-top: 1px solid #f0f0f0; }
   }
   .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:0.82rem;position:relative; }
-  .bday-today { animation: bday-pulse 2s ease-in-out infinite; }
+  .bday-today { }
   @keyframes bday-pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .bday-icon { font-size:1.3rem;flex-shrink:0; }
@@ -877,7 +877,7 @@
     transition: filter 0.35s ease, transform 0.35s ease;
     background: linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);
     background-size: 300% 100%;
-    animation: shimmer 1.4s ease-in-out infinite;
+    /* animation removed for mobile perf */
   }
   .card-img.img-loaded {
     filter: none;
@@ -4260,7 +4260,7 @@ function buildTypePill(type, size) {
   const s = getTypeStyle(type);
   const fs  = size === 'lg' ? '0.82rem' : '0.72rem';
   const pad = size === 'lg' ? '5px 12px' : '3px 9px';
-  const dot = s.dot ? `<span style="width:6px;height:6px;border-radius:50%;background:${s.dot};margin-right:5px;flex-shrink:0;display:inline-block;animation:pill-pulse 1.2s ease-in-out infinite;"></span>` : '';
+  const dot = s.dot ? `<span style="width:6px;height:6px;border-radius:50%;background:${s.dot};margin-right:5px;flex-shrink:0;display:inline-block;"></span>` : '';
   const cake = s.cake ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0;"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2 1 2 1"/><line x1="2" y1="21" x2="22" y2="21"/><path d="M7 8v2"/><path d="M12 8v2"/><path d="M17 8v2"/><path d="M7 4h.01"/><path d="M12 4h.01"/><path d="M17 4h.01"/></svg>` : '';
   const prefix = cake || dot;
   return `<span style="display:inline-flex;align-items:center;font-size:${fs};font-weight:700;border-radius:6px;padding:${pad};background:${s.bg};color:${s.color};border:1px solid ${s.border};">${prefix}${escHtml(type)}</span>`;
