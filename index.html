@@ -1529,7 +1529,7 @@
       </div>
 
       <!-- Tab bar -->
-      <div style="display:flex;gap:3px;background:#f0efeb;border-radius:10px;padding:3px;width:fit-content;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;" id="admin-tab-bar">
+      <div style="display:flex;gap:3px;background:#f0efeb;border-radius:10px;padding:3px;width:fit-content;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;position:relative;z-index:10;" id="admin-tab-bar">
        <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:#ff5c35;color:#fff;font-family:inherit;">
         <i data-lucide="calendar" style="width:13px;height:13px;"></i>Events
        </button>
@@ -1567,7 +1567,7 @@
       </div>
 
       <!-- TAB: Works -->
-      <div id="admin-tab-works" class="admin-tab-panel" style="display:none;">
+      <div id="admin-tab-works" class="admin-tab-panel" style="display:none;position:relative;z-index:1;">
        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
         <p style="font-size:0.78rem;color:#9ca3af;">Manage artist works — series, music, magazine, brand &amp; more</p>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -6500,7 +6500,7 @@ function renderAdminWorksList() {
 
     // ── ROW — same style as Events tab rows ──────────────────
     const row = document.createElement('div');
-    row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;';
+    row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;position:relative;z-index:1;';
 
     // Info block
     const info = document.createElement('div');
