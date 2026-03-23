@@ -90,11 +90,12 @@
   .page.active {
     display: flex;
     flex-direction: column;
-    animation: pageIn 0.2s ease both;
+    animation: pageIn 0.18s ease both;
   }
+  /* opacity-only — ไม่ใช้ transform เพื่อไม่สร้าง composite layer ใหม่บน iOS */
   @keyframes pageIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
   .nav-link { cursor: pointer; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 99px; color: #9ca3af; letter-spacing: 0.01em; }
   .nav-link:hover { color: #111; background: rgba(0,0,0,0.06); }
@@ -431,6 +432,10 @@
   @media (max-width: 780px) {
     #form-preview-layout { grid-template-columns: 1fr !important; }
     #form-preview-col { border-left: none !important; border-top: 1px solid #f0f0f0; }
+  }
+  /* ── Admin tab panels: fade-in ป้องกันกระตุก ── */
+  .admin-tab-panel.tab-active {
+    animation: pageIn 0.18s ease both;
   }
   .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:0.82rem;position:relative; }
   .bday-today { }
@@ -877,16 +882,7 @@
   .month-group {
     /* ไม่ใส่ contain เพราะทำให้ sticky/overflow พัง */
   }
-  /* ── Lazy image: fade-in ที่ไม่กระตุก (ไม่ใช้ blur/transform) ── */
-  .card-img.img-loading {
-    opacity: 0;
-    background: #f3f4f6;
-  }
-  .card-img.img-loaded {
-    opacity: 1;
-    transition: opacity 0.2s ease;
-    background: transparent;
-  }
+  /* img-loading / img-loaded defined above (line ~158) */
   /* ── Reduce heavy shadows on mobile (perf) ── */
   @media (max-width: 767px) {
     .event-card { box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important; }
@@ -3241,6 +3237,7 @@ async function _fetchAllData(force = false) {
       _vsLastFingerprint = '';
       _calLastFP = '';
       _worksLastFP = '';
+      _adminListFP = '';
       scheduleRender();
       renderBirthdayBanners();
     }
@@ -3297,6 +3294,7 @@ async function loadEventsFromSheets(force = false) {
       if (newFP !== prevFP) {
         _vsLastFingerprint = '';
         _calLastFP = '';
+        _adminListFP = '';
         scheduleRender();
       }
       _scheduleEventStartTimers();
@@ -3955,90 +3953,57 @@ function _vsInit(groups) {
 
   _vsGrid = grid;
   if (!_vsGrid) return;
-  _vsGrid.innerHTML = '';
-  _vsGrid.style.display = 'flex';
-  _vsGrid.style.flexDirection = 'column';
 
+  // Build ทั้งหมดลง DocumentFragment ก่อน — swap เข้า DOM ครั้งเดียว ไม่มี flash
+  const frag = document.createDocumentFragment();
   let idx = 0;
   let currentMonth = null;
-  const monthMap = new Map();
-  const CHUNK = 20; // cards per RAF chunk
 
-  function buildAll() {
-    // Render ALL items synchronously — no sentinel, no IntersectionObserver
-    // Virtual scroll was causing blank list view; simpler full render is more reliable
-    while (idx < groups.length) {
-      const item = groups[idx++];
-      if (item.type === 'month-header') {
-        const gw = document.createElement('div');
-        gw.className = 'month-group';
-        const hdr = document.createElement('div');
-        hdr.className = 'month-group-header';
-        hdr.innerHTML = `<div class="month-group-header-box"><div class="month-group-header-dots"><div class="month-group-header-dot" style="background:#f97316;"></div><div class="month-group-header-dot" style="background:#6b7280;"></div><div class="month-group-header-dot" style="background:#22c55e;"></div></div><span class="month-group-header-label">${item.label}</span><span class="month-group-header-count">${item.total} event${item.total !== 1 ? 's' : ''}</span></div><span class="month-group-header-line"></span>`;
-        gw.appendChild(hdr);
-        let gridEl;
-        if (item.mode === 'list') {
-          gridEl = document.createElement('div');
-          gridEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(260px,35vw,480px),1fr));gap:8px;';
-        } else {
-          gridEl = document.createElement('div');
-          gridEl.className = 'cards-grid';
-          gridEl.style.cssText = 'display:grid;gap:clamp(8px,1.5vw,20px);align-items:stretch;';
-        }
-        gw.appendChild(gridEl);
-        _vsGrid.appendChild(gw);
-        currentMonth = { gw, gridEl };
-        monthMap.set(item.key, currentMonth);
-      } else if (item.type === 'card') {
-        const card = item.buildFn(item.ev);
-        if (currentMonth && card) currentMonth.gridEl.appendChild(card);
+  function buildItem(item) {
+    if (item.type === 'month-header') {
+      const gw = document.createElement('div');
+      gw.className = 'month-group';
+      const hdr = document.createElement('div');
+      hdr.className = 'month-group-header';
+      hdr.innerHTML = `<div class="month-group-header-box"><div class="month-group-header-dots"><div class="month-group-header-dot" style="background:#f97316;"></div><div class="month-group-header-dot" style="background:#6b7280;"></div><div class="month-group-header-dot" style="background:#22c55e;"></div></div><span class="month-group-header-label">${item.label}</span><span class="month-group-header-count">${item.total} event${item.total !== 1 ? 's' : ''}</span></div><span class="month-group-header-line"></span>`;
+      gw.appendChild(hdr);
+      let gridEl;
+      if (item.mode === 'list') {
+        gridEl = document.createElement('div');
+        gridEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(260px,35vw,480px),1fr));gap:8px;';
+      } else {
+        gridEl = document.createElement('div');
+        gridEl.className = 'cards-grid';
+        gridEl.style.cssText = 'display:grid;gap:clamp(8px,1.5vw,20px);align-items:stretch;';
       }
+      gw.appendChild(gridEl);
+      frag.appendChild(gw);
+      currentMonth = { gw, gridEl };
+    } else if (item.type === 'card') {
+      const card = item.buildFn(item.ev);
+      if (currentMonth && card) currentMonth.gridEl.appendChild(card);
     }
-    debounceLucide();
-    startCardCountdowns();
   }
 
-  // Render first 20 cards immediately, then rest in next RAF to avoid blocking paint
-  let firstDone = false;
-  function renderFirst() {
-    let rendered = 0;
-    while (idx < groups.length && rendered < CHUNK) {
-      const item = groups[idx++];
-      if (item.type === 'month-header') {
-        const gw = document.createElement('div');
-        gw.className = 'month-group';
-        const hdr = document.createElement('div');
-        hdr.className = 'month-group-header';
-        hdr.innerHTML = `<div class="month-group-header-box"><div class="month-group-header-dots"><div class="month-group-header-dot" style="background:#f97316;"></div><div class="month-group-header-dot" style="background:#6b7280;"></div><div class="month-group-header-dot" style="background:#22c55e;"></div></div><span class="month-group-header-label">${item.label}</span><span class="month-group-header-count">${item.total} event${item.total !== 1 ? 's' : ''}</span></div><span class="month-group-header-line"></span>`;
-        gw.appendChild(hdr);
-        let gridEl;
-        if (item.mode === 'list') {
-          gridEl = document.createElement('div');
-          gridEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(260px,35vw,480px),1fr));gap:8px;';
-        } else {
-          gridEl = document.createElement('div');
-          gridEl.className = 'cards-grid';
-          gridEl.style.cssText = 'display:grid;gap:clamp(8px,1.5vw,20px);align-items:stretch;';
-        }
-        gw.appendChild(gridEl);
-        _vsGrid.appendChild(gw);
-        currentMonth = { gw, gridEl };
-        monthMap.set(item.key, currentMonth);
-      } else if (item.type === 'card') {
-        const card = item.buildFn(item.ev);
-        if (currentMonth && card) currentMonth.gridEl.appendChild(card);
-        rendered++;
-      }
-    }
+  // Render items แบ่งเป็น chunk ผ่าน rAF เพื่อไม่บล็อก main thread
+  const CHUNK = 30;
+  function renderChunk() {
+    const end = Math.min(idx + CHUNK, groups.length);
+    while (idx < end) buildItem(groups[idx++]);
     if (idx < groups.length) {
-      requestAnimationFrame(buildAll);
+      requestAnimationFrame(renderChunk);
     } else {
+      // Swap เข้า DOM ครั้งเดียว — ไม่มีช่วง blank
+      _vsGrid.style.display = 'flex';
+      _vsGrid.style.flexDirection = 'column';
+      _vsGrid.innerHTML = '';
+      _vsGrid.appendChild(frag);
       debounceLucide();
       startCardCountdowns();
     }
   }
 
-  renderFirst();
+  renderChunk();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -5040,12 +5005,12 @@ function renderCalendarCardGrid(monthEvents) {
     }
     return;
   }
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(200px,22vw,320px),1fr));gap:clamp(8px,1.5vw,16px);align-items:stretch;';
   if (noEv) noEv.style.display = 'none';
 
   const todayStr = _todayInBKK();
-  // ✅ render ทุก event ในครั้งเดียว ใช้ content-visibility:auto แทน batch
-  grid.innerHTML = eventsToShow.map(ev => {
+  // Build into fragment first, then swap once — no blank flash
+  const _calFrag = document.createDocumentFragment();
+  eventsToShow.map(ev => {
     const color = getArtistColor(ev.artists);
     const past = isEventPast(ev);
     const days2 = daysUntilEvent(ev.dateStart);
@@ -5080,8 +5045,10 @@ function renderCalendarCardGrid(monthEvents) {
     const imgThumb = ev.image
       ? `<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;flex-shrink:0;" onerror="this.style.display='none'">`
       : `<div style="width:72px;height:72px;border-radius:10px;flex-shrink:0;background:${grad};display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>`;
-    return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;" onclick="openDetailModal('${ev.__backendId}')">
-      <div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
+    const div = document.createElement('div');
+    div.style.cssText = `background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;`;
+    div.onclick = () => openDetailModal(ev.__backendId);
+    div.innerHTML = `<div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
       <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}${badge?`<span style="margin-left:auto;">${badge}</span>`:''}</div>
         <div style="font-size:0.85rem;font-weight:700;color:${past?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div>
@@ -5091,9 +5058,14 @@ function renderCalendarCardGrid(monthEvents) {
           ${loc?`<span style="color:#d1d5db;">·</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(loc)}</span>`:''}
         </div>
         ${calCountdownHtml}
-      </div>
-    </div>`;
-  }).join('');
+      </div>`;
+    _calFrag.appendChild(div);
+  });
+
+  // Swap เข้า DOM ครั้งเดียว — ไม่มี blank flash
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(200px,22vw,320px),1fr));gap:clamp(8px,1.5vw,16px);align-items:stretch;';
+  grid.innerHTML = '';
+  grid.appendChild(_calFrag);
 
   // ── Start live countdown tickers for calendar cards ──
   startCardCountdowns();
@@ -5415,22 +5387,35 @@ function renderAdminYearTabs() {
   sel.innerHTML = years.map(y => `<option value="${y}" ${y === _adminYearFilter ? 'selected' : ''}>${y}</option>`).join('');
 }
 
+let _currentAdminTab = 'events';
 function switchAdminTab(tab) {
-  document.querySelectorAll('.admin-tab-btn').forEach(b => {
-    const isActive = b.id === 'atb-' + tab;
-    b.style.background = isActive ? '#111' : 'transparent';
-    b.style.color = isActive ? '#fff' : '#6b7280';
+  if (_currentAdminTab === tab) return; // no-op ถ้ากด tab เดิม
+  _currentAdminTab = tab;
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.admin-tab-btn').forEach(b => {
+      const isActive = b.id === 'atb-' + tab;
+      b.style.background = isActive ? '#111' : 'transparent';
+      b.style.color = isActive ? '#fff' : '#6b7280';
+    });
+    document.querySelectorAll('.admin-tab-panel').forEach(p => {
+      p.style.display = 'none';
+      p.classList.remove('tab-active');
+    });
+    const panel = document.getElementById('admin-tab-' + tab);
+    if (panel) {
+      panel.style.display = 'block';
+      // force reflow เพื่อให้ animation fire ใหม่
+      void panel.offsetWidth;
+      panel.classList.add('tab-active');
+    }
+    if (tab === 'works') {
+      if (worksLoaded) renderAdminWorksList();
+      else loadWorksFromSheets().then(renderAdminWorksList);
+    }
+    if (tab === 'bdays') renderAnniversaryAdmin();
+    if (tab === 'anniv') renderAnniversaryAdmin();
+    debounceLucide();
   });
-  document.querySelectorAll('.admin-tab-panel').forEach(p => p.style.display = 'none');
-  const panel = document.getElementById('admin-tab-' + tab);
-  if (panel) panel.style.display = 'block';
-  if (tab === 'works') {
-    if (worksLoaded) renderAdminWorksList();
-    else loadWorksFromSheets().then(renderAdminWorksList);
-  }
-  if (tab === 'bdays') renderAnniversaryAdmin();
-  if (tab === 'anniv') renderAnniversaryAdmin();
-  debounceLucide();
 }
 
 function setAdminYear(y) {
@@ -5440,12 +5425,21 @@ function setAdminYear(y) {
   renderAdminList();
 }
 
+let _adminListFP = '';
 function renderAdminList() {
   const list    = document.getElementById('admin-events-list');
   const noEv    = document.getElementById('admin-no-events');
   const limitWarn = document.getElementById('admin-limit-warn');
   if (!list) return;
   if (limitWarn) limitWarn.style.display = allEvents.length >= 999 ? 'block' : 'none';
+
+  // Fingerprint check — skip re-render if data & filter unchanged
+  const fp = _adminYearFilter + '|' + allEvents.length + '|' + (allEvents[0]?.__backendId || '');
+  if (fp === _adminListFP && list.children.length > 0) {
+    renderAdminYearTabs();
+    return;
+  }
+  _adminListFP = fp;
 
   // Always render year tabs first (even if no events)
   renderAdminYearTabs();
@@ -5598,9 +5592,8 @@ function updateAdminRow(row, ev) {
       ?`<span style="font-size:0.78rem;color:#dc2626;font-weight:600;">${t('admin_confirm_delete')}</span><button class="btn-danger" onclick="confirmDelete('${rowKey}')">Yes</button><button class="btn-secondary" style="font-size:0.8rem;padding:5px 10px;" onclick="cancelDelete('${rowKey}')">${t('admin_cancel')}</button>`
       :`<button class="btn-secondary" style="font-size:0.8rem;padding:6px 10px;" onclick="openEditModal('${rowKey}')"><i data-lucide="edit-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:3px;"></i>${'Edit'}</button><button class="btn-danger" onclick="startDelete('${rowKey}')"><i data-lucide="trash-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:2px;"></i>${t('admin_delete')}</button>`
     }</div>`;
-  debounceLucide();
 }
-function startDelete(k)  { deleteConfirmIds.add(k);    const r=document.querySelector(`#admin-events-list [data-event-id="${k}"]`); const e=findEventByKey(k); if(r&&e)updateAdminRow(r,e); }
+function startDelete(k)  { deleteConfirmIds.add(k);    const r=document.querySelector(`#admin-events-list [data-event-id="${k}"]`); const e=findEventByKey(k); if(r&&e){ updateAdminRow(r,e); debounceLucide(); } }
 function cancelDelete(k) { deleteConfirmIds.delete(k); const r=document.querySelector(`#admin-events-list [data-event-id="${k}"]`); const e=findEventByKey(k); if(r&&e)updateAdminRow(r,e); }
 async function confirmDelete(key) {
   const ev = findEventByKey(key);
@@ -6626,8 +6619,8 @@ function renderWorks() {
     return card;
   }
 
-  accordion.style.display = 'block';
-  accordion.innerHTML = '';
+  // Build ลง fragment ก่อน swap ครั้งเดียว — ไม่มี blank flash
+  const _wFrag = document.createDocumentFragment();
 
   // เลือกปีเฉพาะ → การ์ดตรงๆ ไม่มี divider ไม่มี badge
   if (_worksYear !== 'all') {
@@ -6635,7 +6628,10 @@ function renderWorks() {
     cardGrid.style.cssText = gridCols;
     cardGrid.className = 'works-year-grid';
     filtered.forEach(w => cardGrid.appendChild(buildCard(w)));
-    accordion.appendChild(cardGrid);
+    _wFrag.appendChild(cardGrid);
+    accordion.style.display = 'block';
+    accordion.innerHTML = '';
+    accordion.appendChild(_wFrag);
     debounceLucide();
     return;
   }
@@ -6648,7 +6644,10 @@ function renderWorks() {
     cardGrid.style.cssText = gridCols;
     cardGrid.className = 'works-year-grid';
     filtered.forEach(w => cardGrid.appendChild(buildCard(w)));
-    accordion.appendChild(cardGrid);
+    _wFrag.appendChild(cardGrid);
+    accordion.style.display = 'block';
+    accordion.innerHTML = '';
+    accordion.appendChild(_wFrag);
     debounceLucide();
     return;
   }
@@ -6664,15 +6663,15 @@ function renderWorks() {
       <div style="flex:1;height:1px;background:#f0f0f0;"></div>
       <span style="font-size:0.65rem;color:#9ca3af;">${works.length} works</span>
     `;
-    accordion.appendChild(divider);
+    _wFrag.appendChild(divider);
 
-    // Card grid — year badge injected after card is in DOM
+    // Card grid — year badge injected into fragment
     const cardGrid = document.createElement('div');
     cardGrid.style.cssText = gridCols;
     cardGrid.className = 'works-year-grid';
     works.forEach(w => cardGrid.appendChild(buildCard(w)));
-    accordion.appendChild(cardGrid);
-    // Now cards are in DOM — inject year badge on thumb
+    _wFrag.appendChild(cardGrid);
+    // inject year badge on thumb (works fine in fragment)
     cardGrid.querySelectorAll('div[style*="aspect-ratio"]').forEach(thumb => {
       thumb.style.position = 'relative';
       const badge = document.createElement('span');
@@ -6682,6 +6681,10 @@ function renderWorks() {
     });
   });
 
+  // Swap เข้า DOM ครั้งเดียว
+  accordion.style.display = 'block';
+  accordion.innerHTML = '';
+  accordion.appendChild(_wFrag);
   debounceLucide();
 }
 
@@ -6705,12 +6708,12 @@ document.addEventListener('touchmove',  () => {}, { passive: true });
 // Pause/resume background refresh when tab visibility changes
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    // Refresh when tab becomes visible — always check if >60s since last fetch
+    // Refresh when tab becomes visible — check if >60s since last fetch
+    // ส่ง force=false เพื่อให้ fingerprint check ทำงาน (ไม่ re-render ถ้า data ไม่เปลี่ยน)
     const age = Date.now() - Cache.getTS(LC.TS_EV);
-    const evStale = age > 60000; // refresh if older than 1 minute
-    const wkStale = !Cache.isFresh(LC.TS_WK);
+    const evStale = age > 60000;
     if (evStale && !_fetchingAll) {
-      _fetchAllData(true).catch(()=>{});
+      _fetchAllData(false).catch(()=>{});
     }
   }
 });
