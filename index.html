@@ -6824,36 +6824,25 @@ function renderWorks() {
     return;
   }
 
-  // ทุกกรณีอื่น (All Years, หรือมี filter tab/artist) → แสดง divider แยกปีเสมอ
-
-  years.forEach((year, idx) => {
-    const works = yearMap[year];
-
-    // Divider row
-    const divider = document.createElement('div');
-    divider.style.cssText = 'display:flex;align-items:center;gap:8px;padding:' + (idx === 0 ? '4px 0 6px' : '16px 0 6px') + ';';
-    divider.innerHTML = `
-      <span style="font-size:0.75rem;font-weight:800;color:${idx === 0 ? '#7e22ce' : '#9ca3af'};min-width:36px;">${escHtml(year)}</span>
-      <div style="flex:1;height:1px;background:#f0f0f0;"></div>
-      <span style="font-size:0.65rem;color:#9ca3af;">${works.length} works</span>
-    `;
-    _wFrag.appendChild(divider);
-
-    // Card grid — year badge injected into fragment
-    const cardGrid = document.createElement('div');
-    cardGrid.style.cssText = gridCols;
-    cardGrid.className = 'works-year-grid';
-    works.forEach(w => cardGrid.appendChild(buildCard(w)));
-    _wFrag.appendChild(cardGrid);
-    // inject year badge on thumb (works fine in fragment)
-    cardGrid.querySelectorAll('div[style*="aspect-ratio"]').forEach(thumb => {
-      thumb.style.position = 'relative';
-      const badge = document.createElement('span');
-      badge.textContent = year;
-      badge.style.cssText = 'position:absolute;top:5px;right:5px;font-size:0.55rem;font-weight:700;background:rgba(0,0,0,0.5);color:#fff;padding:1px 5px;border-radius:4px;z-index:2;pointer-events:none;';
-      thumb.appendChild(badge);
+  // มี filter tab หรือ artist → flat grid ไม่มี divider (ปีขึ้นบนการ์ดอยู่แล้ว)
+  const flatGrid = document.createElement('div');
+  flatGrid.style.cssText = gridCols;
+  flatGrid.className = 'works-year-grid';
+  years.forEach(year => {
+    yearMap[year].forEach(w => {
+      const card = buildCard(w);
+      const thumb = card.querySelector('div[style*="aspect-ratio"]');
+      if (thumb) {
+        thumb.style.position = 'relative';
+        const badge = document.createElement('span');
+        badge.textContent = w.year || year;
+        badge.style.cssText = 'position:absolute;top:5px;right:5px;font-size:0.55rem;font-weight:700;background:rgba(0,0,0,0.5);color:#fff;padding:1px 5px;border-radius:4px;z-index:2;pointer-events:none;';
+        thumb.appendChild(badge);
+      }
+      flatGrid.appendChild(card);
     });
   });
+  _wFrag.appendChild(flatGrid);
 
   // Swap เข้า DOM ครั้งเดียว
   accordion.style.display = 'block';
