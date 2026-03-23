@@ -5399,9 +5399,13 @@ function renderAdminYearTabs() {
   sel.innerHTML = years.map(y => `<option value="${y}" ${y === _adminYearFilter ? 'selected' : ''}>${y}</option>`).join('');
 }
 
-let _currentAdminTab = 'events';
+let _currentAdminTab = '';
 function switchAdminTab(tab) {
-  if (_currentAdminTab === tab) return; // no-op ถ้ากด tab เดิม
+  if (_currentAdminTab === tab) {
+    // แม้ tab เดิม ให้ force re-render ถ้าเป็น works (กรณี data อาจเปลี่ยน)
+    if (tab === 'works') { if (worksLoaded) renderAdminWorksList(); else loadWorksFromSheets().then(renderAdminWorksList); }
+    return;
+  }
   _currentAdminTab = tab;
   requestAnimationFrame(() => {
     document.querySelectorAll('.admin-tab-btn').forEach(b => {
@@ -5727,6 +5731,7 @@ async function doAdminLogin() {
     document.getElementById('admin-login').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'flex';
     navigate('admin'); renderAdminList(); renderAnniversaryAdmin();
+    _currentAdminTab = ''; // reset ก่อนเสมอ เพื่อให้ switchAdminTab ไม่ถูก skip
     switchAdminTab('events');
     if (worksLoaded) renderAdminWorksList(); else loadWorksFromSheets().then(renderAdminWorksList);
     debounceLucide();
@@ -5828,6 +5833,7 @@ function openEditModal(key) {
 function closeEventFormModal() {
   document.getElementById('event-form-modal').style.display = 'none';
   document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
   editingEventId = null; editingEventRowNumber = null;
 }
 function closeEventFormModalBackdrop(e) { /* intentionally disabled */ }
@@ -6281,14 +6287,21 @@ function openEditWorksModal(work) {
   const prevImg = document.getElementById('wf-prev-image');
   if (prevImg) prevImg.style.display = 'none';
   if (work.image) previewWorksImg();
-  document.getElementById('works-form-modal').style.display = 'flex';
+  const modal = document.getElementById('works-form-modal');
+  modal.style.display = 'flex';
+  // Reset scroll to top of modal box
+  const box = modal.querySelector('.modal-box');
+  if (box) box.scrollTop = 0;
   document.body.style.overflow = 'hidden';
+  // Focus title field
+  setTimeout(() => { const f = document.getElementById('wf-title'); if (f) f.focus(); }, 80);
   debounceLucide();
 }
 
 function closeWorksFormModal() {
   document.getElementById('works-form-modal').style.display = 'none';
   document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
   _clearWorksForm();
 }
 
@@ -6341,20 +6354,30 @@ async function handleWorksFormSubmit() {
       if (res.status !== 'ok') throw new Error(res.message || 'Create failed');
     }
     closeWorksFormModal();
-    showToast(_editingWorkId ? 'Work updated' : 'Work added');
+    showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
     worksLoaded = false;
     await loadWorksFromSheets(true);
     renderAdminWorksList();
   } catch(err) {
-    showToast('Error: ' + (err.message || 'Failed to save work'));
+    showToast('❌ Error: ' + (err.message || 'Failed to save work'));
+    console.error('[handleWorksFormSubmit]', err);
+  } finally {
+    btn.disabled=false; txt.style.display='inline'; spin.style.display='none';
   }
-  btn.disabled=false; txt.style.display='inline'; spin.style.display='none';
 }
 
 async function deleteWork(backendId, title) {
   if (!confirm('Delete "' + title + '"?')) return;
   const work = allWorks.find(w => String(w.__backendId || w.id) === String(backendId));
   const id = work ? (work.__backendId || work.id || '') : String(backendId);
+  // Visual feedback — find the delete button and show loading state
+  const allRows = document.querySelectorAll('#admin-works-list > div');
+  let targetDelBtn = null;
+  allRows.forEach(row => {
+    const btns = row.querySelectorAll('button');
+    btns.forEach(b => { if (b.textContent.trim() === 'Delete') { const editBtn = row.querySelector('button:first-of-type'); if (editBtn && editBtn !== b) targetDelBtn = b; } });
+  });
+  if (targetDelBtn) { targetDelBtn.disabled = true; targetDelBtn.textContent = '...'; }
   try {
     const res = await apiPost({ action: 'deleteWork', id });
     if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
@@ -6366,7 +6389,9 @@ async function deleteWork(backendId, title) {
     renderAdminWorksList();
     if (currentPage === 'works') renderWorks();
   } catch(err) {
-    showToast('Error: ' + (err.message || 'Failed to delete'));
+    if (targetDelBtn) { targetDelBtn.disabled = false; targetDelBtn.textContent = 'Delete'; }
+    showToast('❌ Error: ' + (err.message || 'Failed to delete'));
+    console.error('[deleteWork]', err);
   }
 }
 
@@ -6455,9 +6480,14 @@ function renderAdminWorksList() {
     // Edit button — created with createElement, no innerHTML escaping needed
     const editBtn = document.createElement('button');
     editBtn.textContent = 'Edit';
+    editBtn.setAttribute('data-wid', wid);
     editBtn.style.cssText = 'background:#f3f4f6;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;font-weight:600;cursor:pointer;color:#374151;flex-shrink:0;';
-    editBtn.addEventListener('click', function() {
-      openEditWorksModal(window._adminWorksMap[wid]);
+    editBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const key = this.getAttribute('data-wid');
+      const workObj = window._adminWorksMap[key];
+      if (!workObj) { showToast('ไม่พบข้อมูล work นี้ กรุณา Refresh'); return; }
+      openEditWorksModal(workObj);
     });
     row.appendChild(editBtn);
 
@@ -6465,9 +6495,14 @@ function renderAdminWorksList() {
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Delete';
     delBtn.className = 'btn-danger';
+    delBtn.setAttribute('data-wid', wid);
+    delBtn.setAttribute('data-title', w.title || '');
     delBtn.style.flexShrink = '0';
-    delBtn.addEventListener('click', function() {
-      deleteWork(wid, w.title);
+    delBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const key = this.getAttribute('data-wid');
+      const ttl = this.getAttribute('data-title');
+      deleteWork(key, ttl);
     });
     row.appendChild(delBtn);
 
@@ -6802,6 +6837,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('admin-login').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'flex';
     renderAnniversaryAdmin();
+    // reset tab state so switchAdminTab ไม่ถูก skip
+    _currentAdminTab = '';
+    switchAdminTab('events');
+    if (worksLoaded) renderAdminWorksList(); else loadWorksFromSheets().then(renderAdminWorksList);
   }
 
   // ── STEP 1: Try to load from cache immediately (< 5ms, zero network) ──
