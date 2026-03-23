@@ -5596,18 +5596,86 @@ function updateAdminRow(row, ev) {
   const color  = getArtistColor(ev.artists);
   const past   = isEventPast(ev);
   const isConf = deleteConfirmIds.has(rowKey);
-  const idBadge = !ev.__backendId
-    ? `<span style="font-size:0.68rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;" title="ID missing">⚠ no id</span>`
-    : '';
-  row.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></div>
-    <div style="flex:1;min-width:150px;">
-      <p style="font-weight:700;font-size:1rem;${past?'color:#9ca3af;':''}">${escHtml(ev.title)}${idBadge}${past?`<span style="font-size:0.7rem;background:#f3f4f6;color:#9ca3af;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;">${t('past_events')}</span>`:''}</p>
-      <p style="font-size:0.78rem;color:#9ca3af;margin-top:2px;">${fmtDate(ev.dateStart)} · ${getArtistLabel(ev.artists)}</p>
-    </div>
-    <div style="display:flex;gap:6px;align-items:center;">${isConf
-      ?`<span style="font-size:0.78rem;color:#dc2626;font-weight:600;">${t('admin_confirm_delete')}</span><button class="btn-danger" onclick="confirmDelete('${rowKey}')">Yes</button><button class="btn-secondary" style="font-size:0.8rem;padding:5px 10px;" onclick="cancelDelete('${rowKey}')">${t('admin_cancel')}</button>`
-      :`<button class="btn-secondary" style="font-size:0.8rem;padding:6px 10px;" onclick="openEditModal('${rowKey}')"><i data-lucide="edit-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:3px;"></i>${'Edit'}</button><button class="btn-danger" onclick="startDelete('${rowKey}')"><i data-lucide="trash-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:2px;"></i>${t('admin_delete')}</button>`
-    }</div>`;
+
+  row.innerHTML = '';
+
+  // ── Dot
+  const dot = document.createElement('div');
+  dot.style.cssText = `width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;`;
+  row.appendChild(dot);
+
+  // ── Info block
+  const info = document.createElement('div');
+  info.style.cssText = 'flex:1;min-width:150px;';
+
+  const titleP = document.createElement('p');
+  titleP.style.cssText = `font-weight:700;font-size:1rem;${past ? 'color:#9ca3af;' : ''}`;
+  titleP.textContent = ev.title || '';
+
+  if (!ev.__backendId) {
+    const badge = document.createElement('span');
+    badge.title = 'ID missing';
+    badge.style.cssText = 'font-size:0.68rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;';
+    badge.textContent = '⚠ no id';
+    titleP.appendChild(badge);
+  }
+  if (past) {
+    const pastBadge = document.createElement('span');
+    pastBadge.style.cssText = 'font-size:0.7rem;background:#f3f4f6;color:#9ca3af;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;';
+    pastBadge.textContent = t('past_events');
+    titleP.appendChild(pastBadge);
+  }
+
+  const metaP = document.createElement('p');
+  metaP.style.cssText = 'font-size:0.78rem;color:#9ca3af;margin-top:2px;';
+  metaP.textContent = `${fmtDate(ev.dateStart)} · ${getArtistLabel(ev.artists)}`;
+
+  info.appendChild(titleP);
+  info.appendChild(metaP);
+  row.appendChild(info);
+
+  // ── Button area
+  const btnArea = document.createElement('div');
+  btnArea.style.cssText = 'display:flex;gap:6px;align-items:center;';
+
+  if (isConf) {
+    // Confirm-delete state
+    const confirmTxt = document.createElement('span');
+    confirmTxt.style.cssText = 'font-size:0.78rem;color:#dc2626;font-weight:600;';
+    confirmTxt.textContent = t('admin_confirm_delete');
+    btnArea.appendChild(confirmTxt);
+
+    const yesBtn = document.createElement('button');
+    yesBtn.className = 'btn-danger';
+    yesBtn.textContent = 'Yes';
+    yesBtn.addEventListener('click', function(e) { e.stopPropagation(); confirmDelete(rowKey); });
+    btnArea.appendChild(yesBtn);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn-secondary';
+    cancelBtn.style.cssText = 'font-size:0.8rem;padding:5px 10px;';
+    cancelBtn.textContent = t('admin_cancel');
+    cancelBtn.addEventListener('click', function(e) { e.stopPropagation(); cancelDelete(rowKey); });
+    btnArea.appendChild(cancelBtn);
+  } else {
+    // Normal Edit / Delete buttons
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-secondary';
+    editBtn.style.cssText = 'font-size:0.8rem;padding:6px 10px;display:inline-flex;align-items:center;gap:4px;';
+    editBtn.innerHTML = '<i data-lucide="edit-2" style="width:13px;height:13px;"></i>Edit';
+    editBtn.addEventListener('click', function(e) { e.stopPropagation(); openEditModal(rowKey); });
+    btnArea.appendChild(editBtn);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-danger';
+    delBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;';
+    delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>' + t('admin_delete');
+    delBtn.addEventListener('click', function(e) { e.stopPropagation(); startDelete(rowKey); });
+    btnArea.appendChild(delBtn);
+  }
+
+  row.appendChild(btnArea);
+  debounceLucide();
 }
 function startDelete(k)  { deleteConfirmIds.add(k);    const r=document.querySelector(`#admin-events-list [data-event-id="${k}"]`); const e=findEventByKey(k); if(r&&e){ updateAdminRow(r,e); debounceLucide(); } }
 function cancelDelete(k) { deleteConfirmIds.delete(k); const r=document.querySelector(`#admin-events-list [data-event-id="${k}"]`); const e=findEventByKey(k); if(r&&e)updateAdminRow(r,e); }
@@ -6430,20 +6498,20 @@ function renderAdminWorksList() {
     const artistArr = (w.artists || '').split(',').map(a => a.trim()).filter(Boolean);
     const colorMap = { Pond: '#f97316', Phuwin: '#6b7280', Permpoon: '#22c55e' };
 
-    // ── ROW (no innerHTML for interactive parts) ──────────────────
+    // ── ROW — same style as Events tab rows ──────────────────
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:10px 14px;border:1.5px solid #ebebeb;';
+    row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;';
 
     // Info block
     const info = document.createElement('div');
     info.style.cssText = 'flex:1;min-width:0;';
 
     const titleEl = document.createElement('div');
-    titleEl.style.cssText = 'font-size:0.85rem;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    titleEl.style.cssText = 'font-size:1rem;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
     titleEl.textContent = w.title || '';
 
     const meta = document.createElement('div');
-    meta.style.cssText = 'font-size:0.68rem;color:#9ca3af;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+    meta.style.cssText = 'font-size:0.78rem;color:#9ca3af;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
 
     if (w.category) {
       const cat = document.createElement('span');
@@ -6477,11 +6545,16 @@ function renderAdminWorksList() {
     info.appendChild(meta);
     row.appendChild(info);
 
-    // Edit button — created with createElement, no innerHTML escaping needed
+    // Buttons wrapper — same layout as Events tab
+    const btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'display:flex;gap:6px;align-items:center;flex-shrink:0;';
+
+    // Edit button — same style as Events tab
     const editBtn = document.createElement('button');
-    editBtn.textContent = 'Edit';
+    editBtn.className = 'btn-secondary';
     editBtn.setAttribute('data-wid', wid);
-    editBtn.style.cssText = 'background:#f3f4f6;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;font-weight:600;cursor:pointer;color:#374151;flex-shrink:0;';
+    editBtn.style.cssText = 'font-size:0.8rem;padding:6px 10px;display:inline-flex;align-items:center;gap:4px;';
+    editBtn.innerHTML = '<i data-lucide="edit-2" style="width:13px;height:13px;"></i>Edit';
     editBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const key = this.getAttribute('data-wid');
@@ -6489,28 +6562,32 @@ function renderAdminWorksList() {
       if (!workObj) { showToast('ไม่พบข้อมูล work นี้ กรุณา Refresh'); return; }
       openEditWorksModal(workObj);
     });
-    row.appendChild(editBtn);
+    btnWrap.appendChild(editBtn);
 
-    // Delete button
+    // Delete button — same style as Events tab
     const delBtn = document.createElement('button');
-    delBtn.textContent = 'Delete';
     delBtn.className = 'btn-danger';
     delBtn.setAttribute('data-wid', wid);
     delBtn.setAttribute('data-title', w.title || '');
-    delBtn.style.flexShrink = '0';
+    delBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;';
+    delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>Delete';
     delBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const key = this.getAttribute('data-wid');
       const ttl = this.getAttribute('data-title');
       deleteWork(key, ttl);
     });
-    row.appendChild(delBtn);
+    btnWrap.appendChild(delBtn);
+
+    row.appendChild(btnWrap);
 
     frag.appendChild(row);
   });
 
   list.innerHTML = '';
   list.appendChild(frag);
+  // Re-init Lucide icons for the newly created Edit/Delete buttons
+  debounceLucide();
 }
 
 function setWorksTab(tab) {
