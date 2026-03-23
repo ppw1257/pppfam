@@ -3537,7 +3537,7 @@ let _todayStrCache = '';
 let _todayStrDate  = 0;
 function _getTodayStr() {
   const now = Date.now();
-  if (now - _todayStrDate > 5000) { // ลดจาก 60s → 5s
+  if (now - _todayStrDate > 30000) { // 30s cache — midnight timer flush อยู่แล้ว
     _todayStrCache = _todayInBKK();
     _todayStrDate  = now;
   }
@@ -4373,6 +4373,10 @@ function buildCardCountdown(ev) {
 // Also watches today's events and triggers re-render exactly when they start
 function startCardCountdowns() {
   if (_cardCountdownTimer) clearInterval(_cardCountdownTimer);
+  // ✅ FIX: ถ้าไม่มีงานวันนี้ ไม่ต้องรัน interval ทุกวินาที ลด CPU ลงมาก
+  const _todayCheck = _todayInBKK();
+  const _hasTodayEv = allEvents.some(ev => ev.dateStart === _todayCheck && !ev._isPast && ev.startTime);
+  if (!_hasTodayEv) return;
   _cardCountdownTimer = setInterval(() => {
     if (_countdownPaused) return; // skip when tab hidden
 
