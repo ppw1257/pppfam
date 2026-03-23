@@ -23,12 +23,12 @@
   <link rel="preconnect" href="https://script.google.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
-  <!-- Preload critical font subset -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap"></noscript>
+  <!-- โหลด font แบบ blocking เพื่อป้องกัน FOUT (font flash ที่ทำให้กระตุก) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap">
   <!-- Non-blocking scripts -->
   <script src="/_sdk/element_sdk.js" defer></script>
-  <script src="https://cdn.tailwindcss.com/3.4.17" defer></script>
+  <!-- Tailwind โหลดก่อน render เพื่อป้องกัน layout shift (ไม่ใช้ defer) -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" defer></script>
   <!-- Service Worker registration — L3 cache layer -->
   <script>
@@ -87,12 +87,20 @@
   body { height: 100%; background: #fafaf8; color: #111; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
   #app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .page { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; }
-  .page.active { display: flex; flex-direction: column; }
+  .page.active {
+    display: flex;
+    flex-direction: column;
+    animation: pageIn 0.2s ease both;
+  }
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
   .nav-link { cursor: pointer; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 99px; color: #9ca3af; letter-spacing: 0.01em; }
   .nav-link:hover { color: #111; background: rgba(0,0,0,0.06); }
   .nav-link.active { color: #111; background: #e5e7eb; border-radius: 99px; font-weight: 600; }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: none; box-shadow: var(--shadow-card); height: 100%; position: relative; content-visibility: auto; contain-intrinsic-size: 0 300px; }
-  .month-group { content-visibility: auto; contain-intrinsic-size: 0 400px; }
+  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: none; box-shadow: var(--shadow-card); height: 100%; position: relative; }
+  .month-group { }
   .event-card:hover { }
   .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.75);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;z-index:5; }
   .event-card:hover .card-hover-overlay { opacity:1; }
@@ -147,8 +155,8 @@
     display: block;
     background: #f3f4f6;
   }
-  .card-img.img-loading { opacity: 0; }
-  .card-img.img-loaded  { opacity: 1; }
+  .card-img.img-loading { opacity: 0; transition: none; }
+  .card-img.img-loaded  { opacity: 1; transition: opacity 0.25s ease; }
   .artist-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
   /* ── CALENDAR ── */
   .cal-day { width:66px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;box-sizing:border-box;position:relative;border:none;padding:0; }
@@ -862,21 +870,21 @@
     width: 100%;
   }
 
-  /* ── CSS containment reduces layout recalc ── */
+  /* ── CSS containment: paint-only (ไม่ใช้ layout contain เพราะทำให้การ์ดสูงผิดปกติ) ── */
   .event-card {
-    contain: layout style;
-    will-change: auto;
+    contain: paint;
   }
   .month-group {
-    contain: layout;
+    /* ไม่ใส่ contain เพราะทำให้ sticky/overflow พัง */
   }
-  /* ── Lazy image: shimmer while loading ── */
+  /* ── Lazy image: fade-in ที่ไม่กระตุก (ไม่ใช้ blur/transform) ── */
   .card-img.img-loading {
-    filter: blur(4px);
-    transform: scale(1.02);
+    opacity: 0;
     background: #f3f4f6;
   }
   .card-img.img-loaded {
+    opacity: 1;
+    transition: opacity 0.2s ease;
     background: transparent;
   }
   /* ── Reduce heavy shadows on mobile (perf) ── */
@@ -3168,10 +3176,17 @@ async function _fetchAllData(force = false) {
       fetchWithTimeout(`${base}/birthdays.json?t=${t}`),
       fetchWithTimeout(`${base}/anniversaries.json?t=${t}`),
     ]);
+    // ── fingerprint ก่อนอัปเดต เพื่อตรวจว่าข้อมูลเปลี่ยนจริงหรือเปล่า ──
+    const _prevEvFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '');
+    const _prevWkFP = allWorks.length  + '|' + (allWorks[0]?.__backendId  || '');
+    let dataChanged = false;
+
     // Events
     const evData = evRes.events || evRes;
     if (Array.isArray(evData) && evData.length) {
       const processed = processEvents(evData);
+      const newFP = processed.length + '|' + (processed[0]?.__backendId || '');
+      if (newFP !== _prevEvFP) dataChanged = true;
       allEvents = processed;
       _memCache.set('events', processed);
       Cache.set(LC.EVENTS, processed);
@@ -3181,7 +3196,10 @@ async function _fetchAllData(force = false) {
     // Works
     const wkData = wkRes.works || wkRes;
     if (Array.isArray(wkData) && wkData.length) {
-      allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      const wk = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      const newWkFP = wk.length + '|' + (wk[0]?.__backendId || '');
+      if (newWkFP !== _prevWkFP) dataChanged = true;
+      allWorks = wk;
       worksLoaded = true;
       _memCache.set('works', allWorks);
       Cache.set(LC.WORKS, allWorks);
@@ -3218,8 +3236,14 @@ async function _fetchAllData(force = false) {
     }
     _fmtDateCache.clear();
     hideConnectionError();
-    scheduleRender();
-    renderBirthdayBanners();
+    // ── Re-render เฉพาะเมื่อข้อมูลเปลี่ยนจริง หรือเป็น force fetch ──
+    if (dataChanged || force) {
+      _vsLastFingerprint = '';
+      _calLastFP = '';
+      _worksLastFP = '';
+      scheduleRender();
+      renderBirthdayBanners();
+    }
     _scheduleEventStartTimers();
   } catch(e) {
     console.warn('GitHub fetch failed, falling back to Apps Script:', e.message);
@@ -3258,6 +3282,8 @@ async function loadEventsFromSheets(force = false) {
     if (data && data.status === 'ok') {
       const raw = data.events || [];
       const processed = processEvents(raw);
+      const prevFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '');
+      const newFP  = processed.length + '|' + (processed[0]?.__backendId || '');
       allEvents = processed;
       _memCache.set('events', processed);   // L1 write
       Cache.set(LC.EVENTS, processed);      // L2 write
@@ -3267,7 +3293,12 @@ async function loadEventsFromSheets(force = false) {
       _fmtDateCache.clear();
       _escCache.clear();
       hideConnectionError();
-      scheduleRender();
+      // Re-render เฉพาะเมื่อข้อมูลเปลี่ยน
+      if (newFP !== prevFP) {
+        _vsLastFingerprint = '';
+        _calLastFP = '';
+        scheduleRender();
+      }
       _scheduleEventStartTimers();
     }
   } catch(e) {
@@ -4783,7 +4814,20 @@ function filterCalendar(artist) {
   renderCalendar();
 }
 
+// Calendar fingerprint — skip re-render when nothing changed
+let _calLastFP = '';
+
 function renderCalendar() {
+  // ── Fingerprint check — skip if same month/year/filter/selected/data ──
+  const calFP = `${calYear}|${calMonth}|${calFilter}|${calSelectedDate||''}|${allEvents.length}`;
+  const dateStripEl0 = document.getElementById('cal-date-strip');
+  const gridEmpty = !dateStripEl0 || dateStripEl0.children.length === 0;
+  if (calFP === _calLastFP && !gridEmpty) {
+    // Data and view identical — nothing to re-render
+    return;
+  }
+  _calLastFP = calFP;
+
   _calStatYear = calYear;
   renderCalYearStats();
   const year = calYear, month = calMonth;
@@ -4834,7 +4878,7 @@ function renderCalendar() {
   const countEl = document.getElementById('cal-month-event-count');
   if (countEl) countEl.textContent = totalMonthEvents.size;
 
-  // ── Month strip (4×3 grid) ──
+  // ── Month strip (4×3 grid) — อัปเดต in-place ถ้าทำได้ ──
   const stripEl = document.getElementById('cal-month-strip');
   if (stripEl) {
     const allMonthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -4844,12 +4888,17 @@ function renderCalendar() {
       const m = parseInt(ev.dateStart.split('-')[1]) - 1;
       if (m >= 0 && m < 12) evCountByMonth[m]++;
     });
-    stripEl.innerHTML = allMonthNames.map((mn, mi) => {
+    const newStripHTML = allMonthNames.map((mn, mi) => {
       const isActive = mi === month;
       const count = evCountByMonth[mi];
       const dotHtml = count > 0 ? `<span style="width:5px;height:5px;border-radius:50%;background:${isActive?'rgba(255,255,255,0.55)':'#f97316'};display:inline-block;flex-shrink:0;"></span>` : '';
       return `<button onclick="calMonth=${mi};calSelectedDate=null;renderCalendar();" style="padding:9px 6px;border-radius:10px;border:none;font-size:0.82rem;font-weight:${isActive?'700':'600'};background:${isActive?'#111':'#f3f4f6'};color:${isActive?'#fff':'#374151'};cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;">${mn}${dotHtml}</button>`;
     }).join('');
+    // Only update DOM if content actually changed
+    if (stripEl.dataset.fp !== calFP.slice(0, 20)) {
+      stripEl.innerHTML = newStripHTML;
+      stripEl.dataset.fp = calFP.slice(0, 20);
+    }
   }
 
   // ── Date strip — only days with events + today ──
@@ -5031,7 +5080,7 @@ function renderCalendarCardGrid(monthEvents) {
     const imgThumb = ev.image
       ? `<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;flex-shrink:0;" onerror="this.style.display='none'">`
       : `<div style="width:72px;height:72px;border-radius:10px;flex-shrink:0;background:${grad};display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>`;
-    return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;content-visibility:auto;contain-intrinsic-size:0 90px;" onclick="openDetailModal('${ev.__backendId}')">
+    return `<div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;" onclick="openDetailModal('${ev.__backendId}')">
       <div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
       <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}${badge?`<span style="margin-left:auto;">${badge}</span>`:''}</div>
@@ -5704,23 +5753,40 @@ async function adminRefresh() {
 
 function navigate(page) {
   if (page === 'admin' && (!panelUnlocked || !isLoggedIn())) return;
+  if (currentPage === page) return; // no-op ถ้าอยู่หน้าเดิมอยู่แล้ว
   currentPage = page;
-  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  const pageEl = document.getElementById('page-'+page);
-  if (pageEl) {
-    pageEl.classList.add('active');
-    pageEl.scrollTop = 0; // always scroll to top when switching pages
-  }
-  const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
-  if (navEl) navEl.classList.add('active');
-  // Works: render from cache instantly, then fetch fresh in background
-  if (page === 'works') {
-    if (allWorks.length) { renderWorks(); }
-    loadWorksFromSheets(); // always refresh in background (no-op if fresh)
-  }
-  scheduleRender();
-  debounceLucide();
+
+  // รวม DOM write ทั้งหมดไว้ใน rAF เดียว — ป้องกัน layout thrash
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    const pageEl = document.getElementById('page-' + page);
+    if (pageEl) {
+      pageEl.scrollTop = 0;
+      pageEl.classList.add('active');
+    }
+    const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
+    if (navEl) navEl.classList.add('active');
+
+    // Works: render from cache instantly, then fetch fresh in background
+    if (page === 'works') {
+      if (allWorks.length) { renderWorks(); }
+      loadWorksFromSheets(); // always refresh in background (no-op if fresh)
+      debounceLucide();
+      return;
+    }
+
+    // Calendar: fingerprint check ภายใน renderCalendar เองอยู่แล้ว — เรียกตรงได้เลย
+    if (page === 'calendar') {
+      renderCalendar();
+      debounceLucide();
+      return;
+    }
+
+    // Home/Admin: ใช้ scheduleRender ปกติ
+    scheduleRender();
+    debounceLucide();
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -6143,24 +6209,36 @@ async function loadWorksFromSheets(force = false) {
     const res = await fetchWithTimeout(`${JSON_BASE_URL}/works.json?t=${t}`);
     const raw = res.works || res;
     if (Array.isArray(raw) && raw.length) {
-      allWorks = _ensureWorksBackendId(raw.filter(w => w.title));
+      const prevWkFP = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
+      const newWorks = _ensureWorksBackendId(raw.filter(w => w.title));
+      const newWkFP  = newWorks.length + '|' + (newWorks[0]?.__backendId || '');
+      allWorks = newWorks;
       worksLoaded = true;
       _memCache.set('works', allWorks);
       Cache.set(LC.WORKS, allWorks);
       Cache.setTS(LC.TS_WK);
-      if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
+      if (newWkFP !== prevWkFP) {
+        _worksLastFP = '';
+        if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
+      }
     }
   } catch(e) {
     // Fallback to Apps Script if GitHub fails
     try {
       const res = await fetchWithTimeout(API_URL + '?action=getWorks&t=' + Date.now());
       if (res && res.works) {
-        allWorks = _ensureWorksBackendId(res.works.filter(w => w.title));
+        const prevWkFP2 = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
+        const newWorks2 = _ensureWorksBackendId(res.works.filter(w => w.title));
+        const newWkFP2  = newWorks2.length + '|' + (newWorks2[0]?.__backendId || '');
+        allWorks = newWorks2;
         worksLoaded = true;
         _memCache.set('works', allWorks);
         Cache.set(LC.WORKS, allWorks);
         Cache.setTS(LC.TS_WK);
-        if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
+        if (newWkFP2 !== prevWkFP2) {
+          _worksLastFP = '';
+          if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
+        }
       }
     } catch(e2) { console.warn('Works load failed:', e2.message); }
   } finally { _fetchingWorks = false; }
@@ -6425,12 +6503,21 @@ function _refreshWorksYearButtons() {
   bar.querySelectorAll('button').forEach(btn => _styleYearBtn(btn, btn.dataset.year === _worksYear));
 }
 
+let _worksLastFP = '';
+
 function renderWorks() {
   const accordion = document.getElementById('works-accordion');
   const grid    = document.getElementById('works-grid');
   const empty   = document.getElementById('works-empty');
   const loading = document.getElementById('works-loading');
   if (!accordion) return;
+
+  // Fingerprint check — skip re-render if nothing changed
+  const wFP = `${_worksYear}|${_worksTab}|${_worksArtist}|${allWorks.length}`;
+  if (wFP === _worksLastFP && accordion.innerHTML.trim() !== '') {
+    return;
+  }
+  _worksLastFP = wFP;
 
   if (loading) loading.style.display = 'none';
 
@@ -6527,7 +6614,7 @@ function renderWorks() {
       ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${escHtml(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="this.parentElement.style.background='${grad}'"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
-    card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;content-visibility:auto;contain-intrinsic-size:0 220px;';
+    card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;';
 
     if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
     card.innerHTML = `${thumb}
