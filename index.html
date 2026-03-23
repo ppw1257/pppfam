@@ -6434,33 +6434,61 @@ async function handleWorksFormSubmit() {
   }
 }
 
-async function deleteWork(backendId, title) {
-  if (!confirm('Delete "' + title + '"?')) return;
-  const work = allWorks.find(w => String(w.__backendId || w.id) === String(backendId));
-  const id = work ? (work.__backendId || work.id || '') : String(backendId);
-  // Visual feedback — find the delete button and show loading state
-  const allRows = document.querySelectorAll('#admin-works-list > div');
-  let targetDelBtn = null;
-  allRows.forEach(row => {
-    const btns = row.querySelectorAll('button');
-    btns.forEach(b => { if (b.textContent.trim() === 'Delete') { const editBtn = row.querySelector('button:first-of-type'); if (editBtn && editBtn !== b) targetDelBtn = b; } });
+function deleteWork(backendId, title) {
+  const row = document.querySelector('#admin-works-list [data-wid="' + CSS.escape(String(backendId)) + '"]');
+  if (!row) { showToast('ไม่พบแถวนี้ กรุณา Refresh'); return; }
+
+  const btnWrap = row.querySelector('div:last-child');
+  if (!btnWrap) return;
+  const originalHTML = btnWrap.innerHTML;
+
+  const confirmTxt = document.createElement('span');
+  confirmTxt.style.cssText = 'font-size:0.78rem;color:#dc2626;font-weight:600;white-space:nowrap;';
+  confirmTxt.textContent = 'ลบใช่ไหม?';
+
+  const yesBtn = document.createElement('button');
+  yesBtn.className = 'btn-danger';
+  yesBtn.style.cssText = 'font-size:0.8rem;padding:5px 12px;';
+  yesBtn.textContent = 'Yes';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn-secondary';
+  cancelBtn.style.cssText = 'font-size:0.8rem;padding:5px 10px;';
+  cancelBtn.textContent = 'Cancel';
+
+  btnWrap.innerHTML = '';
+  btnWrap.appendChild(confirmTxt);
+  btnWrap.appendChild(yesBtn);
+  btnWrap.appendChild(cancelBtn);
+
+  cancelBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    btnWrap.innerHTML = originalHTML;
+    debounceLucide();
   });
-  if (targetDelBtn) { targetDelBtn.disabled = true; targetDelBtn.textContent = '...'; }
-  try {
-    const res = await apiPost({ action: 'deleteWork', id });
-    if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
-    showToast('Work deleted ✓');
-    Cache.clearAll();
-    worksLoaded = false;
-    _memCache.del('works');
-    await loadWorksFromSheets(true);
-    renderAdminWorksList();
-    if (currentPage === 'works') renderWorks();
-  } catch(err) {
-    if (targetDelBtn) { targetDelBtn.disabled = false; targetDelBtn.textContent = 'Delete'; }
-    showToast('❌ Error: ' + (err.message || 'Failed to delete'));
-    console.error('[deleteWork]', err);
-  }
+
+  yesBtn.addEventListener('click', async function(e) {
+    e.stopPropagation();
+    yesBtn.disabled = true; yesBtn.textContent = '...';
+    const work = window._adminWorksMap[String(backendId)];
+    const id = work ? (work.__backendId || work.id || String(backendId)) : String(backendId);
+    try {
+      const res = await apiPost({ action: 'deleteWork', id });
+      if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
+      showToast('Work deleted ✓');
+      Cache.clearAll();
+      worksLoaded = false;
+      _memCache.del('works');
+      await loadWorksFromSheets(true);
+      renderAdminWorksList();
+      if (currentPage === 'works') renderWorks();
+    } catch(err) {
+      btnWrap.innerHTML = originalHTML;
+      debounceLucide();
+      showToast('❌ Error: ' + (err.message || 'Failed to delete'));
+      console.error('[deleteWork]', err);
+    }
+  });
 }
 
 function renderAdminWorksList() {
@@ -6490,9 +6518,12 @@ function renderAdminWorksList() {
   window._adminWorksMap = {};
   const frag = document.createDocumentFragment();
 
-  [...filtered].reverse().forEach(w => {
-    // Use a stable numeric index as key to avoid any escaping issues with id strings
-    const wid = w.__backendId || w.id || String(w.__rowNumber || '');
+  const _reversedFiltered = [...filtered].reverse();
+  _reversedFiltered.forEach((w, _idx) => {
+    // Use __rowNumber as the most stable unique key; fallback to loop index
+    const wid = (w.__backendId && w.__backendId !== '') ? w.__backendId
+              : (w.__rowNumber ? String(w.__rowNumber) : String(_idx));
+    w.__adminKey = wid; // stamp key onto object for reliable lookup
     window._adminWorksMap[wid] = w;
 
     const artistArr = (w.artists || '').split(',').map(a => a.trim()).filter(Boolean);
@@ -6500,6 +6531,7 @@ function renderAdminWorksList() {
 
     // ── ROW — same style as Events tab rows ──────────────────
     const row = document.createElement('div');
+    row.dataset.wid = wid;
     row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;';
 
     // Info block
