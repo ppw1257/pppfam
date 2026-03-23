@@ -1573,14 +1573,15 @@
       <!-- TAB: Works -->
       <div id="admin-tab-works" class="admin-tab-panel" style="display:none;">
        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
-        <p style="font-size:0.78rem;color:#9ca3af;">Manage artist works — series, music, magazine, brand &amp; more</p>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+         <button class="btn-primary" id="add-work-btn" style="font-size:0.82rem;padding:6px 12px;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="plus" style="width:13px;height:13px;"></i>Add Work</button>
+         <button class="btn-secondary" id="admin-works-refresh-btn" onclick="adminWorksRefresh()" style="display:flex;align-items:center;gap:5px;font-size:0.82rem;padding:6px 12px;"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i>Refresh</button>
+        </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+         <span style="font-size:0.78rem;font-weight:600;color:#6b7280;">Year:</span>
          <select id="admin-works-year-filter" onchange="renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;">
           <option value="all">All Years</option>
          </select>
-         <button class="btn-primary" id="add-work-btn" style="font-size:0.82rem;padding:6px 12px;">
-          <i data-lucide="plus" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:3px;"></i>Add Work
-         </button>
         </div>
        </div>
        <div id="admin-works-list" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -6514,7 +6515,7 @@ function _rebuildWorkBtnWrap(btnWrap, wid, w) {
   const editBtn = document.createElement('button');
   editBtn.className = 'btn-secondary';
   editBtn.style.cssText = 'font-size:0.8rem;padding:6px 10px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;';
-  editBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit';
+  editBtn.innerHTML = '<i data-lucide="edit-2" style="width:13px;height:13px;"></i>Edit';
   editBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     _workEditClick(String(wid));
@@ -6524,22 +6525,52 @@ function _rebuildWorkBtnWrap(btnWrap, wid, w) {
   const delBtn = document.createElement('button');
   delBtn.className = 'btn-danger';
   delBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;cursor:pointer;';
-  delBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>Delete';
+  delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>Delete';
   delBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     deleteWork(String(wid), w.title || '');
   });
   btnWrap.appendChild(delBtn);
+  debounceLucide();
 }
 
-// Global handler — เรียกจาก inline onclick ของปุ่ม Edit
+// Refresh works list — same pattern as adminRefresh() for events
+async function adminWorksRefresh() {
+  const btn = document.getElementById('admin-works-refresh-btn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
+  try {
+    worksLoaded = false;
+    _memCache.del('works');
+    Cache.clearAll();
+    await loadWorksFromSheets(true);
+    renderAdminWorksList();
+    showToast('Works refreshed ✓');
+  } catch(err) {
+    showToast('❌ Refresh failed: ' + (err.message || ''));
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    debounceLucide();
+  }
+}
+
+// Global handler — เรียกจาก addEventListener ของปุ่ม Edit
 function _workEditClick(wid) {
+  // Try map first (fastest path)
   let workObj = window._adminWorksMap && window._adminWorksMap[String(wid)];
+  // Fallback: search allWorks by __adminKey, __backendId, or __rowNumber
   if (!workObj && allWorks && allWorks.length) {
+    workObj = allWorks.find(w =>
+      String(w.__adminKey) === String(wid) ||
+      String(w.__backendId) === String(wid) ||
+      String(w.__rowNumber) === String(wid)
+    );
+  }
+  // Last resort: re-render list to repopulate _adminWorksMap then try again
+  if (!workObj) {
     renderAdminWorksList();
     workObj = window._adminWorksMap && window._adminWorksMap[String(wid)];
   }
-  if (!workObj) { showToast('ไม่พบข้อมูล กรุณา Refresh'); return; }
+  if (!workObj) { showToast('ไม่พบข้อมูล กรุณากด Refresh'); return; }
   openEditWorksModal(workObj);
 }
 
