@@ -1571,7 +1571,7 @@
        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
         <p style="font-size:0.78rem;color:#9ca3af;">Manage artist works — series, music, magazine, brand &amp; more</p>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-         <select id="admin-works-year-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;">
+         <select id="admin-works-year-filter" onchange="renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;">
           <option value="all">All Years</option>
          </select>
          <button class="btn-primary" style="font-size:0.82rem;padding:6px 12px;" onclick="openAddWorksModal()">
@@ -3250,7 +3250,6 @@ async function _fetchAllData(force = false) {
       _calLastFP = '';
       _worksLastFP = '';
       _adminListFP = '';
-      _adminWorksListFP = '';
       scheduleRender();
       renderBirthdayBanners();
     }
@@ -6243,7 +6242,7 @@ let worksLoaded    = false;
 let _fetchingWorks = false;
 let _worksTab      = 'all';
 let _worksArtist   = 'all';
-let _worksYear     = '2026';
+let _worksYear     = 'all';
 
 const CATEGORY_CONFIG = {
   littlebigworld: { label: 'Little Big World', icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', color: '#7c3aed', bg: '#faf5ff', border: '#ddd6fe' },
@@ -6425,7 +6424,6 @@ async function handleWorksFormSubmit() {
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
     worksLoaded = false;
-    _adminWorksListFP = '';
     await loadWorksFromSheets(true);
     renderAdminWorksList();
   } catch(err) {
@@ -6454,7 +6452,6 @@ async function deleteWork(backendId, title) {
     showToast('Work deleted ✓');
     Cache.clearAll();
     worksLoaded = false;
-    _adminWorksListFP = '';
     _memCache.del('works');
     await loadWorksFromSheets(true);
     renderAdminWorksList();
@@ -6466,7 +6463,6 @@ async function deleteWork(backendId, title) {
   }
 }
 
-let _adminWorksListFP = '';
 function renderAdminWorksList() {
   const list  = document.getElementById('admin-works-list');
   const empty = document.getElementById('admin-works-empty');
@@ -6484,11 +6480,6 @@ function renderAdminWorksList() {
 
   const selectedYear = yearSel ? yearSel.value : 'all';
   const filtered = selectedYear === 'all' ? allWorks : allWorks.filter(w => (w.year||'') === selectedYear);
-
-  // Fingerprint check — ถ้า data ไม่เปลี่ยนและ DOM มีอยู่แล้ว ไม่ต้อง rebuild
-  const fp = selectedYear + '|' + filtered.length + '|' + (filtered[0]?.__backendId || '') + '|' + (filtered[filtered.length-1]?.__backendId || '');
-  if (fp === _adminWorksListFP && list.children.length > 0) return;
-  _adminWorksListFP = fp;
 
   if (!filtered.length) {
     list.innerHTML = ''; if (empty) empty.style.display = 'block'; return;
@@ -6633,6 +6624,8 @@ function setWorksArtist(artist) {
 
 function setWorksYear(year) {
   _worksYear = year;
+  const page = document.getElementById('page-works');
+  if (page) page.scrollTo({ top: 0, behavior: 'smooth' });
   renderWorks();
 }
 
@@ -6822,21 +6815,7 @@ function renderWorks() {
     return;
   }
 
-  // แสดง divider เฉพาะตอน All Years + All category + All artist
-  const showDividers = (_worksTab === 'all' && _worksArtist === 'all');
-
-  if (!showDividers) {
-    const cardGrid = document.createElement('div');
-    cardGrid.style.cssText = gridCols;
-    cardGrid.className = 'works-year-grid';
-    filtered.forEach(w => cardGrid.appendChild(buildCard(w)));
-    _wFrag.appendChild(cardGrid);
-    accordion.style.display = 'block';
-    accordion.innerHTML = '';
-    accordion.appendChild(_wFrag);
-    debounceLucide();
-    return;
-  }
+  // All Years → แสดง divider แยกปีเสมอ (ไม่ว่า category/artist จะเป็นอะไร)
 
   years.forEach((year, idx) => {
     const works = yearMap[year];
