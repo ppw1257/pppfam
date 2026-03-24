@@ -101,7 +101,7 @@
     --color-pondphuwinpermpoon-text:#be185d;
     --color-pondphuwinpermpoon-text-dark:#831843;
 
-    --radius-card: 16px;
+    --radius-card: 18px;
     --shadow-card: none;
     --border-card: none;
     --color-accent: #111;
@@ -135,13 +135,34 @@
     from { opacity: 0; }
     to   { opacity: 1; }
   }
-  .nav-link { cursor: pointer; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: 6px; color: #6b7280; letter-spacing: 0em; transition: color 0.15s, background 0.15s; }
+  .nav-link { cursor: pointer; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: 8px; color: #9ca3af; letter-spacing: 0em; transition: color 0.15s, background 0.15s; }
   .nav-link:hover { color: #111; background: #f5f5f5; }
-  .nav-link.active { color: #111; background: #f3f4f6; border-radius: 6px; font-weight: 700; box-shadow: none; }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #efefef; box-shadow: 0 2px 12px rgba(0,0,0,0.07); height: 100%; position: relative; transition: box-shadow 0.18s, transform 0.18s; }
+  .nav-link.active { color: #111; background: transparent; border-radius: 8px; font-weight: 700; box-shadow: none; }
+  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #f0f0f0; box-shadow: 0 1px 8px rgba(0,0,0,0.05); height: 100%; position: relative; transition: box-shadow 0.18s, transform 0.18s; }
   .month-group { }
-  .event-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12); transform: translateY(-4px); border-color: #e8e8e8; }
-  .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.75);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;z-index:5; }
+  .event-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #e8e8e8; }
+  /* ── Next event highlight ── */
+  .event-card--next {
+    border: 2px solid var(--next-color, #f97316) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--next-color, #f97316) 12%, transparent), 0 4px 20px rgba(0,0,0,0.08) !important;
+  }
+  .event-card--next:hover {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--next-color, #f97316) 18%, transparent), 0 8px 28px rgba(0,0,0,0.13) !important;
+    transform: translateY(-3px);
+  }
+  .next-card-label {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #fff; padding: 3px 9px; border-radius: 99px;
+    position: absolute; top: 10px; left: 10px; z-index: 6;
+    background: var(--next-color, #f97316);
+    pointer-events: none;
+  }
+  .event-card--next .card-img-wrap .next-card-label { top: 10px; left: 10px; }
+  @supports not (color: color-mix(in srgb, red 50%, blue)) {
+    .event-card--next { box-shadow: 0 0 0 4px rgba(249,115,22,0.15), 0 4px 20px rgba(0,0,0,0.08) !important; }
+  }
+  .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.55);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;z-index:5; }
   .event-card:hover .card-hover-overlay { opacity:1; }
   .card-hover-overlay .oh-title { font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4; }
   .card-hover-overlay .oh-desc { font-size:0.68rem;color:rgba(255,255,255,0.7);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical; }
@@ -155,7 +176,7 @@
   .timeline-dow { font-size:0.58rem;font-weight:700;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase; }
   .timeline-circle { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1; }
   .timeline-circle span { font-size:0.82rem;font-weight:900;color:#fff; }
-  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;border:1px solid #efefef;border-left:3px solid #111;transition:box-shadow 0.18s, transform 0.18s; }
+  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;border:1px solid #efefef;border-left:3px solid var(--timeline-accent,#e5e7eb);transition:box-shadow 0.18s, transform 0.18s; }
   .timeline-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); }
   .timeline-card-top { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
   .timeline-card-title { font-size:0.85rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:4px; }
@@ -172,7 +193,7 @@
   .card-countdown { display:none !important; }
   .count-box { background:rgba(0,0,0,0.08); color:#111; padding:4px 6px; border-radius:6px; font-size:0.65rem; font-weight:800; text-align:center; line-height:1.2; min-width:34px; letter-spacing:0.02em; }
   .count-box span { display:block; font-size:0.5rem; font-weight:600; color:#9ca3af; margin-top:1px; letter-spacing:0.06em; }
-  .today-badge { background:#f97316; color:#fff; font-weight:700; padding:2px 8px; border-radius:4px; position:absolute; top:8px; left:8px; font-size:0.6rem; letter-spacing:0.04em; box-shadow:none; z-index:4; }
+  .today-badge { background:#f97316; color:#fff; font-weight:700; padding:2px 8px; border-radius:99px; position:absolute; top:8px; left:8px; font-size:0.58rem; letter-spacing:0.04em; box-shadow:none; z-index:4; }
   .next-event-label { font-size:0.58rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#f97316; margin-top:6px; margin-bottom:2px; }
   @media (max-width:480px) { .count-box { font-size:0.6rem; padding:3px 5px; min-width:28px; } }
   .card-img-placeholder { width: 100%; height: 160px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -195,8 +216,8 @@
     background: #f3f4f6;
   }
   .card-img.img-loading { opacity: 0; transition: none; }
-  .card-img.img-loaded  { opacity: 1; transition: opacity 0.25s ease; }
-  .artist-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .card-img.img-loaded  { opacity: 1; transition: opacity 0.35s ease; }
+  .artist-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
   /* ── CALENDAR ── */
   .cal-day { width:66px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;box-sizing:border-box;position:relative;border:none;padding:0; }
   .cal-day:hover { background: #f3f4f6; }
@@ -207,8 +228,8 @@
   .cal-event-dot { display:none; }
   .cal-event-dot-circle { display:none; }
   /* event list right side */
-  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow 0.18s, transform 0.18s; }
-  .cal-list-item:hover { box-shadow:0 4px 16px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.07); transform:translateY(-2px); }
+  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;border:1px solid #f0f0f0;box-shadow:0 1px 6px rgba(0,0,0,0.04);cursor:pointer;transition:box-shadow 0.18s, transform 0.18s; }
+  .cal-list-item:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); transform:translateY(-2px); }
   .cal-list-date { flex-shrink:0;width:48px;text-align:center; }
   .cal-list-dow { font-size:0.68rem;font-weight:700;color:#9ca3af;letter-spacing:0.07em;text-transform:uppercase; }
   .cal-list-num { font-size:1.3rem;font-weight:700;color:#111;line-height:1.1; }
@@ -297,9 +318,9 @@
   .filter-bar > div:last-child { flex-shrink: 0; }
   .cal-month-strip { display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none; }
   .cal-month-strip::-webkit-scrollbar { display:none; }
-  .cal-month-pill { padding:5px 14px;border-radius:6px;font-size:0.8rem;font-weight:500;color:#6b7280;background:#f9fafb;cursor:pointer;white-space:nowrap;border:1px solid #e5e7eb;font-family:inherit;transition:all 0.15s; }
-  .cal-month-pill:hover { background:#f3f4f6;color:#111; }
-  .cal-month-pill.active { background:#111;color:#fff;font-weight:600;box-shadow:none; }
+  .cal-month-pill { padding:5px 14px;border-radius:99px;font-size:0.78rem;font-weight:500;color:#6b7280;background:transparent;cursor:pointer;white-space:nowrap;border:1px solid #e5e7eb;font-family:inherit;transition:all 0.15s; }
+  .cal-month-pill:hover { background:#f3f4f6;color:#111; border-color:#d1d5db; }
+  .cal-month-pill.active { background:#111;color:#fff;font-weight:600;box-shadow:none;border-color:#111; }
   /* date strip */
   /* cal-date-strip: controlled by inline style per context */
   .cal-date-strip::-webkit-scrollbar { display:none; }
@@ -322,7 +343,7 @@
   .cal-ev-card-title { font-size:clamp(0.78rem,1.2vw,0.88rem);font-weight:700;color:#111;line-height:1.35;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical; }
   .cal-ev-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;align-items:center;gap:5px;flex-wrap:wrap; }
   .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
-  .modal-box { background: #fff; border-radius: 16px; max-width: 860px; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); margin: auto; border: 1px solid #e5e7eb; }
+  .modal-box { background: #fff; border-radius: 20px; max-width: 860px; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.10); margin: auto; border: 1px solid #f0f0f0; }
   .form-input { width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.7rem 0.95rem; font-size: 1rem; outline: none; background: #fff; box-sizing: border-box; }
   .form-input:focus { border-color: #f97316; box-shadow: 0 0 0 2px rgba(249,115,22,0.15); }
   .form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.3rem; display: block; }
@@ -345,7 +366,7 @@
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d4d4d0; border-radius: 99px; }
-  .section-header { font-size: 1.3rem; font-weight: 700; color: #111; letter-spacing: -0.02em; }
+  .section-header { font-size: 1.3rem; font-weight: 600; color: #111; letter-spacing: -0.02em; }
   .artist-check { display: none; }
   .artist-check-label {
     display: inline-flex; align-items: center; gap: 6px;
@@ -386,9 +407,9 @@
     font-weight: 700;
   }
   .detail-hero { width: 100%; max-height: 520px; object-fit: contain; background: transparent; display: block; border-radius: 0; }
-  .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; border: 1px solid #e5e7eb; font-size: 0.82rem; font-weight: 600; color: #374151; text-decoration: none; transition: border-color 0.15s; }
+  .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 99px; border: 1px solid #e5e7eb; font-size: 0.82rem; font-weight: 600; color: #374151; text-decoration: none; transition: border-color 0.15s, background 0.15s; }
   .link-btn:hover { background: #f7f7f5; border-color: #c0c0bc; }
-  footer { background: #fff; border-top: 1px solid #f0f0f0; margin-top: auto; flex-shrink: 0; }
+  footer { background: transparent; border-top: none; margin-top: auto; flex-shrink: 0; }
   .blink-heart { color: #22c55e; display:inline-block; animation: blink-pulse 2s ease-in-out infinite; }
   @keyframes blink-pulse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
   @media (max-width: 640px) {
@@ -486,7 +507,7 @@
   .admin-tab-panel.tab-active {
     animation: pageIn 0.18s ease forwards;
   }
-  .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:0.82rem;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.06); }
+  .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:12px;font-size:0.82rem;position:relative;box-shadow:none;border:1px solid #f0f0f0; }
   .bday-today { }
   @keyframes bday-pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -494,13 +515,13 @@
   .bday-countdown { font-size:0.7rem;font-weight:800;padding:3px 8px;border-radius:99px;margin-left:auto;flex-shrink:0;letter-spacing:0.05em; }
   .month-group { margin-bottom: 2.5rem; padding-top: 1.5rem; }
   .month-group:first-child { padding-top: 0; }
-  .month-group-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; margin-top: 0.5rem; }
-  .month-group-header-box { display: inline-flex; align-items: center; gap: 8px; }
-  .month-group-header-dots { display: flex; gap: 4px; align-items: center; }
+  .month-group-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; margin-top: 1.75rem; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+  .month-group-header-box { display: inline-flex; align-items: baseline; gap: 6px; }
+  .month-group-header-dots { display: none; }
   .month-group-header-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .month-group-header-label { font-size: 1.1rem; font-weight: 700; color: #111; letter-spacing: -0.02em; }
-  .month-group-header-line { flex: 1; height: 1px; background: #f0f0f0; border-radius: 99px; }
-  .month-group-header-count { font-size: 0.75rem; font-weight: 600; color: #f97316; background: #fff7ed; border-radius: 6px; padding: 2px 9px; border: 1px solid #fed7aa; }
+  .month-group-header-label { font-size: 1.4rem; font-weight: 700; color: #111; letter-spacing: -0.03em; line-height: 1; }
+  .month-group-header-line { display: none; }
+  .month-group-header-count { font-size: 0.72rem; font-weight: 600; color: #9ca3af; background: transparent; border-radius: 6px; padding: 2px 9px; border: 1px solid #e5e7eb; }
   /* Map embed */
   .map-embed-wrap { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
   .map-embed-wrap iframe { width: 100%; height: 300px; border: 0; display: block; }
@@ -622,7 +643,7 @@
 
     /* ── Section headers ── */
     .section-header { font-size: 1.15rem !important; }
-    .month-group-header-label { font-size: 1.1rem !important; }
+    .month-group-header-label { font-size: 1.3rem !important; }
     .month-group { margin-bottom: 1.5rem !important; }
     #page-home > div > div[style*="grid-template-columns:2fr"] { grid-template-columns: 1fr 1fr !important; }
 
@@ -804,10 +825,20 @@
      NAV — responsive, no hamburger, CSS only
   ══════════════════════════════════════════════ */
   #main-nav {
-    background: #fff;
+    background: rgba(255,255,255,0.92);
     border-bottom: 1px solid #f0f0f0;
     flex-shrink: 0;
     box-shadow: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  #main-nav.scrolled {
+    box-shadow: 0 1px 16px rgba(0,0,0,0.06);
+    border-bottom-color: #e8e8e8;
   }
   .nav-inner {
     width: 100%;
@@ -882,7 +913,7 @@
   #home-title        { font-size: var(--text-3xl) !important; }
   #cal-section-title { font-size: var(--text-2xl) !important; }
   .section-header    { font-size: var(--text-xl)  !important; }
-  .month-group-header-label { font-size: var(--text-xl) !important; }
+  .month-group-header-label { font-size: clamp(1.3rem, 3vw, 1.8rem) !important; }
   .timeline-card-title, .list-card-title { font-size: var(--text-base) !important; }
   .timeline-card-meta, .list-card-meta   { font-size: var(--text-sm)   !important; }
 
@@ -1122,7 +1153,7 @@
 
   /* ── Section headers fluid ── */
   .section-header { font-size: clamp(1rem, 2.5vw, 1.5rem) !important; }
-  .month-group-header-label { font-size: clamp(1rem, 2.2vw, 1.4rem) !important; }
+  .month-group-header-label { font-size: clamp(1.2rem, 2.5vw, 1.6rem) !important; }
 
   /* ── Event card text fluid ── */
   .timeline-card-title, .list-card-title {
@@ -1231,16 +1262,21 @@
   <div id="app">
    <nav id="main-nav">
     <div class="nav-inner">
-     <div class="nav-logo" onclick="navigate('home')" style="display:flex;align-items:center;gap:7px;">
-      <span id="nav-site-title">PondPhuwinPermpoon Schedule</span>
+     <div class="nav-logo" onclick="navigate('home')" style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;gap:3px;flex-shrink:0;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div>
+        <div style="width:7px;height:7px;border-radius:50%;background:#94a3b8;"></div>
+        <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
+      </div>
+      <span id="nav-site-title">PPP Schedule</span>
      </div>
      <div class="nav-links-wrap" id="nav-links">
       <span class="nav-link active" data-page="home" onclick="navigate('home')"><i data-lucide="home" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label" >Home</span></span>
       <span class="nav-link" data-page="calendar" onclick="navigate('calendar')"><i data-lucide="calendar" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Calendar</span></span>
       <span class="nav-link" data-page="works" onclick="navigate('works')"><i data-lucide="star" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Works</span></span>
       <span class="nav-link" data-page="admin" id="nav-admin-link" style="display:none;" onclick="navigate('admin')"><i data-lucide="settings" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Admin</span></span>
-      <button id="nav-refresh-btn" onclick="forceRefreshAll()" title="Refresh data" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:99px;border:1px solid #e5e7eb;background:transparent;cursor:pointer;color:#9ca3af;padding:0;flex-shrink:0;transition:background 0.15s;">
-        <svg id="nav-refresh-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      <button id="nav-refresh-btn" onclick="forceRefreshAll()" title="Refresh data" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:99px;border:none;background:transparent;cursor:pointer;color:#d1d5db;padding:0;flex-shrink:0;transition:color 0.15s,background 0.15s;">
+        <svg id="nav-refresh-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </button>
      </div>
     </div>
@@ -1254,9 +1290,9 @@
      <!-- HERO -->
      <div id="bento-grid">
       <!-- Event 1 -->
-      <div id="bento-next" style="background:#111;border-radius:14px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;padding:18px 20px;" onclick="bentoNextClick()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')bentoNextClick()">
-       <div id="bento-next-bg" style="position:absolute;inset:0;background-size:cover;background-position:top center;opacity:0.45;"></div>
-       <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.08) 100%);"></div>
+      <div id="bento-next" style="background:#1a1a1a;border-radius:16px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;padding:18px 20px;" onclick="bentoNextClick()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')bentoNextClick()">
+       <div id="bento-next-bg" style="position:absolute;inset:0;background-size:cover;background-position:top center;opacity:0.5;border-radius:16px;"></div>
+       <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0.04) 100%);border-radius:16px;"></div>
        <div style="position:absolute;top:18px;left:20px;">
         <div style="display:flex;align-items:center;gap:6px;">
          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;border-radius:50%;background:#f97316;"></div><div style="width:5px;height:5px;border-radius:50%;background:#6b7280;"></div><div style="width:5px;height:5px;border-radius:50%;background:#22c55e;"></div></div>
@@ -1271,9 +1307,9 @@
        </div>
       </div>
       <!-- Event 2 -->
-      <div id="bento-ev2" style="background:#111;border-radius:14px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;padding:18px 20px;" onclick="bentoNextClick2()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')bentoNextClick2()">
-       <div id="bento-next2-bg" style="position:absolute;inset:0;background-size:cover;background-position:top center;opacity:0.45;"></div>
-       <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.08) 100%);"></div>
+      <div id="bento-ev2" style="background:#1a1a1a;border-radius:16px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;padding:18px 20px;" onclick="bentoNextClick2()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')bentoNextClick2()">
+       <div id="bento-next2-bg" style="position:absolute;inset:0;background-size:cover;background-position:top center;opacity:0.5;border-radius:16px;"></div>
+       <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0.04) 100%);border-radius:16px;"></div>
        <div style="position:relative;">
         <div id="bento-next2-label" style="font-size:0.6rem;font-weight:800;letter-spacing:0.08em;margin-bottom:6px;display:none;"></div>
         <div id="bento-next2-title" style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:5px;display:none;"></div>
@@ -1296,7 +1332,7 @@
          style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-       <span id="events-count" style="font-size:0.68rem;font-weight:700;color:#fff;background:#111;border-radius:6px;padding:2px 10px;box-shadow:none;"></span>
+       <span id="events-count" style="font-size:0.68rem;font-weight:600;color:#6b7280;background:transparent;border:1px solid #e5e7eb;border-radius:6px;padding:2px 10px;"></span>
 
       </div>
      </div>
@@ -3980,7 +4016,7 @@ function renderHome() {
     const days = daysUntilEvent(next.dateStart);
     const color = getArtistColor(next.artists);
     const dayLabel = days === 0 ? t('next_today') : days === 1 ? t('next_1day') : days !== null && days <= 30 ? t('next_days', days) : t('next_event');
-    const _bg = ['linear-gradient(135deg,#ef4444,#f97316)','linear-gradient(135deg,#f97316,#fbbf24)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#059669,#3b82f6)','linear-gradient(135deg,#f97316,#ef4444)','linear-gradient(135deg,#0891b2,#7c3aed)','linear-gradient(135deg,#d97706,#ef4444)','linear-gradient(135deg,#059669,#0891b2)'];
+    const _bg = ['#111','#f97316','#7c3aed','#059669','#f97316','#0891b2','#d97706','#059669'];
     const dayBadgeGrad = _bg[days] || _bg[0];
     el('bento-next-label').innerHTML = `<span style="background:${dayBadgeGrad};color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">${dayLabel}</span>`;
     el('bento-next-label').style.color = '';
@@ -4007,7 +4043,7 @@ function renderHome() {
     const color2 = getArtistColor(next2.artists);
     const dayLabel2 = days2 === 0 ? t('next_today') : days2 === 1 ? t('next_1day') : days2 !== null && days2 <= 30 ? t('next_days', days2) : t('next_event');
     const meta2 = [next2.dateStart ? fmtDate(next2.dateStart) : '', next2.startTime ? fmtTime(next2.startTime) : '', next2.location].filter(Boolean).join(' · ');
-    const _bg2 = ['linear-gradient(135deg,#ef4444,#f97316)','linear-gradient(135deg,#f97316,#fbbf24)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#059669,#3b82f6)','linear-gradient(135deg,#f97316,#ef4444)','linear-gradient(135deg,#0891b2,#7c3aed)','linear-gradient(135deg,#d97706,#ef4444)','linear-gradient(135deg,#059669,#0891b2)'];
+    const _bg2 = ['#111','#f97316','#7c3aed','#059669','#f97316','#0891b2','#d97706','#059669'];
     const dayBadgeGrad2 = _bg2[days2] || _bg2[0];
     el('bento-next2-label').innerHTML = `<span style="background:${dayBadgeGrad2};color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">${dayLabel2}</span>`;
     el('bento-next2-label').style.color = '';
@@ -4095,16 +4131,16 @@ function _buildListItem(ev) {
   const dots = artistArr.map(a => { const ac = getArtistColor(a); return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:600;color:${ac};"><span style="width:5px;height:5px;border-radius:50%;background:${ac};display:inline-block;"></span>${a}</span>`; }).join(' ');
   const meta = [ev.dateStart ? fmtDate(ev.dateStart) : '', ev.startTime ? fmtTime(ev.startTime) : '', ev.location ? escHtml(ev.location) : ''].filter(Boolean).join(' · ');
   const days = daysUntilEvent(ev.dateStart);
-  const _bg = ['linear-gradient(135deg,#ef4444,#f97316)','linear-gradient(135deg,#f97316,#fbbf24)','linear-gradient(135deg,#7c3aed,#ec4899)','linear-gradient(135deg,#059669,#3b82f6)','linear-gradient(135deg,#f97316,#ef4444)','linear-gradient(135deg,#0891b2,#7c3aed)','linear-gradient(135deg,#d97706,#ef4444)','linear-gradient(135deg,#059669,#0891b2)'];
-  const badge = (days !== null && days >= 0 && days <= 7) ? `<span style="background:${_bg[days]||_bg[7]};color:#fff;font-size:0.62rem;font-weight:900;padding:3px 10px;border-radius:99px;letter-spacing:0.07em;margin-left:auto;flex-shrink:0;">${days===0?'TODAY':days===1?'1 DAY':days+' DAYS'}</span>` : '';
+  const _bg = ['#111','#f97316','#7c3aed','#059669','#f97316','#0891b2','#d97706','#059669'];
+  const badge = (days !== null && days >= 0 && days <= 7) ? `<span style="background:${_bg[days]||_bg[7]};color:#fff;font-size:0.62rem;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:0.06em;margin-left:auto;flex-shrink:0;">${days===0?'TODAY':days===1?'1 DAY':days+' DAYS'}</span>` : '';
   // Use data-src for lazy loading
   const imgHtml = ev.image
-    ? `<img src="${_fixImgSrc(ev.image)}" style="width:68px;height:68px;border-radius:10px;object-fit:cover;object-position:top;display:block;flex-shrink:0;" loading="lazy" onerror="_onImgError(this)">`
-    : `<div style="width:68px;height:68px;border-radius:10px;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true"></div>`;
+    ? `<img src="${_fixImgSrc(ev.image)}" style="width:68px;height:68px;border-radius:12px;object-fit:cover;object-position:top;display:block;flex-shrink:0;" loading="lazy" onerror="_onImgError(this)">`
+    : `<div style="width:68px;height:68px;border-radius:12px;background:${color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true"></div>`;
   const item = document.createElement('div');
   item.className = 'list-card';
   const ab4 = getArtistBg(ev.artists);
-  item.style.cssText = `background:#fff;border-radius:16px;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-left:3px solid ${color};padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;contain:layout style;`;
+  item.style.cssText = `background:#fff;border-radius:18px;border:1px solid #f0f0f0;box-shadow:0 1px 6px rgba(0,0,0,0.04);border-left:3px solid ${color};padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;contain:layout style;`;
   item.onclick = () => openDetailModal(ev.__backendId);
   item.innerHTML = `${imgHtml}<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">${dots}${badge}</div><div style="font-size:0.88rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div><div style="font-size:0.72rem;color:#9ca3af;">${meta}</div></div>`;
   return item;
@@ -4164,7 +4200,8 @@ function _vsInit(groups) {
       gw.className = 'month-group';
       const hdr = document.createElement('div');
       hdr.className = 'month-group-header';
-      hdr.innerHTML = `<div class="month-group-header-box"><div class="month-group-header-dots"><div class="month-group-header-dot" style="background:#f97316;"></div><div class="month-group-header-dot" style="background:#6b7280;"></div><div class="month-group-header-dot" style="background:#22c55e;"></div></div><span class="month-group-header-label">${item.label}</span><span class="month-group-header-count">${item.total} event${item.total !== 1 ? 's' : ''}</span></div><span class="month-group-header-line"></span>`;
+      const _lp1 = item.label.split(' '); const _m1 = _lp1[0]||''; const _y1 = _lp1[1]||'';
+      hdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m1}</span><span style="font-size:1.4rem;font-weight:300;color:#d1d5db;letter-spacing:-0.03em;line-height:1;">${_y1}</span><span class="month-group-header-count" style="margin-left:4px;">${item.total} event${item.total !== 1 ? 's' : ''}</span></div>`;
       gw.appendChild(hdr);
       let gridEl;
       if (item.mode === 'list') {
@@ -4452,7 +4489,7 @@ function buildTypePill(type, size) {
   const dot = s.dot ? `<span style="width:6px;height:6px;border-radius:50%;background:${s.dot};margin-right:5px;flex-shrink:0;display:inline-block;"></span>` : '';
   const cake = s.cake ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0;"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2 1 2 1"/><line x1="2" y1="21" x2="22" y2="21"/><path d="M7 8v2"/><path d="M12 8v2"/><path d="M17 8v2"/><path d="M7 4h.01"/><path d="M12 4h.01"/><path d="M17 4h.01"/></svg>` : '';
   const prefix = cake || dot;
-  return `<span style="display:inline-flex;align-items:center;font-size:${fs};font-weight:700;border-radius:6px;padding:${pad};background:${s.bg};color:${s.color};border:1px solid ${s.border};">${prefix}${escHtml(type)}</span>`;
+  return `<span style="display:inline-flex;align-items:center;font-size:${fs};font-weight:600;border-radius:99px;padding:${pad};background:${s.bg};color:${s.color};border:1px solid ${s.border};">${prefix}${escHtml(type)}</span>`;
 }
 function buildDateBadge(ev, color) {
   if (!ev.dateStart) return '';
@@ -4461,9 +4498,9 @@ function buildDateBadge(ev, color) {
   if (ev.dateEnd && ev.dateEnd !== ev.dateStart) {
     const d2 = new Date(ev.dateEnd + 'T00:00:00');
     const dow2 = d2.toLocaleDateString(t('date_locale'), { weekday: 'short' }).toUpperCase();
-    return `<div style="position:absolute;top:12px;right:12px;background:${color};color:#fff;border-radius:8px;padding:0.4rem 0.6rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);"><div style="font-size:0.62rem;font-weight:700;letter-spacing:0.04em;">${dow} ${d.getDate()} – ${dow2} ${d2.getDate()}</div></div>`;
+    return `<div style="position:absolute;top:12px;right:12px;background:${color};color:#fff;border-radius:10px;padding:0.4rem 0.6rem;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);"><div style="font-size:0.62rem;font-weight:700;letter-spacing:0.04em;">${dow} ${d.getDate()} – ${dow2} ${d2.getDate()}</div></div>`;
   }
-  return `<div style="position:absolute;top:12px;right:12px;background:${color};color:#fff;border-radius:8px;padding:0.5rem 0.75rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);"><div style="font-size:0.7rem;font-weight:700;letter-spacing:0.05em;">${dow}</div><div style="font-size:1.3rem;font-weight:700;line-height:1;">${d.getDate()}</div></div>`;
+  return `<div style="position:absolute;top:12px;right:12px;background:${color};color:#fff;border-radius:10px;padding:0.5rem 0.75rem;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);"><div style="font-size:0.7rem;font-weight:700;letter-spacing:0.05em;">${dow}</div><div style="font-size:1.3rem;font-weight:700;line-height:1;">${d.getDate()}</div></div>`;
 }
 
 // ── Countdown helpers ─────────────────────────────────────────────
@@ -4509,14 +4546,14 @@ function buildCountdownImgBadge(ev, inline = false) {
   const days = daysUntilEvent(ev.dateStart);
   if (days === null || days < 0 || days > 7) return '';
   const styles = [
-    'background:linear-gradient(135deg,#ef4444,#f97316);',   // TODAY
-    'background:linear-gradient(135deg,#f97316,#fbbf24);',   // 1 DAY
-    'background:linear-gradient(135deg,#7c3aed,#ec4899);',   // 2 DAYS
-    'background:linear-gradient(135deg,#059669,#3b82f6);',   // 3 DAYS
-    'background:linear-gradient(135deg,#f97316,#ef4444);',   // 4 DAYS
-    'background:linear-gradient(135deg,#0891b2,#7c3aed);',   // 5 DAYS
-    'background:linear-gradient(135deg,#d97706,#ef4444);',   // 6 DAYS
-    'background:linear-gradient(135deg,#059669,#0891b2);',   // 7 DAYS
+    'background:#111;',                    // TODAY
+    'background:#f97316;',                 // 1 DAY
+    'background:#7c3aed;',                 // 2 DAYS
+    'background:#059669;',                 // 3 DAYS
+    'background:#f97316;',                 // 4 DAYS
+    'background:#0891b2;',                 // 5 DAYS
+    'background:#d97706;',                 // 6 DAYS
+    'background:#059669;',                 // 7 DAYS
   ];
   const label = days === 0 ? 'TODAY' : days === 1 ? '1 DAY' : `${days} DAYS`;
   const st = styles[days] || styles[7];
@@ -4640,8 +4677,10 @@ function createCard(ev) {
   if (!ev.title || !ev.title.trim()) return document.createDocumentFragment();
   const color = getArtistColor(ev.artists);
   const ab = getArtistBg(ev.artists);
+  const isNext = _nextEventId && ev.__backendId === _nextEventId;
   const card = document.createElement('div');
-  card.className = 'event-card';
+  card.className = 'event-card' + (isNext ? ' event-card--next' : '');
+  if (isNext) card.style.setProperty('--next-color', color);
   // no colored border
   card.dataset.eventId = ev.__backendId;
   card.setAttribute('role', 'button');
@@ -4651,8 +4690,10 @@ function createCard(ev) {
   card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetailModal(ev.__backendId); } };
   const hasHtml = v => !!v && /<[a-z][\s\S]*>/i.test(v);
 
+  const nextBadge = isNext ? `<div class="next-card-label"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>NEXT</div>` : '';
+
   const imgHtml = ev.image
-    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
+    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${isNext ? '' : buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
     : `<div style="height:4px;background:${color};flex-shrink:0;"></div>`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
@@ -4689,7 +4730,7 @@ function createCard(ev) {
   const locText = lp.join(', ');
   const locFontSize = locText.length > 40 ? '0.55rem' : locText.length > 25 ? '0.58rem' : '0.62rem';
   const locRow = lp.length
-    ? `<div style="margin-bottom:4px;"><span style="display:inline-flex;align-items:center;gap:4px;font-size:${locFontSize};font-weight:600;color:#374151;background:#f3f4f6;border:1px solid #e5e7eb;padding:2px 7px;border-radius:5px;"><svg width="9" height="9" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${escHtml(locText)}</span></span></div>`
+    ? `<div style="margin-bottom:4px;"><span style="display:inline-flex;align-items:center;gap:4px;font-size:${locFontSize};font-weight:500;color:#6b7280;padding:2px 0;"><svg width="9" height="9" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${escHtml(locText)}</span></span></div>`
     : '';
 
   const typePill = buildTypePill(ev.type, 'sm');
@@ -4698,7 +4739,7 @@ function createCard(ev) {
     : '';
   const pillsRow = (typePill || tvPill) ? `<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:5px;">${tvPill}${typePill}</div>` : '';
   const noteRow = (ev.note && !hasHtml(ev.note))
-    ? `<div style="font-size:0.76rem;font-weight:700;color:#374151;margin-bottom:5px;display:flex;align-items:flex-start;gap:5px;background:#fafafa;border-left:3px solid #374151;padding:4px 7px;border-radius:0 5px 5px 0;line-height:1.4;"><svg width="11" height="11" fill="none" stroke="#374151" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(ev.note)}</div>`
+    ? `<div style="font-size:0.72rem;font-weight:600;color:#6b7280;margin-bottom:5px;display:flex;align-items:flex-start;gap:5px;padding:4px 8px;border-radius:8px;background:#f9fafb;line-height:1.4;"><svg width="11" height="11" fill="none" stroke="#9ca3af" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(ev.note)}</div>`
     : '';
   const descRow = (ev.description && !hasHtml(ev.description))
     ? `<div style="font-size:0.7rem;color:#9ca3af;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:4px;">${escHtml(ev.description)}</div>`
@@ -4708,12 +4749,13 @@ function createCard(ev) {
   const shareBtn = ``;
   const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${t('view_details_hover')}</div></div></div>`;
   const imgSection = ev.image
-    ? `<div class="card-img-wrap">${shareBtn}<img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
-    : `<div style="height:6px;background:${color};flex-shrink:0;"></div>`;
+    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${isNext ? '' : buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
+    : `<div style="height:3px;background:${color};flex-shrink:0;opacity:0.7;"></div>`;
+
   const noImgBadge = !ev.image ? buildCountdownImgBadge(ev, true) : '';
   card.style.flexDirection = '';
-  card.innerHTML = `${imgSection}${hoverOverlay}
-    <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;position:relative;">
+  card.innerHTML = `${nextBadge}${imgSection}${hoverOverlay}
+    <div style="padding:0.65rem 0.75rem;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;position:relative;">
       ${noImgBadge}
       ${artistBadge}
       <h3 style="font-weight:700;font-size:0.78rem;letter-spacing:-0.01em;margin-bottom:4px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:#111;">${escHtml(ev.title)}</h3>
@@ -6360,7 +6402,8 @@ function buildTimelineView(events) {
     });
     const mhdr = document.createElement('div');
     mhdr.className = 'month-group-header';
-    mhdr.innerHTML = `<div class="month-group-header-box"><div class="month-group-header-dots"><div class="month-group-header-dot" style="background:#f97316;"></div><div class="month-group-header-dot" style="background:#6b7280;"></div><div class="month-group-header-dot" style="background:#22c55e;"></div></div><span class="month-group-header-label">${label}</span><span class="month-group-header-count">${group.length} event${group.length!==1?'s':''}</span></div><span class="month-group-header-line"></span>`;
+    const _lp2 = label.split(' '); const _m2 = _lp2[0]||''; const _y2 = _lp2[1]||'';
+    mhdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m2}</span><span style="font-size:1.4rem;font-weight:300;color:#d1d5db;letter-spacing:-0.03em;line-height:1;">${_y2}</span><span class="month-group-header-count" style="margin-left:4px;">${group.length} event${group.length!==1?'s':''}</span></div>`;
     wrap.appendChild(mhdr);
     const tl = document.createElement('div');
     tl.className = 'timeline-wrap';
@@ -7198,6 +7241,16 @@ document.addEventListener('visibilitychange', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  // ── NAV SCROLL BLUR ──
+  const _nav = document.getElementById('main-nav');
+  const _pages = document.querySelectorAll('.page');
+  function _updateNavScroll() {
+    let scrolled = false;
+    _pages.forEach(p => { if (p.scrollTop > 8) scrolled = true; });
+    if (_nav) _nav.classList.toggle('scrolled', scrolled);
+  }
+  _pages.forEach(p => p.addEventListener('scroll', _updateNavScroll, { passive: true }));
+
   // ── STEP 0: Render UI shell instantly (< 1ms) ──
   applyI18n();
   checkPanelKey();
