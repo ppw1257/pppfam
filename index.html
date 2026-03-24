@@ -3258,6 +3258,7 @@ async function _fetchAllData(force = false) {
       _calLastFP = '';
       _worksLastFP = '';
       _adminListFP = '';
+      _adminWorksListFP = '';
       scheduleRender();
       renderBirthdayBanners();
     }
@@ -6484,6 +6485,7 @@ async function handleWorksFormSubmit() {
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
     worksLoaded = false;
+    _adminWorksListFP = ''; // force re-render
     await loadWorksFromSheets(true);
     renderAdminWorksList();
     // ── Render หน้า Works ทันที ──
@@ -6554,6 +6556,7 @@ function deleteWork(backendId, title) {
       showToast('Work deleted ✓');
       Cache.clearAll();
       worksLoaded = false;
+      _adminWorksListFP = ''; // force re-render
       _memCache.del('works');
       await loadWorksFromSheets(true);
       renderAdminWorksList();
@@ -6598,6 +6601,7 @@ async function adminWorksRefresh() {
   if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
   try {
     worksLoaded = false;
+    _adminWorksListFP = ''; // force re-render
     _memCache.del('works');
     Cache.clearAll();
     await loadWorksFromSheets(true);
@@ -6632,11 +6636,18 @@ function _workEditClick(wid) {
   openEditWorksModal(workObj);
 }
 
+let _adminWorksListFP = '';
+
 function renderAdminWorksList() {
   const list  = document.getElementById('admin-works-list');
   const empty = document.getElementById('admin-works-empty');
   const yearSel = document.getElementById('admin-works-year-filter');
   if (!list) return;
+
+  // ── Fingerprint guard — skip re-render ถ้าข้อมูลไม่เปลี่ยน ──
+  const _awFP = allWorks.length + '|' + (yearSel ? yearSel.value : 'all') + '|' + (allWorks[0]?.__backendId || '') + '|' + (allWorks[allWorks.length-1]?.__backendId || '');
+  if (_awFP === _adminWorksListFP && list.children.length > 0) return;
+  _adminWorksListFP = _awFP;
 
   // Populate year dropdown
   if (yearSel && allWorks.length) {
