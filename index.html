@@ -6682,10 +6682,16 @@ async function handleWorksFormSubmit() {
     }
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
+    // Auto switch to the year of saved work so it appears immediately
+    if (data.year) { _worksYear = data.year; }
     worksLoaded = false;
     _adminWorksListFP = '';
+    _worksLastFP = ''; // force re-render
     Cache.clearAll(); _fetchingAll = false;
     await _fetchFreshFromAppsScript();
+    // Auto switch to works tab in admin so new work is visible immediately
+    _currentAdminTab = '';
+    switchAdminTab('works');
   } catch(err) {
     showToast('❌ Error: ' + (err.message || 'Failed to save work'));
     console.error('[handleWorksFormSubmit]', err);
@@ -6994,8 +7000,8 @@ function _buildWorksYearDropdown() {
     sel.innerHTML = years.map(y => `<option value="${y}" ${y===current?'selected':''}>${y}</option>`).join('');
     if (!years.includes(current)) { sel.value = years[0] || ''; _worksYear = sel.value; }
   }
-  // ถ้า _worksYear เป็นปีเก่า ให้ reset เป็นปีล่าสุดที่แสดง
-  if (_worksYear !== 'all' && _worksYear && Number(_worksYear) < currentYear) {
+  // ถ้า _worksYear ไม่อยู่ใน list และไม่ใช่ 'all' ให้ reset เป็นปีล่าสุด
+  if (_worksYear !== 'all' && _worksYear && !years.includes(_worksYear)) {
     _worksYear = years[0] || String(currentYear);
   }
   // Build pill buttons — All Years + ปีปัจจุบันและอนาคต
