@@ -3734,6 +3734,49 @@ function getFullDateDisplay(dateStr) {
 }
 // Memoized escHtml — called thousands of times per render
 const _escCache = new Map();
+// ── Image URL fixer — แปลง URL ทุกแบบให้โหลดได้เสมอ ──
+function _fixImgSrc(url) {
+  if (!url) return '';
+  url = url.trim();
+  // Google Drive: /file/d/ID/view  →  direct download
+  const driveFile = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+  if (driveFile) return `https://drive.google.com/uc?export=view&id=${driveFile[1]}`;
+  // Google Drive: open?id=ID  →  direct download
+  const driveOpen = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+  if (driveOpen) return `https://drive.google.com/uc?export=view&id=${driveOpen[1]}`;
+  // Google Drive: uc?id=  (keep as is, just ensure export=view)
+  if (url.includes('drive.google.com/uc')) {
+    return url.replace('export=download','export=view').replace(/&amp;/g,'&');
+  }
+  // Google Photos / lh3 shared link
+  if (url.match(/photos\.google\.com|googleusercontent\.com/)) return url;
+  // Dropbox: dl=0 → dl=1 (direct)
+  if (url.includes('dropbox.com')) return url.replace('dl=0','dl=1').replace('www.dropbox','dl.dropboxusercontent');
+  return url;
+}
+
+// ── Image error handler — retry ด้วย proxy เมื่อโหลดไม่ได้ ──
+function _onImgError(img) {
+  const src = img.getAttribute('data-original-src') || img.src;
+  img.setAttribute('data-original-src', src);
+  const attempt = parseInt(img.getAttribute('data-attempt') || '0');
+  // proxy list ที่ใช้ลองตามลำดับ
+  const proxies = [
+    s => `https://images.weserv.nl/?url=${encodeURIComponent(s)}&default=`,
+    s => `https://wsrv.nl/?url=${encodeURIComponent(s)}`,
+    s => `https://corsproxy.io/?${encodeURIComponent(s)}`,
+  ];
+  if (attempt < proxies.length) {
+    img.setAttribute('data-attempt', attempt + 1);
+    img.src = proxies[attempt](src);
+  } else {
+    // ลองทุก proxy แล้วยังไม่ได้ — ซ่อนรูป
+    img.style.display = 'none';
+    const wrap = img.closest('.card-img-wrap,[style*="aspect-ratio"]');
+    if (wrap) wrap.style.background = '#f5f2ee';
+  }
+}
+
 function escHtml(str) {
   if (!str) return '';
   const cached = _escCache.get(str);
@@ -3921,7 +3964,7 @@ function _buildListItem(ev) {
   const badge = (days !== null && days >= 0 && days <= 7) ? `<span style="background:${_bg[days]||_bg[7]};color:#fff;font-size:0.62rem;font-weight:900;padding:3px 10px;border-radius:99px;letter-spacing:0.07em;margin-left:auto;flex-shrink:0;">${days===0?'TODAY':days===1?'1 DAY':days+' DAYS'}</span>` : '';
   // Use data-src for lazy loading
   const imgHtml = ev.image
-    ? `<img src="${escHtml(ev.image)}" style="width:68px;height:68px;border-radius:10px;object-fit:cover;object-position:top;display:block;flex-shrink:0;" loading="lazy" onerror="this.style.display='none'">`
+    ? `<img src="${_fixImgSrc(ev.image)}" style="width:68px;height:68px;border-radius:10px;object-fit:cover;object-position:top;display:block;flex-shrink:0;" loading="lazy" onerror="_onImgError(this)">`
     : `<div style="width:68px;height:68px;border-radius:10px;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true"></div>`;
   const item = document.createElement('div');
   item.className = 'list-card';
@@ -4471,7 +4514,7 @@ function createCard(ev) {
   const hasHtml = v => !!v && /<[a-z][\s\S]*>/i.test(v);
 
   const imgHtml = ev.image
-    ? `<div class="card-img-wrap"><img src="${escHtml(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="this.style.display='none';">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
+    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
     : `<div style="height:4px;background:${color};flex-shrink:0;"></div>`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
@@ -4527,7 +4570,7 @@ function createCard(ev) {
   const shareBtn = ``;
   const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${t('view_details_hover')}</div></div></div>`;
   const imgSection = ev.image
-    ? `<div class="card-img-wrap">${shareBtn}<img src="${escHtml(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="this.parentElement.style.display='none';">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
+    ? `<div class="card-img-wrap">${shareBtn}<img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
     : `<div style="height:6px;background:${color};flex-shrink:0;"></div>`;
   const noImgBadge = !ev.image ? buildCountdownImgBadge(ev, true) : '';
   card.style.flexDirection = '';
@@ -4554,7 +4597,7 @@ function openDetailModal(id) {
   // Image
   const imgWrap = document.getElementById('detail-img-wrap');
   imgWrap.innerHTML = ev.image
-    ? `<img src="${escHtml(ev.image)}" style="width:100%;height:auto;display:block;" alt="${escHtml(ev.title)}" loading="lazy" decoding="async">`
+    ? `<img src="${_fixImgSrc(ev.image)}" style="width:100%;height:auto;display:block;" alt="${escHtml(ev.title)}" loading="lazy" decoding="async">`
     : '';
 
   // Artist badge
@@ -5059,16 +5102,16 @@ function renderCalendarCardGrid(monthEvents) {
     };
     const grad = gradients[color] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
     const imgHtml = ev.image
-      ? `<img class="cal-ev-card-img" src="${escHtml(ev.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="cal-ev-card-img-placeholder" style="display:none;background:${grad};"><svg width="28" height="28" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>`
+      ? `<img class="cal-ev-card-img" src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" onerror="_onImgError(this);if(this.style.display==='none'onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="cal-ev-card-img-placeholder" style="display:none;background:${grad};"><svg width="28" height="28" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>`
       : `<div class="cal-ev-card-img-placeholder" style="background:${grad};"></div>`;
 
     const imgThumb = ev.image
-      ? `<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;flex-shrink:0;" onerror="this.style.display='none'">`
+      ? `<img src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" style="width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;flex-shrink:0;" onerror="_onImgError(this)">`
       : `<div style="width:72px;height:72px;border-radius:10px;flex-shrink:0;background:${grad};display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>`;
     const div = document.createElement('div');
     div.style.cssText = `background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;`;
     div.onclick = () => openDetailModal(ev.__backendId);
-    div.innerHTML = `<div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${escHtml(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
+    div.innerHTML = `<div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="_onImgError(this)">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
       <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}${badge?`<span style="margin-left:auto;">${badge}</span>`:''}</div>
         <div style="font-size:0.85rem;font-weight:700;color:${past?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div>
@@ -5289,7 +5332,7 @@ function openWorksPreviewPopup() {
     return `${div}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
   }).join('');
   const thumb = data.image
-    ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;"><img src="${escHtml(data.image)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" onerror="this.parentElement.style.background='${grad}'"></div>`
+    ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;"><img src="${_fixImgSrc(data.image)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" onerror="_onImgError(this)"></div>`
     : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};"></div>`;
   document.getElementById('works-preview-popup-card').innerHTML = `<div style="background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;">
     ${thumb}
@@ -6253,7 +6296,7 @@ let worksLoaded    = false;
 let _fetchingWorks = false;
 let _worksTab      = 'all';
 let _worksArtist   = 'all';
-let _worksYear     = '2026'; // default เริ่มที่ปี 2026
+let _worksYear     = 'all'; // default แสดงทุกปี
 
 const CATEGORY_CONFIG = {
   littlebigworld: { label: 'Little Big World', icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', color: '#7c3aed', bg: '#faf5ff', border: '#ddd6fe' },
@@ -6741,15 +6784,22 @@ function _buildWorksYearDropdown() {
   if (_worksYear !== 'all' && _worksYear && Number(_worksYear) < currentYear) {
     _worksYear = years[0] || String(currentYear);
   }
-  // Build pill buttons (ไม่มีปุ่ม All Years)
+  // Build pill buttons — All Years + ปีปัจจุบันและอนาคต
   const bar = document.getElementById('works-year-bar');
   if (!bar) return;
-  // Only rebuild if year list changed (avoid flicker)
-  const existing = bar.dataset.years || '';
-  const newList = years.join(',');
-  if (existing === newList && bar.children.length) return;
+  // Only rebuild if year list changed
+  const newList = 'all,' + years.join(',');
+  if (bar.dataset.years === newList && bar.children.length) return;
   bar.dataset.years = newList;
   bar.innerHTML = '';
+  // ปุ่ม All Years ก่อนเสมอ
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'All Years';
+  allBtn.onclick = () => setWorksYear('all');
+  allBtn.dataset.year = 'all';
+  _styleYearBtn(allBtn, _worksYear === 'all');
+  bar.appendChild(allBtn);
+  // ปุ่มปีปัจจุบันและอนาคต
   years.forEach(y => {
     const btn = document.createElement('button');
     btn.textContent = y;
@@ -6821,9 +6871,9 @@ function renderWorks() {
     : _worksYear;
 
   let filtered = allWorks;
-  // กรองปีเฉพาะเมื่อ: เลือกปีและไม่มี filter tab/artist อื่น
-  if (_effectiveYear !== 'all' && _worksTab === 'all' && _worksArtist === 'all') {
-    filtered = filtered.filter(w => (w.year||'') === _effectiveYear);
+  // กรองปีเฉพาะเมื่อ: เลือกปีเฉพาะ (ไม่ใช่ all)
+  if (_worksYear && _worksYear !== 'all') {
+    filtered = filtered.filter(w => (w.year||'') === _worksYear);
   }
   if (_worksTab !== 'all') filtered = filtered.filter(w => _catToKey(w.category) === _worksTab);
   if (_worksArtist !== 'all') filtered = filtered.filter(w => {
@@ -6886,7 +6936,7 @@ function renderWorks() {
       return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
     }).join('');
     const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${escHtml(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="this.parentElement.style.background='${grad}'"></div>`
+      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="_onImgError(this)"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
     card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;';
