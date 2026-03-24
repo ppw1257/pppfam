@@ -3735,42 +3735,48 @@ function getFullDateDisplay(dateStr) {
 // Memoized escHtml — called thousands of times per render
 const _escCache = new Map();
 // ── Image URL fixer — แปลง URL ทุกแบบให้โหลดได้เสมอ ──
+function _extractDriveId(url) {
+  if (!url) return null;
+  // /file/d/ID/view หรือ /file/d/ID?
+  const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+  if (m1) return m1[1];
+  // open?id=ID หรือ uc?id=ID หรือ id=ID
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+  if (m2) return m2[1];
+  return null;
+}
 function _fixImgSrc(url) {
   if (!url) return '';
-  url = url.trim();
-  // Google Drive: /file/d/ID/view  →  direct download
-  const driveFile = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
-  if (driveFile) return `https://drive.google.com/uc?export=view&id=${driveFile[1]}`;
-  // Google Drive: open?id=ID  →  direct download
-  const driveOpen = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
-  if (driveOpen) return `https://drive.google.com/uc?export=view&id=${driveOpen[1]}`;
-  // Google Drive: uc?id=  (keep as is, just ensure export=view)
-  if (url.includes('drive.google.com/uc')) {
-    return url.replace('export=download','export=view').replace(/&amp;/g,'&');
+  url = url.trim().replace(/&amp;/g, '&');
+  // Google Drive ทุก format → ใช้ thumbnail API (ไม่ถูก block โดย browser)
+  if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+    const id = _extractDriveId(url);
+    if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w600`;
   }
-  // Google Photos / lh3 shared link
-  if (url.match(/photos\.google\.com|googleusercontent\.com/)) return url;
-  // Dropbox: dl=0 → dl=1 (direct)
+  // Dropbox: dl=0 → dl=1
   if (url.includes('dropbox.com')) return url.replace('dl=0','dl=1').replace('www.dropbox','dl.dropboxusercontent');
   return url;
 }
 
 // ── Image error handler — retry ด้วย proxy เมื่อโหลดไม่ได้ ──
 function _onImgError(img) {
-  const src = img.getAttribute('data-original-src') || img.src;
-  img.setAttribute('data-original-src', src);
+  const original = img.getAttribute('data-original-src') || img.src;
+  if (!img.getAttribute('data-original-src')) img.setAttribute('data-original-src', original);
   const attempt = parseInt(img.getAttribute('data-attempt') || '0');
-  // proxy list ที่ใช้ลองตามลำดับ
-  const proxies = [
-    s => `https://images.weserv.nl/?url=${encodeURIComponent(s)}&default=`,
-    s => `https://wsrv.nl/?url=${encodeURIComponent(s)}`,
-    s => `https://corsproxy.io/?${encodeURIComponent(s)}`,
-  ];
+  // ถ้าเป็น Google Drive thumbnail ลอง format อื่นก่อน
+  const driveThumb = original.match(/drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]+)/);
+  const driveId = driveThumb ? driveThumb[1] : _extractDriveId(original);
+  const proxies = [];
+  if (driveId) {
+    proxies.push(`https://drive.google.com/uc?export=view&id=${driveId}`);
+    proxies.push(`https://lh3.googleusercontent.com/d/${driveId}`);
+  }
+  proxies.push(`https://images.weserv.nl/?url=${encodeURIComponent(original)}`);
+  proxies.push(`https://wsrv.nl/?url=${encodeURIComponent(original)}`);
   if (attempt < proxies.length) {
     img.setAttribute('data-attempt', attempt + 1);
-    img.src = proxies[attempt](src);
+    img.src = proxies[attempt];
   } else {
-    // ลองทุก proxy แล้วยังไม่ได้ — ซ่อนรูป
     img.style.display = 'none';
     const wrap = img.closest('.card-img-wrap,[style*="aspect-ratio"]');
     if (wrap) wrap.style.background = '#f5f2ee';
@@ -5102,7 +5108,7 @@ function renderCalendarCardGrid(monthEvents) {
     };
     const grad = gradients[color] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
     const imgHtml = ev.image
-      ? `<img class="cal-ev-card-img" src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" onerror="_onImgError(this);if(this.style.display==='none'onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="cal-ev-card-img-placeholder" style="display:none;background:${grad};"><svg width="28" height="28" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>`
+      ? `<img class="cal-ev-card-img" src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" onerror="_onImgError(this);if(this.style.display==='none'&&this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="cal-ev-card-img-placeholder" style="display:none;background:${grad};"><svg width="28" height="28" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>`
       : `<div class="cal-ev-card-img-placeholder" style="background:${grad};"></div>`;
 
     const imgThumb = ev.image
