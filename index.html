@@ -3598,6 +3598,68 @@ function _refreshAllPages() {
   });
 }
 
+// ── _fetchFreshFromAppsScript: ดึงข้อมูลใหม่ตรงจาก Apps Script (bypass GitHub CDN cache)
+// เรียกหลัง save/edit/delete ทุก action — ผู้ใช้เห็นข้อมูลใหม่ทันที ไม่ต้องรอ GitHub rebuild
+async function _fetchFreshFromAppsScript() {
+  const base = APPS_SCRIPT_ADMIN_URL;
+  const t = Date.now();
+  try {
+    const [evRes, wkRes, bdRes, anRes] = await Promise.all([
+      fetchWithTimeout(`${base}?action=getEvents&t=${t}`),
+      fetchWithTimeout(`${base}?action=getWorks&t=${t}`),
+      fetchWithTimeout(`${base}?action=getBirthdays&t=${t}`),
+      fetchWithTimeout(`${base}?action=getAnniversaries&t=${t}`),
+    ]);
+    const evData = evRes.events || evRes;
+    if (Array.isArray(evData) && evData.length) {
+      allEvents = processEvents(evData);
+      _memCache.set('events', allEvents);
+      Cache.set(LC.EVENTS, allEvents);
+      Cache.setTS(LC.TS_EV);
+      apiLoaded = true;
+    }
+    const wkData = wkRes.works || wkRes;
+    if (Array.isArray(wkData)) {
+      allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      worksLoaded = true;
+      _memCache.set('works', allWorks);
+      Cache.set(LC.WORKS, allWorks);
+      Cache.setTS(LC.TS_WK);
+    }
+    const bdData = bdRes.birthdays || bdRes;
+    if (Array.isArray(bdData)) {
+      allBirthdays = bdData.map(r => ({
+        __backendId: r.id || '',
+        artist_name: r.artist_name || '',
+        birthday_month: parseInt(r.birthday_month) || 0,
+        birthday_day: parseInt(r.birthday_day) || 0,
+        color: r.color || '#6b7280'
+      }));
+      _memCache.set('bdays', allBirthdays);
+      Cache.set(LC.BDAYS, allBirthdays);
+      Cache.setTS(LC.TS_BD);
+    }
+    const anData = anRes.anniversaries || anRes;
+    if (Array.isArray(anData)) {
+      allAnniversaries = anData.map(r => ({
+        __backendId: r.id || '',
+        anniversary_name: r.anniversary_name || '',
+        anniversary_month: parseInt(r.anniversary_month) || 0,
+        anniversary_day: parseInt(r.anniversary_day) || 0,
+        anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
+        color: r.color || '#a855f7'
+      }));
+      _memCache.set('annivs', allAnniversaries);
+      Cache.set(LC.ANNIVS, allAnniversaries);
+      Cache.setTS(LC.TS_AN);
+    }
+    _fmtDateCache.clear();
+  } catch(e) {
+    console.warn('_fetchFreshFromAppsScript failed:', e.message);
+  }
+  _refreshAllPages();
+}
+
 // ── Status helpers ────────────────────────────────────────────────
 // Cache today's date string for performance (refreshes each render cycle)
 let _todayStrCache = '';
@@ -5769,9 +5831,8 @@ async function confirmDelete(key) {
   try {
     const result = await deleteEventInSheets(ev.__backendId || ev.__rawId, ev.__rowNumber);
     showToast(result.status === 'not_found' ? t('toast_removed') : t('toast_deleted'));
-    Cache.clearAll();
-    await loadEventsFromSheets(true);
-    _refreshAllPages();
+    Cache.clearAll(); _fetchingAll = false;
+    await _fetchFreshFromAppsScript();
   } catch(err) {
     if (rowEl) rowEl.style.opacity = '1';
     showToast(t('toast_error') + ': ' + (err.message || ''));
@@ -5804,12 +5865,18 @@ function renderAnniversaryAdmin() {
 }
 
 async function deleteBirthday(id) {
-  try { await deleteBirthdayInSheets(id); showToast(t('toast_bday_deleted')); Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); await loadBirthdaysFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners(); }
-  catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
+  try {
+    await deleteBirthdayInSheets(id); showToast(t('toast_bday_deleted'));
+    Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); _fetchingAll = false;
+    await _fetchFreshFromAppsScript();
+  } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 async function deleteAnniversary(id) {
-  try { await deleteAnniversaryInSheets(id); showToast(t('toast_anniv_deleted')); Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); await loadAnniversariesFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners(); }
-  catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
+  try {
+    await deleteAnniversaryInSheets(id); showToast(t('toast_anniv_deleted'));
+    Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); _fetchingAll = false;
+    await _fetchFreshFromAppsScript();
+  } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 
 function openAnnivForm() { document.getElementById('anniv-form-wrap').style.display = 'block'; }
@@ -5829,7 +5896,9 @@ async function saveAnniversary() {
   if (!day||day<1||day>31) { showToast(t('toast_invalid_day')); return; }
   try {
     await createAnniversaryInSheets({ anniversary_name:label, anniversary_month:String(month), anniversary_day:String(day), anniversary_year:year||'', color });
-    closeAnnivForm(); showToast(t('toast_anniv_saved')); Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); await loadAnniversariesFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners();
+    closeAnnivForm(); showToast(t('toast_anniv_saved'));
+    Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); _fetchingAll = false;
+    await _fetchFreshFromAppsScript();
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 function openBdayForm() { document.getElementById('bday-form-wrap').style.display = 'block'; }
@@ -5848,7 +5917,9 @@ async function saveBirthday() {
   if (!day||day<1||day>31)       { showToast(t('toast_invalid_day')); return; }
   try {
     await createBirthdayInSheets({ artist_name:name, birthday_month:String(month), birthday_day:String(day), color });
-    closeBdayForm(); showToast(t('toast_bday_saved')); Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); await loadBirthdaysFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners();
+    closeBdayForm(); showToast(t('toast_bday_saved'));
+    Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); _fetchingAll = false;
+    await _fetchFreshFromAppsScript();
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 
@@ -6186,9 +6257,8 @@ async function handleEventFormSubmit() {
       _adminOpenMonths.add(schema.dateStart.slice(0, 7));
     }
     clearForm();
-    Cache.clearAll(); _fetchingEvents = false;
-    await loadEventsFromSheets(true);
-    _refreshAllPages();
+    Cache.clearAll(); _fetchingEvents = false; _fetchingAll = false;
+    await _fetchFreshFromAppsScript();
     if (worksLoaded) {} // works ไม่เปลี่ยน ไม่ต้อง reload
   }
 }
@@ -6508,8 +6578,8 @@ async function handleWorksFormSubmit() {
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
     worksLoaded = false;
     _adminWorksListFP = '';
-    await loadWorksFromSheets(true);
-    _refreshAllPages();
+    Cache.clearAll(); _fetchingAll = false;
+    await _fetchFreshFromAppsScript();
   } catch(err) {
     showToast('❌ Error: ' + (err.message || 'Failed to save work'));
     console.error('[handleWorksFormSubmit]', err);
@@ -6573,12 +6643,11 @@ function deleteWork(backendId, title) {
       const res = await apiPost({ action: 'deleteWork', id });
       if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
       showToast('Work deleted ✓');
-      Cache.clearAll();
+      Cache.clearAll(); _fetchingAll = false;
       worksLoaded = false;
       _adminWorksListFP = '';
       _memCache.del('works');
-      await loadWorksFromSheets(true);
-      _refreshAllPages();
+      await _fetchFreshFromAppsScript();
     } catch(err) {
       _restoreBtnWrap();
       showToast('❌ Error: ' + (err.message || 'Failed to delete'));
