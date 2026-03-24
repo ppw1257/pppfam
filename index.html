@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
   <!-- โหลด font แบบ blocking เพื่อป้องกัน FOUT (font flash ที่ทำให้กระตุก) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=K2D:wght@400;600;700;800&display=swap">
   <!-- Non-blocking scripts -->
   <script src="/_sdk/element_sdk.js" defer></script>
   <!-- Tailwind โหลดก่อน render เพื่อป้องกัน layout shift (ไม่ใช้ defer) -->
@@ -58,20 +58,55 @@
   </script>
   <style>
   :root {
-    --color-pond: #f4845f;
-    --color-phuwin: #8fa3b1;
-    --color-permpoon: #5fad8e;
-    --color-pondphuwin: #b09be0;
-    --color-pondpermpoon: #7bafd4;
-    --color-phuwinpermpoon: #e08fa0;
-    --color-pondphuwinpermpoon: #e08fb5;
+    /* ── Style B: Dark Nav + Solid Color Cards ── */
+    --color-pond:              #f97316;
+    --color-pond-bg:           #fff7ed;
+    --color-pond-border:       #fed7aa;
+    --color-pond-text:         #c2410c;
+    --color-pond-text-dark:    #7c2d12;
+
+    --color-phuwin:            #64748b;
+    --color-phuwin-bg:         #f1f5f9;
+    --color-phuwin-border:     #cbd5e1;
+    --color-phuwin-text:       #334155;
+    --color-phuwin-text-dark:  #1e293b;
+
+    --color-permpoon:          #22c55e;
+    --color-permpoon-bg:       #f0fdf4;
+    --color-permpoon-border:   #bbf7d0;
+    --color-permpoon-text:     #15803d;
+    --color-permpoon-text-dark:#14532d;
+
+    --color-pondphuwin:        #a855f7;
+    --color-pondphuwin-bg:     #faf5ff;
+    --color-pondphuwin-border: #e9d5ff;
+    --color-pondphuwin-text:   #7e22ce;
+    --color-pondphuwin-text-dark:#581c87;
+
+    --color-pondpermpoon:      #3b82f6;
+    --color-pondpermpoon-bg:   #eff6ff;
+    --color-pondpermpoon-border:#bfdbfe;
+    --color-pondpermpoon-text: #1d4ed8;
+    --color-pondpermpoon-text-dark:#1e3a8a;
+
+    --color-phuwinpermpoon:    #ec4899;
+    --color-phuwinpermpoon-bg: #fdf2f8;
+    --color-phuwinpermpoon-border:#fbcfe8;
+    --color-phuwinpermpoon-text:#be185d;
+    --color-phuwinpermpoon-text-dark:#831843;
+
+    --color-pondphuwinpermpoon:    #ec4899;
+    --color-pondphuwinpermpoon-bg: #fdf2f8;
+    --color-pondphuwinpermpoon-border:#fbcfe8;
+    --color-pondphuwinpermpoon-text:#be185d;
+    --color-pondphuwinpermpoon-text-dark:#831843;
+
     --radius-card: 16px;
-    --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-card: none;
     --border-card: none;
-    --color-accent: #2d2d2d;
-    /* Soft pastel accent */
-    --accent-primary: #f4845f;
-    --accent-gradient: linear-gradient(135deg, #f4845f 0%, #d98fcc 100%);
+    --color-accent: #111;
+    --accent-primary: #f97316;
+    --accent-gradient: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
     /* Fluid spacing */
     --page-pad-x: clamp(10px, 3vw, 2rem);
     --page-pad-y: clamp(1rem, 2.5vw, 2rem);
@@ -85,9 +120,9 @@
     --text-2xl:  clamp(18px, 2vw,   28px);
     --text-3xl:  clamp(22px, 2.5vw, 36px);
   }
-  * { font-family: 'K2D', sans-serif; -webkit-tap-highlight-color: transparent; }
+  * { font-family: 'Inter', 'K2D', sans-serif; -webkit-tap-highlight-color: transparent; }
   html { height: 100%; overflow: hidden; font-size: 105%; }
-  body { height: 100%; background: #faf9f7; background-attachment: fixed; color: #2d2d2d; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
+  body { height: 100%; background: #ffffff; background-attachment: fixed; color: #2d2d2d; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
   #app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .page { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; }
   .page.active {
@@ -100,12 +135,12 @@
     from { opacity: 0; }
     to   { opacity: 1; }
   }
-  .nav-link { cursor: pointer; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 99px; color: #6b7280; letter-spacing: 0.01em; transition: color 0.15s, background 0.15s; }
-  .nav-link:hover { color: #111; background: #f3f3f1; }
-  .nav-link.active { color: #fff; background: var(--accent-gradient); border-radius: 99px; font-weight: 700; box-shadow: 0 2px 10px rgba(212,130,160,0.25); }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1.5px solid #f0ede8; box-shadow: 0 1px 6px rgba(0,0,0,0.04); height: 100%; position: relative; transition: box-shadow 0.2s, transform 0.15s; }
+  .nav-link { cursor: pointer; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: 6px; color: #6b7280; letter-spacing: 0em; transition: color 0.15s, background 0.15s; }
+  .nav-link:hover { color: #111; background: #f5f5f5; }
+  .nav-link.active { color: #111; background: #f3f4f6; border-radius: 6px; font-weight: 700; box-shadow: none; }
+  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #efefef; box-shadow: 0 2px 12px rgba(0,0,0,0.07); height: 100%; position: relative; transition: box-shadow 0.18s, transform 0.18s; }
   .month-group { }
-  .event-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-3px); border-color: #e0dcd8; }
+  .event-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12); transform: translateY(-4px); border-color: #e8e8e8; }
   .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.75);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;z-index:5; }
   .event-card:hover .card-hover-overlay { opacity:1; }
   .card-hover-overlay .oh-title { font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4; }
@@ -120,14 +155,14 @@
   .timeline-dow { font-size:0.58rem;font-weight:700;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase; }
   .timeline-circle { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1; }
   .timeline-circle span { font-size:0.82rem;font-weight:900;color:#fff; }
-  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);cursor:pointer;border-left:3px solid #f4845f;border:1.5px solid #f0ede8;border-left:3px solid #f4845f;transition:box-shadow 0.2s; }
-  .timeline-card:hover { box-shadow:0 4px 14px rgba(0,0,0,0.10); }
+  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;border:1px solid #efefef;border-left:3px solid #111;transition:box-shadow 0.18s, transform 0.18s; }
+  .timeline-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); }
   .timeline-card-top { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
   .timeline-card-title { font-size:0.85rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:4px; }
   .timeline-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;gap:8px;flex-wrap:wrap; }
   /* list view */
-  .list-card { background:#fff;border-radius:var(--radius-card);border:1.5px solid #f0ede8;box-shadow:0 1px 4px rgba(0,0,0,0.03);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:border-color 0.15s; }
-  .list-card:hover { }
+  .list-card { background:#fff;border-radius:var(--radius-card);border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:box-shadow 0.18s, transform 0.18s; }
+  .list-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); }
   .list-card-img { width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f3f4f6; }
   .list-card-body { flex:1;min-width:0; }
   .list-card-title { font-size:0.85rem;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px; }
@@ -137,10 +172,10 @@
   .card-countdown { display:none !important; }
   .count-box { background:rgba(0,0,0,0.08); color:#111; padding:4px 6px; border-radius:6px; font-size:0.65rem; font-weight:800; text-align:center; line-height:1.2; min-width:34px; letter-spacing:0.02em; }
   .count-box span { display:block; font-size:0.5rem; font-weight:600; color:#9ca3af; margin-top:1px; letter-spacing:0.06em; }
-  .today-badge { background:#f4845f; color:#fff; font-weight:800; padding:3px 9px; border-radius:5px; position:absolute; top:8px; left:8px; font-size:0.62rem; letter-spacing:0.06em; box-shadow:0 2px 6px rgba(244,132,95,0.35); z-index:4; }
-  .next-event-label { font-size:0.58rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#f4845f; margin-top:6px; margin-bottom:2px; }
+  .today-badge { background:#f97316; color:#fff; font-weight:700; padding:2px 8px; border-radius:4px; position:absolute; top:8px; left:8px; font-size:0.6rem; letter-spacing:0.04em; box-shadow:none; z-index:4; }
+  .next-event-label { font-size:0.58rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#f97316; margin-top:6px; margin-bottom:2px; }
   @media (max-width:480px) { .count-box { font-size:0.6rem; padding:3px 5px; min-width:28px; } }
-  .card-img-placeholder { width: 100%; height: 160px; background: #f5f2ee; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card-img-placeholder { width: 100%; height: 160px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   /* ── Card image wrapper: fixed height, never expands ── */
   .card-img-wrap {
     width: 100%;
@@ -148,7 +183,7 @@
     flex-shrink: 0;
     overflow: hidden;
     position: relative;
-    background: #f5f2ee;
+    background: #f8f9fa;
     border-radius: var(--radius-card) var(--radius-card) 0 0;
   }
   .card-img {
@@ -165,15 +200,15 @@
   /* ── CALENDAR ── */
   .cal-day { width:66px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;box-sizing:border-box;position:relative;border:none;padding:0; }
   .cal-day:hover { background: #f3f4f6; }
-  .cal-day-selected { background: #f4845f !important; box-shadow: 0 2px 8px rgba(244,132,95,0.3); }
+  .cal-day-selected { background: #111 !important; box-shadow: none; }
   .cal-day-has-event::after { content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#6b7280; }
   .cal-day-selected.cal-day-has-event::after { background:#fff; }
   .cal-events-wrap { display:none; }
   .cal-event-dot { display:none; }
   .cal-event-dot-circle { display:none; }
   /* event list right side */
-  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;border:1.5px solid #f0ede8;box-shadow:none;cursor:pointer;transition:border-color 0.15s,transform 0.15s; }
-  .cal-list-item:hover { border-color: #e0d8d0; transform:translateY(-1px); }
+  .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow 0.18s, transform 0.18s; }
+  .cal-list-item:hover { box-shadow:0 4px 16px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.07); transform:translateY(-2px); }
   .cal-list-date { flex-shrink:0;width:48px;text-align:center; }
   .cal-list-dow { font-size:0.68rem;font-weight:700;color:#9ca3af;letter-spacing:0.07em;text-transform:uppercase; }
   .cal-list-num { font-size:1.3rem;font-weight:700;color:#111;line-height:1.1; }
@@ -253,18 +288,18 @@
     transition: all 0.15s;
   }
   .artist-filter-btn.active {
-    background: #f4845f !important;
-    border-color: #f4845f !important;
+    background: #111 !important;
+    border-color: #111 !important;
     color: #fff !important;
-    box-shadow: 0 2px 8px rgba(244,132,95,0.25) !important;
+    box-shadow: none !important;
   }
   .filter-bar .flex-spacer { display: none !important; }
   .filter-bar > div:last-child { flex-shrink: 0; }
   .cal-month-strip { display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none; }
   .cal-month-strip::-webkit-scrollbar { display:none; }
-  .cal-month-pill { padding:6px 16px;border-radius:99px;font-size:0.82rem;font-weight:600;color:#6b7280;background:#f5f2ee;cursor:pointer;white-space:nowrap;border:1.5px solid transparent;font-family:inherit;transition:all 0.15s; }
-  .cal-month-pill:hover { background:#ede9e3;color:#2d2d2d; }
-  .cal-month-pill.active { background:#f4845f;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(244,132,95,0.25); }
+  .cal-month-pill { padding:5px 14px;border-radius:6px;font-size:0.8rem;font-weight:500;color:#6b7280;background:#f9fafb;cursor:pointer;white-space:nowrap;border:1px solid #e5e7eb;font-family:inherit;transition:all 0.15s; }
+  .cal-month-pill:hover { background:#f3f4f6;color:#111; }
+  .cal-month-pill.active { background:#111;color:#fff;font-weight:600;box-shadow:none; }
   /* date strip */
   /* cal-date-strip: controlled by inline style per context */
   .cal-date-strip::-webkit-scrollbar { display:none; }
@@ -279,24 +314,24 @@
   .cal-date-chip-dot { width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0; }
   /* card grid */
   .cal-card-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px; }
-  .cal-ev-card { background:#fff;border-radius:16px;border:1.5px solid #f0ede8;box-shadow:none;overflow:hidden;cursor:pointer;transition:border-color 0.15s,transform 0.15s; }
-  .cal-ev-card:hover { border-color:#e0d8d0;transform:translateY(-2px); }
+  .cal-ev-card { background:#fff;border-radius:var(--radius-card);border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;transition:box-shadow 0.18s, transform 0.18s; }
+  .cal-ev-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform:translateY(-4px); }
   .cal-ev-card-img { width:100%;height:120px;object-fit:cover;object-position:top;display:block;background:#f3f4f6; }
   .cal-ev-card-img-placeholder { width:100%;height:120px;display:flex;align-items:center;justify-content:center; }
   .cal-ev-card-body { padding:10px 12px; }
   .cal-ev-card-title { font-size:clamp(0.78rem,1.2vw,0.88rem);font-weight:700;color:#111;line-height:1.35;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical; }
   .cal-ev-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;align-items:center;gap:5px;flex-wrap:wrap; }
   .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
-  .modal-box { background: #fff; border-radius: 20px; max-width: 860px; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.10); margin: auto; border: 1.5px solid #f0ede8; }
-  .form-input { width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.7rem 0.95rem; font-size: 1rem; outline: none;  background: #fff; box-sizing: border-box; }
-  .form-input:focus { border-color: #f4845f; box-shadow: 0 0 0 3px rgba(244,132,95,0.12); }
-  .form-label { font-size: 0.9rem; font-weight: 600; color: #374151; margin-bottom: 0.3rem; display: block; }
-  .btn-primary { background: var(--accent-gradient); color: #fff; border: none; border-radius: 10px; padding: 0.7rem 1.35rem; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 10px rgba(244,132,95,0.25); transition: opacity 0.15s, box-shadow 0.15s; }
-  .btn-primary:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 4px 16px rgba(244,132,95,0.35); }
-  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-  .btn-secondary { background: #fff; color: #374151; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 0.7rem 1.35rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
-  .btn-secondary:hover { background: #f5f5f3; border-color: #c8c8c4; }
-  .btn-danger { background: #fee2e2; color: #dc2626; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+  .modal-box { background: #fff; border-radius: 16px; max-width: 860px; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); margin: auto; border: 1px solid #e5e7eb; }
+  .form-input { width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.7rem 0.95rem; font-size: 1rem; outline: none; background: #fff; box-sizing: border-box; }
+  .form-input:focus { border-color: #f97316; box-shadow: 0 0 0 2px rgba(249,115,22,0.15); }
+  .form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.3rem; display: block; }
+  .btn-primary { background: #111; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.25rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; box-shadow: none; transition: opacity 0.15s; }
+  .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { background: #fff; color: #374151; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.65rem 1.25rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+  .btn-secondary:hover { background: #f9fafb; border-color: #d1d5db; }
+  .btn-danger { background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; padding: 0.45rem 0.9rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
   .btn-danger:hover { background: #fecaca; }
   #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #111; color: #fff; padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 0.9rem; z-index: 999; opacity: 0; pointer-events: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
   #toast.show { opacity: 1; pointer-events: auto; }
@@ -310,7 +345,7 @@
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d4d4d0; border-radius: 99px; }
-  .section-header { font-size: 1.5rem; font-weight: 800; color: #111; letter-spacing: -0.03em; }
+  .section-header { font-size: 1.3rem; font-weight: 700; color: #111; letter-spacing: -0.02em; }
   .artist-check { display: none; }
   .artist-check-label {
     display: inline-flex; align-items: center; gap: 6px;
@@ -324,10 +359,10 @@
   label.artist-check-label[for="ac-pond"] { border-color: #fed7aa; color: #f97316; }
   label.artist-check-label[for="ac-pond"]:hover { border-color: #f97316; background: #fff7ed; }
   #ac-pond:checked + label.artist-check-label {
-    background: #ff5c35 !important;
-    border-color: #ff5c35 !important;
+    background: #111 !important;
+    border-color: #111 !important;
     color: #ffffff !important;
-    box-shadow: 0 2px 6px rgba(255,92,53,0.32);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     font-weight: 700;
   }
   /* Phuwin — slate */
@@ -351,11 +386,11 @@
     font-weight: 700;
   }
   .detail-hero { width: 100%; max-height: 520px; object-fit: contain; background: transparent; display: block; border-radius: 0; }
-  .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; border: 1.5px solid #e0e0de; font-size: 0.82rem; font-weight: 600; color: #374151; text-decoration: none; transition: border-color 0.15s; }
+  .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; border: 1px solid #e5e7eb; font-size: 0.82rem; font-weight: 600; color: #374151; text-decoration: none; transition: border-color 0.15s; }
   .link-btn:hover { background: #f7f7f5; border-color: #c0c0bc; }
-  footer { background: #fff; border-top: 1.5px solid #ebebeb; margin-top: auto; flex-shrink: 0; }
-  .blink-heart { color: #ff5c35; display:inline-block; }
-  @keyframes blink-pulse { 0%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.2)} 100%{opacity:1;transform:scale(1)} }
+  footer { background: #fff; border-top: 1px solid #f0f0f0; margin-top: auto; flex-shrink: 0; }
+  .blink-heart { color: #22c55e; display:inline-block; animation: blink-pulse 2s ease-in-out infinite; }
+  @keyframes blink-pulse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
   @media (max-width: 640px) {
     .cal-event-dot { font-size: 0.68rem; padding: 2px 4px; }
     .cal-day { height: 80px; padding: 4px; }
@@ -451,7 +486,7 @@
   .admin-tab-panel.tab-active {
     animation: pageIn 0.18s ease forwards;
   }
-  .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:0.82rem;position:relative; }
+  .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;font-size:0.82rem;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.06); }
   .bday-today { }
   @keyframes bday-pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -463,9 +498,9 @@
   .month-group-header-box { display: inline-flex; align-items: center; gap: 8px; }
   .month-group-header-dots { display: flex; gap: 4px; align-items: center; }
   .month-group-header-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .month-group-header-label { font-size: 1.3rem; font-weight: 800; color: #111; letter-spacing: -0.03em; }
-  .month-group-header-line { flex: 1; height: 1px; background: #e8e8e4; border-radius: 99px; }
-  .month-group-header-count { font-size: 0.78rem; font-weight: 700; color: #f4845f; background: #fff5f1; border-radius: 6px; padding: 3px 10px; border: 1.5px solid #fad4c4; }
+  .month-group-header-label { font-size: 1.1rem; font-weight: 700; color: #111; letter-spacing: -0.02em; }
+  .month-group-header-line { flex: 1; height: 1px; background: #f0f0f0; border-radius: 99px; }
+  .month-group-header-count { font-size: 0.75rem; font-weight: 600; color: #f97316; background: #fff7ed; border-radius: 6px; padding: 2px 9px; border: 1px solid #fed7aa; }
   /* Map embed */
   .map-embed-wrap { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
   .map-embed-wrap iframe { width: 100%; height: 300px; border: 0; display: block; }
@@ -770,10 +805,9 @@
   ══════════════════════════════════════════════ */
   #main-nav {
     background: #fff;
-    border-bottom: 2px solid transparent;
-    border-image: linear-gradient(90deg, #f4845f 0%, #e08fa0 50%, #b09be0 100%) 1;
+    border-bottom: 1px solid #f0f0f0;
     flex-shrink: 0;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+    box-shadow: none;
   }
   .nav-inner {
     width: 100%;
@@ -795,16 +829,13 @@
     min-width: 0;
   }
   #nav-site-title {
-    font-weight: 800;
+    font-weight: 700;
     font-size: 0.88rem;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background: linear-gradient(90deg, #f4845f, #b09be0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #111;
   }
   .nav-links-wrap {
     display: flex;
@@ -904,8 +935,8 @@
   /* img-loading / img-loaded defined above (line ~158) */
   /* ── Reduce heavy shadows on mobile (perf) ── */
   @media (max-width: 767px) {
-    .event-card { box-shadow: 0 3px 12px rgba(0,0,0,0.10) !important; }
-    .event-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.14) !important; }
+    .event-card { box-shadow: 0 2px 12px rgba(0,0,0,0.07) !important; }
+    .event-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12) !important; }
     .modal-box { box-shadow: 0 4px 24px rgba(0,0,0,0.15) !important; }
   }
   /* ── Smooth infinite-scroll transition ── */
@@ -1208,7 +1239,7 @@
       <span class="nav-link" data-page="calendar" onclick="navigate('calendar')"><i data-lucide="calendar" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Calendar</span></span>
       <span class="nav-link" data-page="works" onclick="navigate('works')"><i data-lucide="star" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Works</span></span>
       <span class="nav-link" data-page="admin" id="nav-admin-link" style="display:none;" onclick="navigate('admin')"><i data-lucide="settings" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Admin</span></span>
-      <button id="nav-refresh-btn" onclick="forceRefreshAll()" title="Refresh data" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:99px;border:1.5px solid #e5e7eb;background:transparent;cursor:pointer;color:#6b7280;padding:0;flex-shrink:0;transition:background 0.15s;">
+      <button id="nav-refresh-btn" onclick="forceRefreshAll()" title="Refresh data" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:99px;border:1px solid #e5e7eb;background:transparent;cursor:pointer;color:#9ca3af;padding:0;flex-shrink:0;transition:background 0.15s;">
         <svg id="nav-refresh-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </button>
      </div>
@@ -1217,7 +1248,7 @@
 
    <!-- HOME PAGE -->
    <div class="page active" id="page-home">
-    <div style="width:100%;padding:2rem 1rem;width:100%;box-sizing:border-box;overflow-x:hidden;">
+    <div style="width:100%;padding:1.5rem 1rem;width:100%;box-sizing:border-box;overflow-x:hidden;background:#fff;">
      <div id="bday-banners" style="display:none;flex-direction:column;gap:8px;margin-bottom:1.5rem;"></div>
 
      <!-- HERO -->
@@ -1256,23 +1287,23 @@
      <div style="margin-bottom:0.75rem;">
       <div id="home-filter-bar" class="filter-bar" style="margin-bottom:6px;">
        <button class="artist-filter-btn" data-artist="all" onclick="filterHome('all')"
-         style="padding:5px 16px;border-radius:99px;border:none;background:linear-gradient(135deg,#f97316,#ec4899);color:#fff;font-size:0.75rem;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(236,72,153,0.35);">✦ All</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:700;cursor:pointer;">✦ All</button>
        <button class="artist-filter-btn" data-artist="Pond" onclick="filterHome('Pond')"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:2px solid #fed7aa;background:#fff7ed;color:#ea580c;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:7px;height:7px;border-radius:50%;background:#f97316;display:inline-block;box-shadow:0 0 4px #f97316;"></span>Pond</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>Pond</button>
        <button class="artist-filter-btn" data-artist="Phuwin" onclick="filterHome('Phuwin')"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:2px solid #d1d5db;background:#f9fafb;color:#374151;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:7px;height:7px;border-radius:50%;background:#6b7280;display:inline-block;box-shadow:0 0 4px #6b7280;"></span>Phuwin</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;flex-shrink:0;"></span>Phuwin</button>
        <button class="artist-filter-btn" data-artist="Permpoon" onclick="filterHome('Permpoon')"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:2px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;box-shadow:0 0 4px #22c55e;"></span>Permpoon</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-       <span id="events-count" style="font-size:0.68rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#f97316,#ec4899);border-radius:6px;padding:2px 10px;box-shadow:0 2px 8px rgba(236,72,153,0.25);"></span>
+       <span id="events-count" style="font-size:0.68rem;font-weight:700;color:#fff;background:#111;border-radius:6px;padding:2px 10px;box-shadow:none;"></span>
 
       </div>
      </div>
      <div id="events-grid"></div>
      <div id="no-events" style="display:none;padding:3rem 1rem;">
       <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
-       <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1.5px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+       <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
         <i data-lucide="calendar-x" style="width:24px;height:24px;color:#a855f7;stroke-width:1.8;"></i>
        </div>
        <p style="font-size:1rem;font-weight:700;color:#111;margin-bottom:6px;" >No upcoming events</p>
@@ -1285,12 +1316,12 @@
       </div>
      </div>
     </div>
-    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💙</span></div></footer>
+    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
    </div>
 
    <!-- CALENDAR PAGE -->
    <div class="page" id="page-calendar">
-    <div style="width:100%;padding:2rem 1rem;width:100%;box-sizing:border-box;">
+    <div style="width:100%;padding:1.5rem 1rem;width:100%;box-sizing:border-box;background:#fff;">
 
      <!-- Header -->
      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.25rem;">
@@ -1305,7 +1336,7 @@
      <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:1rem;align-items:stretch;">
 
      <!-- กรอบ 1: Stats + Artist -->
-     <div style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:14px 20px;box-sizing:border-box;display:flex;flex-direction:column;">
+     <div style="background:#fff;border-radius:14px;border:1px solid #ebebeb;padding:14px 20px;box-sizing:border-box;display:flex;flex-direction:column;">
       <!-- แถว 1: Total + Past/Remaining/% -->
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:12px;border-bottom:1px solid #f3f4f6;margin-bottom:12px;">
        <div style="display:flex;align-items:baseline;gap:8px;">
@@ -1377,17 +1408,17 @@
      <div id="cal-layout" style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;">
 
       <!-- ซ้าย: mini calendar -->
-      <div id="cal-left" style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:16px;flex-shrink:0;">
+      <div id="cal-left" style="background:#fff;border-radius:14px;border:1px solid #ebebeb;padding:16px;flex-shrink:0;">
        <!-- filter pills แนวนอน -->
        <div class="filter-bar" style="margin-bottom:12px;">
         <button class="cal-filter-btn" data-artist="all" onclick="filterCalendar('all')"
-          style="padding:4px 12px;border-radius:99px;border:2px solid #111;background:#111;color:#fff;font-size:0.72rem;font-weight:700;cursor:pointer;">All</button>
+          style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.72rem;font-weight:700;cursor:pointer;">✦ All</button>
         <button class="cal-filter-btn" data-artist="Pond" onclick="filterCalendar('Pond')"
-          style="padding:4px 12px;border-radius:99px;border:2px solid #f97316;background:#fff;color:#f97316;font-size:0.72rem;font-weight:700;cursor:pointer;">Pond</button>
+          style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:0.72rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>Pond</button>
         <button class="cal-filter-btn" data-artist="Phuwin" onclick="filterCalendar('Phuwin')"
-          style="padding:4px 12px;border-radius:99px;border:2px solid #6b7280;background:#fff;color:#6b7280;font-size:0.72rem;font-weight:700;cursor:pointer;">Phuwin</button>
+          style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;font-size:0.72rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;flex-shrink:0;"></span>Phuwin</button>
         <button class="cal-filter-btn" data-artist="Permpoon" onclick="filterCalendar('Permpoon')"
-          style="padding:4px 12px;border-radius:99px;border:2px solid #22c55e;background:#fff;color:#22c55e;font-size:0.72rem;font-weight:700;cursor:pointer;">Permpoon</button>
+          style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.72rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
        </div>
        <!-- month + year nav -->
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -1434,7 +1465,7 @@
      <!-- hidden but keep for JS compatibility -->
      <div id="cal-layout" style="display:none;"><div id="cal-left"><div id="cal-dow-headers"></div><div id="cal-grid" class="cal-grid"></div></div><div id="cal-event-list"></div></div>
     </div>
-    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💙</span></div></footer>
+    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
    </div>
 
    <!-- WORKS PAGE -->
@@ -1444,7 +1475,7 @@
      <!-- Header — same structure as home page -->
      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.25rem;">
       <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#111;margin:0;">Works</h2>
-      <div style="display:none;"><select id="works-year-select" style="display:none;" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1.5px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;font-family:inherit;"></select></div>
+      <div style="display:none;"><select id="works-year-select" style="display:none;" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;font-family:inherit;"></select></div>
      </div>
 
      <!-- Filter bars — same structure as home page -->
@@ -1452,27 +1483,27 @@
       <!-- Artist filter -->
       <div class="filter-bar" style="margin-bottom:6px;" id="works-artist-bar">
        <button onclick="setWorksArtist('all')" id="wa-all" class="works-artist-btn active-wa"
-         style="padding:5px 14px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;flex-shrink:0;">All</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;">✦ All</button>
        <button onclick="setWorksArtist('Pond')" id="wa-Pond" class="works-artist-btn"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #f0f0f0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>Pond</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>Pond</button>
        <button onclick="setWorksArtist('Phuwin')" id="wa-Phuwin" class="works-artist-btn"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #f0f0f0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background:#6b7280;display:inline-block;flex-shrink:0;"></span>Phuwin</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;flex-shrink:0;"></span>Phuwin</button>
        <button onclick="setWorksArtist('Permpoon')" id="wa-Permpoon" class="works-artist-btn"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #f0f0f0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
       </div>
       <!-- Year filter bar — built dynamically by _buildWorksYearButtons() -->
       <div class="filter-bar" id="works-year-bar" style="margin-bottom:6px;"></div>
       <!-- Category tabs — horizontal scroll, never wrap -->
       <div class="filter-bar" id="works-tabs" style="padding-bottom:4px;">
-       <button onclick="setWorksTab('all')"           id="wt-all"           class="works-tab active-wt" style="padding:5px 14px;border-radius:99px;border:1.5px solid #ff5c35;background:#ff5c35;color:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">All</button>
-       <button onclick="setWorksTab('littlebigworld')" id="wt-littlebigworld" class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Little Big World</button>
-       <button onclick="setWorksTab('series')"         id="wt-series"         class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Series</button>
-       <button onclick="setWorksTab('music')"          id="wt-music"          class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Music &amp; MV</button>
-       <button onclick="setWorksTab('magazine')"       id="wt-magazine"       class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Magazines</button>
-       <button onclick="setWorksTab('presenter')"      id="wt-presenter"      class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Brand Presenter</button>
-       <button onclick="setWorksTab('variety')"        id="wt-variety"        class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Variety</button>
-       <button onclick="setWorksTab('interview')"      id="wt-interview"      class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Interviews</button>
-       <button onclick="setWorksTab('otherworks')"     id="wt-otherworks"     class="works-tab" style="padding:5px 14px;border-radius:99px;border:1.5px solid #e5e5e0;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Other Works</button>
+       <button onclick="setWorksTab('all')"           id="wt-all"           class="works-tab active-wt" style="padding:5px 14px;border-radius:6px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">All</button>
+       <button onclick="setWorksTab('littlebigworld')" id="wt-littlebigworld" class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Little Big World</button>
+       <button onclick="setWorksTab('series')"         id="wt-series"         class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Series</button>
+       <button onclick="setWorksTab('music')"          id="wt-music"          class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Music &amp; MV</button>
+       <button onclick="setWorksTab('magazine')"       id="wt-magazine"       class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Magazines</button>
+       <button onclick="setWorksTab('presenter')"      id="wt-presenter"      class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Brand Presenter</button>
+       <button onclick="setWorksTab('variety')"        id="wt-variety"        class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Variety</button>
+       <button onclick="setWorksTab('interview')"      id="wt-interview"      class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Interviews</button>
+       <button onclick="setWorksTab('otherworks')"     id="wt-otherworks"     class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Other Works</button>
       </div>
      </div>
 
@@ -1481,7 +1512,7 @@
      <div id="works-grid" style="display:none;align-items:stretch;"></div>
      <div id="works-empty" style="display:none;padding:3rem 1rem;">
       <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
-       <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1.5px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+       <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
         <i data-lucide="star" style="width:24px;height:24px;color:#a855f7;stroke-width:1.8;"></i>
        </div>
        <p style="font-size:1rem;font-weight:700;color:#111;margin-bottom:6px;">No data yet</p>
@@ -1499,7 +1530,7 @@
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:85%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:45%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
      </div>
     </div>
-    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💙</span></div></footer>
+    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
    </div>
 
    <div class="page" id="page-admin">
@@ -1537,16 +1568,16 @@
 
       <!-- Tab bar -->
       <div style="display:flex;gap:3px;background:#f0efeb;border-radius:10px;padding:3px;width:fit-content;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;" id="admin-tab-bar">
-       <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:#f4845f;color:#fff;font-family:inherit;">
+       <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;background:#111;color:#fff;font-family:inherit;">
         <i data-lucide="calendar" style="width:13px;height:13px;"></i>Events
        </button>
-       <button class="admin-tab-btn" id="atb-works" onclick="switchAdminTab('works')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+       <button class="admin-tab-btn" id="atb-works" onclick="switchAdminTab('works')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
         <i data-lucide="star" style="width:13px;height:13px;"></i>Works
        </button>
-       <button class="admin-tab-btn" id="atb-bdays" onclick="switchAdminTab('bdays')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+       <button class="admin-tab-btn" id="atb-bdays" onclick="switchAdminTab('bdays')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
         <i data-lucide="cake" style="width:13px;height:13px;"></i>Birthdays
        </button>
-       <button class="admin-tab-btn" id="atb-anniv" onclick="switchAdminTab('anniv')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+       <button class="admin-tab-btn" id="atb-anniv" onclick="switchAdminTab('anniv')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
         <i data-lucide="heart" style="width:13px;height:13px;"></i>Anniversary
        </button>
       </div>
@@ -1559,7 +1590,7 @@
         <div style="flex:1;"></div>
         <div style="display:flex;align-items:center;gap:6px;">
          <span style="font-size:0.78rem;font-weight:600;color:#6b7280;">Year:</span>
-         <select id="admin-year-select" onchange="setAdminYear(this.value)" style="padding:4px 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;"></select>
+         <select id="admin-year-select" onchange="setAdminYear(this.value)" style="padding:4px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;"></select>
         </div>
        </div>
        <div id="admin-events-list" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -1582,7 +1613,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
          <span style="font-size:0.78rem;font-weight:600;color:#6b7280;">Year:</span>
-         <select id="admin-works-year-filter" onchange="renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;">
+         <select id="admin-works-year-filter" onchange="renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;">
           <option value="all">All Years</option>
          </select>
         </div>
@@ -1751,7 +1782,7 @@
 
        <div style="grid-column:1/-1;">
         <label class="form-label" for="ev-title" style="font-weight:700;" data-i18n="form_event_name">Event Name <span style="color:#ec4899;">*</span></label>
-        <input class="form-input" id="ev-title" name="title" placeholder="e.g. Pond Concert Night" style="border:1.5px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
+        <input class="form-input" id="ev-title" name="title" placeholder="e.g. Pond Concert Night" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
        </div>
 
        <div style="grid-column:1/-1;">
@@ -1768,7 +1799,7 @@
 
        <div>
         <label class="form-label" for="ev-dateStart" style="font-weight:700;" data-i18n="form_date_start">Date Start <span style="color:#ec4899;">*</span></label>
-        <input class="form-input" id="ev-dateStart" name="dateStart" type="date" style="border:1.5px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
+        <input class="form-input" id="ev-dateStart" name="dateStart" type="date" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
        </div>
        <div>
         <label class="form-label" style="font-weight:700;color:#9ca3af;"><span data-i18n="form_status">Status</span> <span style="font-weight:400;font-size:0.78rem;" data-i18n="form_status_auto">(auto)</span></label>
@@ -1781,7 +1812,7 @@
        <div>
         <label class="form-label" for="ev-startTime" style="font-weight:700;" data-i18n="form_start_time">Start Time <span style="color:#ec4899;">*</span></label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input class="form-input" id="ev-startTime" name="startTime" type="time" style="border:1.5px solid #111;background:#f9f9f9;font-weight:600;flex:1;">
+          <input class="form-input" id="ev-startTime" name="startTime" type="time" style="border:1px solid #111;background:#f9f9f9;font-weight:600;flex:1;">
           <select id="ev-startTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;font-family:inherit;">
             <option value="GMT+7" selected>— Thailand (GMT+7)</option>
             <option value="GMT-12">GMT-12</option>
@@ -2214,11 +2245,11 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
        <div style="grid-column:1/-1;">
         <label class="form-label" style="font-weight:700;">Title <span style="color:#ec4899;">*</span></label>
-        <input class="form-input" id="wf-title" name="title" placeholder="e.g. Dior Spring Campaign" style="border:1.5px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
+        <input class="form-input" id="wf-title" name="title" placeholder="e.g. Dior Spring Campaign" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
        </div>
        <div>
         <label class="form-label" style="font-weight:700;">Category <span style="color:#ec4899;">*</span></label>
-        <select class="form-input" id="wf-category" name="category" style="border:1.5px solid #111;background:#f9f9f9;">
+        <select class="form-input" id="wf-category" name="category" style="border:1px solid #111;background:#f9f9f9;">
          <option value="">— Select —</option>
          <option>Little Big World</option>
          <option>Series</option>
@@ -2232,7 +2263,7 @@
        </div>
        <div>
         <label class="form-label" style="font-weight:700;">Year <span style="color:#ec4899;">*</span></label>
-        <input class="form-input" id="wf-year" name="year" placeholder="2026" style="border:1.5px solid #111;background:#f9f9f9;font-weight:600;">
+        <input class="form-input" id="wf-year" name="year" placeholder="2026" style="border:1px solid #111;background:#f9f9f9;font-weight:600;">
        </div>
        <div style="grid-column:1/-1;">
         <label class="form-label" style="margin-bottom:0.5rem;font-weight:700;">Artist(s)</label>
@@ -2449,7 +2480,7 @@ const i18n_en = {
   countdown_label: 'COUNTDOWN',
   date_locale: 'en-US',
   date_opts_short: { month: 'short', day: 'numeric', year: 'numeric' },
-  footer: '© 2026 made with <span class="blink-heart">💙</span>',
+  footer: '© 2026 made with <span class="blink-heart">💚</span>',
   month_names: ['January','February','March','April','May','June','July','August','September','October','November','December'],
   day_abbr: ['SUN','MON','TUE','WED','THU','FRI','SAT'],
   login_error: 'Incorrect password. Try again.',
@@ -2595,7 +2626,7 @@ const i18n_th = {
   countdown_label: 'นับถอยหลัง',
   date_locale: 'th-TH',
   date_opts_short: { month: 'short', day: 'numeric', year: 'numeric' },
-  footer: '© 2026 made with 💙',
+  footer: '© 2026 made with 💚',
   month_names: ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'],
   day_abbr: ['อา','จ','อ','พ','พฤ','ศ','ส'],
   login_error: 'รหัสผ่านไม่ถูกต้อง ลองใหม่อีกครั้ง',
@@ -3804,11 +3835,23 @@ function getArtistColor(artists) {
   else if (has('Pond') && has('Permpoon')) color = '#3b82f6';
   else if (has('Phuwin') && has('Permpoon')) color = '#ef4444';
   else if (has('Pond'))     color = '#f97316';
-  else if (has('Phuwin'))   color = '#6b7280';
+  else if (has('Phuwin'))   color = '#64748b';
   else if (has('Permpoon')) color = '#22c55e';
   else color = '#64748b';
   _artistColorCache.set(artists, color);
   return color;
+}
+function getArtistBg(artists) {
+  const arr = (artists || '').split(',').map(a => a.trim());
+  const has = x => arr.includes(x);
+  if (has('Pond') && has('Phuwin') && has('Permpoon')) return { bg:'#fdf2f8', border:'#fbcfe8', text:'#be185d', textDark:'#831843' };
+  if (has('Pond') && has('Phuwin'))   return { bg:'#faf5ff', border:'#e9d5ff', text:'#7e22ce', textDark:'#581c87' };
+  if (has('Pond') && has('Permpoon')) return { bg:'#eff6ff', border:'#bfdbfe', text:'#1d4ed8', textDark:'#1e3a8a' };
+  if (has('Phuwin') && has('Permpoon')) return { bg:'#fef2f2', border:'#fecaca', text:'#dc2626', textDark:'#991b1b' };
+  if (has('Pond'))     return { bg:'#fff7ed', border:'#fed7aa', text:'#c2410c', textDark:'#7c2d12' };
+  if (has('Phuwin'))   return { bg:'#f1f5f9', border:'#cbd5e1', text:'#334155', textDark:'#1e293b' };
+  if (has('Permpoon')) return { bg:'#f0fdf4', border:'#bbf7d0', text:'#15803d', textDark:'#14532d' };
+  return { bg:'#f8fafc', border:'#e2e8f0', text:'#475569', textDark:'#1e293b' };
 }
 function getArtistLabel(artists) {
   if (!artists) return '';
@@ -4060,7 +4103,8 @@ function _buildListItem(ev) {
     : `<div style="width:68px;height:68px;border-radius:10px;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true"></div>`;
   const item = document.createElement('div');
   item.className = 'list-card';
-  item.style.cssText = `background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid ${color};contain:layout style;`;
+  const ab4 = getArtistBg(ev.artists);
+  item.style.cssText = `background:#fff;border-radius:16px;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-left:3px solid ${color};padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;contain:layout style;`;
   item.onclick = () => openDetailModal(ev.__backendId);
   item.innerHTML = `${imgHtml}<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">${dots}${badge}</div><div style="font-size:0.88rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div><div style="font-size:0.72rem;color:#9ca3af;">${meta}</div></div>`;
   return item;
@@ -4349,7 +4393,7 @@ function makeSocialBtn(href, iconSvg, label, large, raw) {
         ? iconSvg.replace(/width="[\d.]+"/, 'width="auto"').replace(/height="[\d.]+"/, 'height="16"')
         : iconSvg.replace(/width="(\d+)"/g, 'width="22"').replace(/height="(\d+)"/g, 'height="22"')
       : '';
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="link-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:0.88rem;font-weight:600;color:#374151;text-decoration:none;background:#fff;cursor:pointer;white-space:nowrap;">${scaledIcon}<span>${escHtml(label)}</span></a>`;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="link-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:1px solid #e5e7eb;font-size:0.88rem;font-weight:600;color:#374151;text-decoration:none;background:#fff;cursor:pointer;white-space:nowrap;">${scaledIcon}<span>${escHtml(label)}</span></a>`;
   }
   if (raw) {
     return `<button type="button" onclick="event.stopPropagation();window.open('${url}','_blank','noopener,noreferrer')" style="display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;flex-shrink:0;padding:0;" title="${escHtml(label)}">${iconSvg}</button>`;
@@ -4595,8 +4639,10 @@ function buildCountdownTag(ev, color) { return ''; }
 function createCard(ev) {
   if (!ev.title || !ev.title.trim()) return document.createDocumentFragment();
   const color = getArtistColor(ev.artists);
+  const ab = getArtistBg(ev.artists);
   const card = document.createElement('div');
   card.className = 'event-card';
+  // no colored border
   card.dataset.eventId = ev.__backendId;
   card.setAttribute('role', 'button');
   card.setAttribute('tabindex', '0');
@@ -4670,7 +4716,7 @@ function createCard(ev) {
     <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;position:relative;">
       ${noImgBadge}
       ${artistBadge}
-      <h3 style="font-weight:700;font-size:0.78rem;letter-spacing:-0.01em;margin-bottom:4px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${escHtml(ev.title)}</h3>
+      <h3 style="font-weight:700;font-size:0.78rem;letter-spacing:-0.01em;margin-bottom:4px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:#111;">${escHtml(ev.title)}</h3>
       ${dtRow}${locRow}${pillsRow}${noteRow}${descRow}
       ${socialHtml ? `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;" onclick="event.stopPropagation()">${socialHtml}</div>` : ''}
     </div>`;
@@ -4793,7 +4839,11 @@ function openDetailModal(id) {
 
   document.getElementById('detail-modal').style.display = 'flex';
   const modalBox = document.querySelector('#detail-modal .modal-box');
-  if (modalBox) modalBox.scrollTop = 0;
+  if (modalBox) {
+    modalBox.scrollTop = 0;
+    // Apply artist bg color to modal top band
+    modalBox.style.borderTop = `4px solid ${color}`;
+  }
   document.body.style.overflow = 'hidden';
   const activePage = document.querySelector('.page.active');
   if (activePage) activePage.dataset.scrollY = activePage.scrollTop;
@@ -4917,18 +4967,23 @@ function renderBirthdayBanners() {
 // ═══════════════════════════════════════════════════════════════════
 function filterCalendar(artist) {
   calFilter = artist;
-  calSelectedDate = null; // reset → แสดงทั้งเดือนของ artist นั้น
+  calSelectedDate = null;
+  const artistBtnColors = {
+    'Pond':     { bg:'#fff7ed', color:'#c2410c', border:'#fed7aa' },
+    'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
+    'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
+  };
   document.querySelectorAll('.cal-filter-btn').forEach(btn => {
     const a = btn.dataset.artist;
     if (a === artist) {
-      btn.style.background = a==='all'?'#111':getArtistColor(a);
+      btn.style.background = '#111';
       btn.style.color = '#fff';
-      btn.style.borderColor = a==='all'?'#111':getArtistColor(a);
+      btn.style.borderColor = '#111';
     } else {
-      const c = a==='Pond'?'#f97316':a==='Phuwin'?'#6b7280':a==='Permpoon'?'#22c55e':'#111';
-      btn.style.background = '#fff';
-      btn.style.color = c;
-      btn.style.borderColor = c;
+      const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
+      btn.style.background = c.bg;
+      btn.style.color = c.color;
+      btn.style.borderColor = c.border;
     }
   });
   renderCalendar();
@@ -5201,7 +5256,8 @@ function renderCalendarCardGrid(monthEvents) {
       ? `<img src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" style="width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;flex-shrink:0;" onerror="_onImgError(this)">`
       : `<div style="width:72px;height:72px;border-radius:10px;flex-shrink:0;background:${grad};display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="${color}" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>`;
     const div = document.createElement('div');
-    div.style.cssText = `background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.6:1};border-left:3px solid ${past?'#e5e7eb':color};height:100%;box-sizing:border-box;overflow:hidden;`;
+    const ab2 = getArtistBg(ev.artists);
+    div.style.cssText = `background:#fff;border-radius:16px;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-left:3px solid ${past?'#e5e7eb':color};display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.55:1};height:100%;box-sizing:border-box;overflow:hidden;`;
     div.onclick = () => openDetailModal(ev.__backendId);
     div.innerHTML = `<div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="_onImgError(this)">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
       <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
@@ -5298,13 +5354,19 @@ function nextMonth() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} calSel
 // ═══════════════════════════════════════════════════════════════════
 function filterHome(artist) {
   homeFilter = artist;
-  _vsLastFingerprint = ''; // force grid re-render on filter change
+  _vsLastFingerprint = '';
+  const artistBtnColors = {
+    'Pond':     { bg:'#fff7ed', color:'#c2410c', border:'#fed7aa' },
+    'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
+    'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
+  };
   document.querySelectorAll('.artist-filter-btn').forEach(btn => {
     const a = btn.dataset.artist;
     if (a === artist) {
       btn.style.background = '#111'; btn.style.color = '#fff'; btn.style.borderColor = '#111';
     } else {
-      btn.style.background = '#fff'; btn.style.color = '#6b7280'; btn.style.borderColor = '#f0f0f0';
+      const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
+      btn.style.background = c.bg; btn.style.color = c.color; btn.style.borderColor = c.border;
     }
   });
   // Bento card active state
@@ -5315,7 +5377,7 @@ function filterHome(artist) {
     if (!c) return;
     const isActive = bentoMap[artist] === k;
     c.style.boxShadow = isActive ? `0 0 0 2px ${colorMap[k]}` : 'none';
-    c.style.transform = isActive ? 'scale(1.03)' : 'scale(1)';
+    c.style.transform = isActive ? 'scale(1.015)' : 'scale(1)';
     c.style.borderColor = isActive ? colorMap[k] : '#f0f0f0';
   });
   scheduleRender();
@@ -5426,7 +5488,7 @@ function openWorksPreviewPopup() {
   const thumb = data.image
     ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;"><img src="${_fixImgSrc(data.image)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" onerror="_onImgError(this)"></div>`
     : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};"></div>`;
-  document.getElementById('works-preview-popup-card').innerHTML = `<div style="background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;">
+  document.getElementById('works-preview-popup-card').innerHTML = `<div style="background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.07);overflow:hidden;">
     ${thumb}
     <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;gap:4px;">
       <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:1px;">${artistLine||'<span style="font-size:0.62rem;color:#9ca3af;">No artist</span>'}</div>
@@ -5553,7 +5615,7 @@ function switchAdminTab(tab) {
   requestAnimationFrame(() => {
     document.querySelectorAll('.admin-tab-btn').forEach(b => {
       const isActive = b.id === 'atb-' + tab;
-      b.style.background = isActive ? '#f4845f' : 'transparent';
+      b.style.background = isActive ? '#111' : 'transparent';
       b.style.color = isActive ? '#fff' : '#6b7280';
     });
     document.querySelectorAll('.admin-tab-panel').forEach(p => {
@@ -5987,37 +6049,35 @@ function navigate(page) {
   if (currentPage === page) return; // no-op ถ้าอยู่หน้าเดิมอยู่แล้ว
   currentPage = page;
 
-  // รวม DOM write ทั้งหมดไว้ใน rAF เดียว — ป้องกัน layout thrash
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    const pageEl = document.getElementById('page-' + page);
-    if (pageEl) {
-      pageEl.scrollTop = 0;
-      pageEl.classList.add('active');
-    }
-    const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
-    if (navEl) navEl.classList.add('active');
+  // สลับหน้าทันที — ไม่รอ rAF เพื่อให้ผู้ใช้รู้สึกตอบสนองทันที
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) {
+    pageEl.scrollTop = 0;
+    pageEl.classList.add('active');
+  }
+  const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
 
-    // Works: render from cache instantly, then fetch fresh in background
-    if (page === 'works') {
-      if (allWorks.length) { renderWorks(); }
-      loadWorksFromSheets(); // always refresh in background (no-op if fresh)
-      debounceLucide();
-      return;
-    }
-
-    // Calendar: fingerprint check ภายใน renderCalendar เองอยู่แล้ว — เรียกตรงได้เลย
-    if (page === 'calendar') {
-      renderCalendar();
-      debounceLucide();
-      return;
-    }
-
-    // Home/Admin: ใช้ scheduleRender ปกติ
-    scheduleRender();
+  // Works: render from cache instantly, then fetch fresh in background
+  if (page === 'works') {
+    if (allWorks.length) { renderWorks(); }
+    loadWorksFromSheets(); // always refresh in background (no-op if fresh)
     debounceLucide();
-  });
+    return;
+  }
+
+  // Calendar: fingerprint check ภายใน renderCalendar เองอยู่แล้ว — เรียกตรงได้เลย
+  if (page === 'calendar') {
+    renderCalendar();
+    debounceLucide();
+    return;
+  }
+
+  // Home/Admin: ใช้ scheduleRender ปกติ
+  scheduleRender();
+  debounceLucide();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -6320,7 +6380,8 @@ function buildTimelineView(events) {
       const days2 = daysUntilEvent(ev.dateStart);
       const badge = (days2 !== null && days2 >= 0 && days2 <= 7) ? `<span style="margin-left:auto;flex-shrink:0;background:${color};color:#fff;font-size:0.55rem;font-weight:800;padding:2px 7px;border-radius:99px;">${days2===0?'TODAY':days2+' DAY'+(days2>1?'S':'')}</span>` : '';
       const meta = [ev.startTime ? escHtml(ev.startTime) : '', ev.location ? escHtml(ev.location) : ''].filter(Boolean).join(' · ');
-      item.innerHTML = `${dotHtml}<div class="timeline-card" style="border-left-color:${color};"><div class="timeline-card-top">${artistBadges}${badge}</div><div class="timeline-card-title">${escHtml(ev.title)}</div>${meta?`<div class="timeline-card-meta"><span>${meta}</span></div>`:''}</div>`;
+      const ab3 = getArtistBg(ev.artists);
+      item.innerHTML = `${dotHtml}<div class="timeline-card" style="border-left-color:${color};background:#fff;border-color:#efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);"><div class="timeline-card-top">${artistBadges}${badge}</div><div class="timeline-card-title" style="color:#111;">${escHtml(ev.title)}</div>${meta?`<div class="timeline-card-meta"><span>${meta}</span></div>`:''}</div>`;
       tl.appendChild(item);
     });
     wrap.appendChild(tl);
@@ -6354,7 +6415,7 @@ function debounceLucide() {
   if (typeof requestIdleCallback !== 'undefined') {
     _lucideTimer = requestIdleCallback(() => lucide.createIcons(), { timeout: 300 });
   } else {
-    _lucideTimer = setTimeout(() => lucide.createIcons(), 80);
+    _lucideTimer = setTimeout(() => lucide.createIcons(), 0);
   }
 }
 function showToast(msg) {
@@ -6836,29 +6897,33 @@ function setWorksTab(tab) {
   _worksTab = tab;
   document.querySelectorAll('.works-tab').forEach(b => {
     const isActive = b.id === 'wt-' + tab;
-    b.style.background = isActive ? '#ff5c35' : '#fff';
+    b.style.background = isActive ? '#111' : '#fff';
     b.style.color = isActive ? '#fff' : '#6b7280';
-    b.style.border = isActive ? '1px solid #111' : '1px solid #f0f0f0';
-    b.style.fontWeight = isActive ? '700' : '600';
+    b.style.border = isActive ? '1px solid #111' : '1px solid #e5e7eb';
+    b.style.fontWeight = isActive ? '600' : '500';
   });
   renderWorks();
 }
 
 function setWorksArtist(artist) {
   _worksArtist = artist;
-  const colorMap = { Pond: '#f97316', Phuwin: '#6b7280', Permpoon: '#22c55e' };
+  const artistBtnColors = {
+    'Pond':     { bg:'#fff7ed', color:'#c2410c', border:'#fed7aa' },
+    'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
+    'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
+  };
   document.querySelectorAll('.works-artist-btn').forEach(b => {
+    const a = b.id.replace('wa-', '');
     const isActive = b.id === 'wa-' + artist;
-    const artistKey = b.id.replace('wa-', '');
-    const c = colorMap[artistKey];
     if (isActive) {
-      b.style.background = artist === 'all' ? '#111' : (c || '#111');
+      b.style.background = '#111';
       b.style.color = '#fff';
-      b.style.borderColor = artist === 'all' ? '#111' : (c || '#111');
+      b.style.borderColor = '#111';
     } else {
-      b.style.background = '#fff';
-      b.style.color = '#6b7280';
-      b.style.borderColor = '#f0f0f0';
+      const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
+      b.style.background = c.bg;
+      b.style.color = c.color;
+      b.style.borderColor = c.border;
     }
   });
   renderWorks();
@@ -7043,7 +7108,10 @@ function renderWorks() {
       ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="_onImgError(this)"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
-    card.style.cssText = 'background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;';
+    const wab = getArtistBg(w.artists);
+    card.style.cssText = `background:#fff;border-radius:16px;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:box-shadow 0.18s,transform 0.18s;`;
+    card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 8px 28px rgba(0,0,0,0.12)'; card.style.transform = 'translateY(-4px)'; });
+    card.addEventListener('mouseleave', () => { card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; card.style.transform = ''; });
 
     if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
     card.innerHTML = `${thumb}
