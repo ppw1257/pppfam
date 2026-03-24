@@ -3575,6 +3575,29 @@ function renderCurrentPage() {
   }
 }
 
+// ── _refreshAllPages: reset ทุก fingerprint แล้ว render ทุกหน้าพร้อมกัน 1 rAF ──
+// ใช้หลัง add / edit / delete ทุก action เพื่อให้ข้อมูลขึ้นทันทีทุกหน้า โดยไม่กระตุก
+function _refreshAllPages() {
+  // reset fingerprints ทั้งหมด — บังคับ re-render แม้ data fingerprint ตรงกัน
+  _vsLastFingerprint = '';
+  _calLastFP        = '';
+  _worksLastFP      = '';
+  _adminListFP      = '';
+  _adminWorksListFP = '';
+  _refreshIsPast();
+  requestAnimationFrame(() => {
+    renderHome();
+    renderCalendar();
+    if (isAdmin) {
+      renderAdminList();
+      if (worksLoaded) renderAdminWorksList();
+    }
+    renderWorks();
+    renderBirthdayBanners();
+    debounceLucide();
+  });
+}
+
 // ── Status helpers ────────────────────────────────────────────────
 // Cache today's date string for performance (refreshes each render cycle)
 let _todayStrCache = '';
@@ -5748,6 +5771,7 @@ async function confirmDelete(key) {
     showToast(result.status === 'not_found' ? t('toast_removed') : t('toast_deleted'));
     Cache.clearAll();
     await loadEventsFromSheets(true);
+    _refreshAllPages();
   } catch(err) {
     if (rowEl) rowEl.style.opacity = '1';
     showToast(t('toast_error') + ': ' + (err.message || ''));
@@ -5780,11 +5804,11 @@ function renderAnniversaryAdmin() {
 }
 
 async function deleteBirthday(id) {
-  try { await deleteBirthdayInSheets(id); showToast(t('toast_bday_deleted')); Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); await loadBirthdaysFromSheets(true); }
+  try { await deleteBirthdayInSheets(id); showToast(t('toast_bday_deleted')); Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); await loadBirthdaysFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners(); }
   catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 async function deleteAnniversary(id) {
-  try { await deleteAnniversaryInSheets(id); showToast(t('toast_anniv_deleted')); Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); await loadAnniversariesFromSheets(true); }
+  try { await deleteAnniversaryInSheets(id); showToast(t('toast_anniv_deleted')); Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); await loadAnniversariesFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners(); }
   catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 
@@ -5805,7 +5829,7 @@ async function saveAnniversary() {
   if (!day||day<1||day>31) { showToast(t('toast_invalid_day')); return; }
   try {
     await createAnniversaryInSheets({ anniversary_name:label, anniversary_month:String(month), anniversary_day:String(day), anniversary_year:year||'', color });
-    closeAnnivForm(); showToast(t('toast_anniv_saved')); Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); await loadAnniversariesFromSheets(true);
+    closeAnnivForm(); showToast(t('toast_anniv_saved')); Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); await loadAnniversariesFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners();
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 function openBdayForm() { document.getElementById('bday-form-wrap').style.display = 'block'; }
@@ -5824,7 +5848,7 @@ async function saveBirthday() {
   if (!day||day<1||day>31)       { showToast(t('toast_invalid_day')); return; }
   try {
     await createBirthdayInSheets({ artist_name:name, birthday_month:String(month), birthday_day:String(day), color });
-    closeBdayForm(); showToast(t('toast_bday_saved')); Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); await loadBirthdaysFromSheets(true);
+    closeBdayForm(); showToast(t('toast_bday_saved')); Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); await loadBirthdaysFromSheets(true); renderAnniversaryAdmin(); renderBirthdayBanners();
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 
@@ -6164,9 +6188,7 @@ async function handleEventFormSubmit() {
     clearForm();
     Cache.clearAll(); _fetchingEvents = false;
     await loadEventsFromSheets(true);
-    if (isAdmin) renderAdminList();
-    // ── Re-render ทุกหน้าทันทีหลัง save ──
-    scheduleRender();
+    _refreshAllPages();
     if (worksLoaded) {} // works ไม่เปลี่ยน ไม่ต้อง reload
   }
 }
@@ -6485,12 +6507,9 @@ async function handleWorksFormSubmit() {
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
     worksLoaded = false;
-    _adminWorksListFP = ''; // force re-render
+    _adminWorksListFP = '';
     await loadWorksFromSheets(true);
-    renderAdminWorksList();
-    // ── Render หน้า Works ทันที ──
-    _worksLastFP = ''; // force re-render
-    renderWorks();
+    _refreshAllPages();
   } catch(err) {
     showToast('❌ Error: ' + (err.message || 'Failed to save work'));
     console.error('[handleWorksFormSubmit]', err);
@@ -6556,11 +6575,10 @@ function deleteWork(backendId, title) {
       showToast('Work deleted ✓');
       Cache.clearAll();
       worksLoaded = false;
-      _adminWorksListFP = ''; // force re-render
+      _adminWorksListFP = '';
       _memCache.del('works');
       await loadWorksFromSheets(true);
-      renderAdminWorksList();
-      if (currentPage === 'works') renderWorks();
+      _refreshAllPages();
     } catch(err) {
       _restoreBtnWrap();
       showToast('❌ Error: ' + (err.message || 'Failed to delete'));
