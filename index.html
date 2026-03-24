@@ -2299,7 +2299,7 @@
        </div>
        <div>
         <label class="form-label" style="font-weight:700;">Year <span style="color:#ec4899;">*</span></label>
-        <input class="form-input" id="wf-year" name="year" placeholder="2026" style="border:1px solid #111;background:#f9f9f9;font-weight:600;">
+        <input class="form-input" id="wf-year" name="year" type="number" min="2000" max="2099" placeholder="2026" style="border:1px solid #111;background:#f9f9f9;font-weight:600;">
        </div>
        <div style="grid-column:1/-1;">
         <label class="form-label" style="margin-bottom:0.5rem;font-weight:700;">Artist(s)</label>
@@ -6666,6 +6666,8 @@ async function handleWorksFormSubmit() {
   const data = _readWorksForm();
   if (!data.title) { showToast('Title is required'); document.getElementById('wf-title').focus(); return; }
   if (!data.category) { showToast('Category is required'); document.getElementById('wf-category').focus(); return; }
+  if (!data.year) { showToast('Year is required'); document.getElementById('wf-year').focus(); return; }
+  if (!/^\d{4}$/.test(data.year)) { showToast('Year must be a 4-digit number (e.g. 2026)'); document.getElementById('wf-year').focus(); return; }
   const btn=document.getElementById('works-submit-btn');
   const txt=document.getElementById('works-submit-text');
   const spin=document.getElementById('works-submit-spinner');
