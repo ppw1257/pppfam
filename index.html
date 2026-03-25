@@ -7180,7 +7180,7 @@ function renderWorks() {
 
     // ── Contract expired check ──
     const todayStr = _todayInBKK();
-    const isExpired = w.contract_end === 'true' || w.contract_end === true || w.contract_end === '1';
+    const isExpired = !!(w.contract_end && w.contract_end !== '' && w.contract_end !== 'false');
     // ribbon-style badge คาดมุมบนซ้าย
     const expiredBadge = isExpired
       ? `<div style="position:absolute;top:0;left:0;z-index:4;pointer-events:none;overflow:hidden;width:88px;height:88px;border-radius:10px 0 0 0;"><div style="position:absolute;top:20px;left:-22px;width:100px;background:linear-gradient(135deg,#475569,#334155);color:#fff;font-size:0.52rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;text-align:center;padding:5px 0;transform:rotate(-45deg);transform-origin:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);">EXPIRED</div></div>`
