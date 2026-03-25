@@ -2879,7 +2879,8 @@ function fmtTime(timeStr, evTz) {
   const clean = timeStr.trim();
   // extract timezone suffix e.g. "18:00 GMT+9" — or use evTz passed in
   const tzMatch = clean.match(/(GMT[+-]\d{1,2}(?::\d{2})?)/i);
-  const tz = (tzMatch ? tzMatch[1].toUpperCase() : (evTz ? evTz.toUpperCase() : 'GMT+7'));
+  // evTz (field timezone) takes priority over embedded tz in timeStr
+  const tz = (evTz ? evTz.toUpperCase() : (tzMatch ? tzMatch[1].toUpperCase() : 'GMT+7'));
   const match = clean.match(/(\d{1,2})[:\.](\d{2})\s*(AM|PM|am|pm)?/);
   if (!match) return clean;
   let h = parseInt(match[1]);
@@ -7217,6 +7218,9 @@ function renderWorks() {
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
 
+  // showCat: แสดง category badge เฉพาะหน้า All และ Brand Presenter
+  const _showCatBadge = (_worksTab === 'all' || _worksTab === 'presenter');
+
   function buildCard(w) {
     const cat = CATEGORY_CONFIG[_catToKey(w.category)] || { label: w.category||'', icon: '', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' };
     const artistArr = w.artists ? w.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
@@ -7252,7 +7256,7 @@ function renderWorks() {
         <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
         <div style="font-size:0.78rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-          <span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span>
+          ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span>` : ''}
           ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:3px 9px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
         </div>
       </div>`;
