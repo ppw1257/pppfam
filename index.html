@@ -6318,7 +6318,7 @@ function readFormSchema() {
     type:fv('type'), note:fv('note'), tv:fv('tv'), map:fv('map'), hashtags:fv('hashtags'), keywords:fv('keywords'),
     category:fv('category'), appearance:fv('appearance'), organizer:fv('organizer'), platform:fv('platform'), relatedWork:fv('relatedwork'),
     posterImage:fv('posterImage'),
-    timezone:'',
+    timezone:(()=>{ const _tzEl=document.getElementById('ev-startTimezone'); return _tzEl?_tzEl.value:'GMT+7'; })(),
     youtube:fv('youtube'), instagram:fv('instagram'), facebook:fv('facebook'),
     x:fv('x'), tiktok:fv('tiktok'), website:fv('website'),
     whatsapp:fv('whatsapp'), shopee:fv('shopee'), live:fv('live'), download:fv('download'),
