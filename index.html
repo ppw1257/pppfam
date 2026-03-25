@@ -1539,6 +1539,7 @@
        <button onclick="setWorksTab('presenter')"      id="wt-presenter"      class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Brand Presenter</button>
        <button onclick="setWorksTab('variety')"        id="wt-variety"        class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Variety</button>
        <button onclick="setWorksTab('interview')"      id="wt-interview"      class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Interviews</button>
+       <button onclick="setWorksTab('bts')"            id="wt-bts"            class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Behind the Scenes</button>
        <button onclick="setWorksTab('otherworks')"     id="wt-otherworks"     class="works-tab" style="padding:5px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Other Works</button>
       </div>
      </div>
@@ -2317,6 +2318,7 @@
          <option>Brand Presenter</option>
          <option>Variety</option>
          <option>Interviews</option>
+         <option>Behind the Scenes</option>
          <option>Other Works</option>
         </select>
        </div>
@@ -2366,6 +2368,7 @@
          <option>Host</option>
          <option>Special Project</option>
          <option>Cameo</option>
+         <option>Behind the Scenes</option>
         </select>
        </div>
        <div>
@@ -5544,6 +5547,7 @@ function openWorksPreviewPopup() {
     if (c.includes('presenter')||c.includes('brand')) return 'presenter';
     if (c.includes('variety'))   return 'variety';
     if (c.includes('interview')) return 'interview';
+    if (c.includes('behind')||c.includes('bts')) return 'bts';
     if (c.includes('otherwork')||c.includes('other')) return 'otherworks';
     return c;
   }
@@ -6548,6 +6552,7 @@ const CATEGORY_CONFIG = {
   variety:        { label: 'Variety',          icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>', color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe' },
   interview:      { label: 'Interviews',       icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>', color: '#0e7490', bg: '#ecfeff', border: '#a5f3fc' },
   otherworks:     { label: 'Other Works',      icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' },
+  bts:            { label: 'Behind the Scenes', icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>', color: '#9333ea', bg: '#fdf4ff', border: '#e9d5ff' },
   show:           { label: 'Show',             icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' },
 };
 
@@ -6912,7 +6917,7 @@ function renderAdminWorksList() {
   const _catQ = (document.getElementById('admin-works-cat-filter')?.value || 'all');
   const _expQ = (document.getElementById('admin-works-expired-filter')?.value || 'all');
   // map category filter value → partial match against w.category
-  const _catMap = {littlebigworld:'little big world',series:'series',music:'music',magazine:'magazine',presenter:'presenter',variety:'variety',interview:'interview',otherworks:'other'};
+  const _catMap = {littlebigworld:'little big world',series:'series',music:'music',magazine:'magazine',presenter:'presenter',variety:'variety',interview:'interview',bts:'behind',otherworks:'other'};
   const filtered = allWorks.filter(w => {
     if (selectedYear !== 'all' && (w.year||'') !== selectedYear) return false;
     if (_searchQ) {
@@ -7153,6 +7158,7 @@ function renderWorks() {
     if (c.includes('presenter') || c.includes('brand')) return 'presenter';
     if (c.includes('variety'))   return 'variety';
     if (c.includes('interview')) return 'interview';
+    if (c.includes('behind') || c.includes('bts')) return 'bts';
     if (c.includes('otherwork') || c.includes('other')) return 'otherworks';
     if (c.includes('ad'))        return 'ad';
     return c;
@@ -7169,7 +7175,13 @@ function renderWorks() {
   if (_worksYear && _worksYear !== 'all') {
     filtered = filtered.filter(w => (w.year||'') === _worksYear);
   }
-  if (_worksTab !== 'all') filtered = filtered.filter(w => _catToKey(w.category) === _worksTab);
+  if (_worksTab !== 'all') {
+    if (_worksTab === 'bts') {
+      filtered = filtered.filter(w => _catToKey(w.category) === 'bts' || (w.type||'').toLowerCase().includes('behind'));
+    } else {
+      filtered = filtered.filter(w => _catToKey(w.category) === _worksTab);
+    }
+  }
   if (_worksArtist !== 'all') filtered = filtered.filter(w => {
     if (!w.artists) return false;
     return w.artists.split(',').map(a=>a.trim()).includes(_worksArtist);
@@ -7219,7 +7231,7 @@ function renderWorks() {
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
 
   // showCat: แสดง category badge เฉพาะหน้า All และ Brand Presenter
-  const _showCatBadge = (_worksTab === 'all' || _worksTab === 'presenter');
+  const _showCatBadge = (_worksTab === 'all');
 
   function buildCard(w) {
     const cat = CATEGORY_CONFIG[_catToKey(w.category)] || { label: w.category||'', icon: '', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' };
