@@ -6224,17 +6224,23 @@ function fillForm(ev) {
   set('dateStart',ev.dateStart); set('dateEnd',ev.dateEnd);
 
   // Parse startTime: extract HH:MM for time input, timezone for select
-  const parsetime = (val, timeId, tzId) => {
-    if (!val) return;
-    const match = val.match(/(\d{1,2}:\d{2})/);
-    const tzMatch = val.match(/(GMT[+-]\d+)/i);
+  const parsetime = (val, timeId, tzId, fallbackTz) => {
     const tel = document.getElementById(timeId);
     const tzel = document.getElementById(tzId);
-    if (tel && match) tel.value = match[1].padStart(5,'0');
-    if (tzel && tzMatch) tzel.value = tzMatch[1].toUpperCase();
+    if (val) {
+      const match = val.match(/(\d{1,2}:\d{2})/);
+      const tzMatch = val.match(/(GMT[+-]\d+)/i);
+      if (tel && match) tel.value = match[1].padStart(5,'0');
+      if (tzel) {
+        if (tzMatch) tzel.value = tzMatch[1].toUpperCase();
+        else if (fallbackTz) tzel.value = fallbackTz.toUpperCase();
+      }
+    }
   };
-  parsetime(ev.startTime, 'ev-startTime', 'ev-startTimezone');
-  parsetime(ev.endTime,   'ev-endTime',   'ev-endTimezone');
+  // ev.timezone เป็น fallback ถ้า startTime ไม่มี GMT ติดมา
+  const _evTzFallback = (ev.timezone || '').replace(/GMT/i,'GMT').trim() || 'GMT+7';
+  parsetime(ev.startTime, 'ev-startTime', 'ev-startTimezone', _evTzFallback);
+  parsetime(ev.endTime,   'ev-endTime',   'ev-endTimezone',   _evTzFallback);
 
   set('title',ev.title); set('image',ev.image); set('heroImage',ev.heroImage);
   set('country',ev.country); set('city',ev.city); set('location',ev.location);
