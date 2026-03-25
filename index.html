@@ -2331,7 +2331,8 @@
         <select class="form-input" id="wf-type" name="type">
          <option value="">— Optional —</option>
          <option>Presenter</option>
-         <option>Ambassador</option>
+         <option>Friend of Brand</option>
+         <option>Brand Ambassador</option>
          <option>Guest</option>
          <option>Performance</option>
          <option>Event</option>
@@ -2368,6 +2369,13 @@
        <div>
         <label class="form-label">Release Date</label>
         <input class="form-input" id="wf-releaseDate" name="release_date" type="date">
+       </div>
+       <div>
+        <label class="form-label">Contract Status</label>
+        <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:8px 14px;border-radius:10px;border:1px solid #e5e7eb;background:#f9fafb;width:100%;box-sizing:border-box;transition:background 0.15s;" id="wf-contractEnd-label">
+          <input type="checkbox" id="wf-contractEnd" name="contract_end" value="true" style="width:16px;height:16px;accent-color:#475569;cursor:pointer;flex-shrink:0;" onchange="document.getElementById('wf-contractEnd-label').style.background=this.checked?'#f1f5f9':'#f9fafb';document.getElementById('wf-contractEnd-text').style.color=this.checked?'#334155':'#6b7280';">
+          <span id="wf-contractEnd-text" style="font-size:0.85rem;font-weight:600;color:#6b7280;transition:color 0.15s;">Contract Ended</span>
+        </label>
        </div>
        <div>
         <label class="form-label">Link</label>
@@ -4713,24 +4721,24 @@ function createCard(ev) {
   let dtRow = '';
   if (ev.dateStart) {
     const dateLabel = fmtDateRange(ev.dateStart, ev.dateEnd);
-    // ── Date pill: indigo dark ──
-    const datePill = `<span style="display:inline-flex;align-items:center;gap:4px;background:#e0e7ff;color:#3730a3;border-radius:7px;padding:3px 8px;font-size:0.62rem;font-weight:700;white-space:nowrap;flex-shrink:0;"><svg width="9" height="9" fill="none" stroke="#3730a3" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escHtml(dateLabel)}</span>`;
+    // ── Date: inline icon + colored text, no background ──
+    const datePill = `<span style="display:inline-flex;align-items:center;gap:4px;color:${color};font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;"><svg width="11" height="11" fill="none" stroke="${color}" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escHtml(dateLabel)}</span>`;
     let timePill = '';
     if (ev.startTime) {
       const allTimes = ev.startTime.split('/').map(s => fmtTime(s.trim())).filter(Boolean).join(' / ');
       const timeText = allTimes + (ev.endTime ? ' – ' + fmtTime(ev.endTime) : '');
-      // ── Time pill: teal dark ──
-      timePill = `<span style="display:inline-flex;align-items:center;gap:4px;background:#ccfbf1;color:#0f766e;border-radius:7px;padding:3px 8px;font-size:0.62rem;font-weight:700;white-space:nowrap;flex-shrink:0;"><svg width="9" height="9" fill="none" stroke="#0f766e" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(timeText)}</span>`;
+      // ── Time: inline icon + text, separator between date and time ──
+      timePill = `<span style="color:#d1d5db;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;color:#6b7280;font-size:0.72rem;font-weight:600;white-space:nowrap;flex-shrink:0;"><svg width="11" height="11" fill="none" stroke="#6b7280" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(timeText)}</span>`;
     }
-    dtRow = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:4px;">${datePill}${timePill}</div>`;
+    dtRow = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;margin-bottom:5px;">${datePill}${timePill}</div>`;
   }
 
   // Rule 3: location — truncate long text, auto font size, never overflow
   const lp = [ev.location, ev.city, ev.country].filter(x => x && x.trim() && !/^GMT[+-]?\d*/i.test(x.trim()) && !hasHtml(x));
   const locText = lp.join(', ');
-  // ── Location pill: neutral dark ──
+  // ── Location: inline icon + text, no background ──
   const locRow = lp.length
-    ? `<div style="margin-bottom:4px;"><span style="display:inline-flex;align-items:center;gap:4px;background:#fce7f3;color:#9d174d;border-radius:7px;padding:3px 8px;font-size:0.62rem;font-weight:500;max-width:100%;overflow:hidden;"><svg width="9" height="9" fill="none" stroke="#9d174d" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(locText)}</span></span></div>`
+    ? `<div style="margin-bottom:5px;display:flex;align-items:center;gap:4px;"><svg width="11" height="11" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="font-size:0.75rem;font-weight:500;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(locText)}</span></div>`
     : '';
 
   const typePill = buildTypePill(ev.type, 'sm');
@@ -6631,7 +6639,7 @@ function closeWorksFormModal() {
 }
 
 function _clearWorksForm() {
-  ['wf-title','wf-year','wf-brand','wf-magazine','wf-role','wf-project','wf-image','wf-releaseDate','wf-link','wf-description'].forEach(id => {
+  ['wf-title','wf-year','wf-brand','wf-magazine','wf-role','wf-project','wf-image','wf-releaseDate','wf-contractEnd','wf-link','wf-description'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   ['wf-category','wf-type'].forEach(id => {
@@ -6645,6 +6653,14 @@ function _fillWorksForm(w) {
   set('wf-title', w.title); set('wf-year', w.year); set('wf-brand', w.brand);
   set('wf-magazine', w.magazine); set('wf-role', w.role); set('wf-project', w.project);
   set('wf-image', w.image); set('wf-releaseDate', w.release_date); set('wf-link', w.link);
+  const _cbEnd = document.getElementById('wf-contractEnd');
+  if (_cbEnd) {
+    _cbEnd.checked = !!(w.contract_end === 'true' || w.contract_end === true || w.contract_end === '1');
+    const _lbl = document.getElementById('wf-contractEnd-label');
+    const _txt = document.getElementById('wf-contractEnd-text');
+    if (_lbl) _lbl.style.background = _cbEnd.checked ? '#f1f5f9' : '#f9fafb';
+    if (_txt) _txt.style.color = _cbEnd.checked ? '#334155' : '#6b7280';
+  }
   set('wf-description', w.description); set('wf-category', w.category); set('wf-type', w.type);
   const artistArr = (w.artists||'').split(',').map(a=>a.trim());
   document.querySelectorAll('.artist-check-w').forEach(c => { c.checked = artistArr.includes(c.value); });
@@ -6657,7 +6673,7 @@ function _readWorksForm() {
     title: gv('wf-title'), category: gv('wf-category'), year: gv('wf-year'),
     artists, brand: gv('wf-brand'), magazine: gv('wf-magazine'),
     type: gv('wf-type'), role: gv('wf-role'), project: gv('wf-project'),
-    image: gv('wf-image'), release_date: gv('wf-releaseDate'), link: gv('wf-link'),
+    image: gv('wf-image'), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');return _cb&&_cb.checked?'true':'';})(), link: gv('wf-link'),
     description: gv('wf-description')
   };
 }
@@ -7155,21 +7171,33 @@ function renderWorks() {
       const divider = i > 0 ? `<span style="width:1px;height:10px;background:#e5e7eb;display:inline-block;flex-shrink:0;"></span>` : '';
       return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
     }).join('');
+
+    // ── Contract expired check ──
+    const todayStr = _todayInBKK();
+    const isExpired = w.contract_end === 'true' || w.contract_end === true || w.contract_end === '1';
+    // ribbon-style badge คาดมุมบนซ้าย
+    const expiredBadge = isExpired
+      ? `<div style="position:absolute;top:0;left:0;z-index:4;pointer-events:none;overflow:hidden;width:88px;height:88px;border-radius:10px 0 0 0;"><div style="position:absolute;top:20px;left:-22px;width:100px;background:linear-gradient(135deg,#475569,#334155);color:#fff;font-size:0.52rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;text-align:center;padding:5px 0;transform:rotate(-45deg);transform-origin:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);">EXPIRED</div></div>`
+      : '';
+
     const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;"><img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" loading="lazy" onerror="_onImgError(this)"></div>`
-      : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
+      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)"></div>`
+      : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
     const wab = getArtistBg(w.artists);
-    card.style.cssText = `background:#fff;border-radius:16px;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:box-shadow 0.18s,transform 0.18s;`;
+    card.style.cssText = `background:${isExpired?'#f9fafb':'#fff'};border-radius:16px;border:1px solid ${isExpired?'#e5e7eb':'#efefef'};box-shadow:0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'});overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:box-shadow 0.18s,transform 0.18s;${isExpired?'opacity:0.6;':''}`;
     card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 8px 28px rgba(0,0,0,0.12)'; card.style.transform = 'translateY(-4px)'; });
-    card.addEventListener('mouseleave', () => { card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; card.style.transform = ''; });
+    card.addEventListener('mouseleave', () => { card.style.boxShadow = `0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'})`; card.style.transform = ''; });
 
     if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
     card.innerHTML = `${thumb}
       <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;flex:1;">
         <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
-        <div style="font-size:0.78rem;font-weight:700;color:#111;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
-        <div><span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${cat.color};background:${cat.bg};border:1px solid ${cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span></div>
+        <div style="font-size:0.78rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
+          <span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span>
+          ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:3px 9px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
+        </div>
       </div>`;
     return card;
   }
