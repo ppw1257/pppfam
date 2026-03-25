@@ -1654,6 +1654,29 @@
          </select>
         </div>
        </div>
+       <!-- Search + Category filter -->
+       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;">
+        <div style="position:relative;flex:1;min-width:200px;">
+         <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+         <input id="admin-works-search" type="text" placeholder="ค้นหาชื่อ, แบรนด์, artist..." oninput="_adminWorksListFP='';renderAdminWorksList()" style="width:100%;padding:7px 10px 7px 32px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.82rem;font-family:inherit;outline:none;box-sizing:border-box;background:#fff;">
+        </div>
+        <select id="admin-works-cat-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;outline:none;">
+         <option value="all">All Categories</option>
+         <option value="littlebigworld">Little Big World</option>
+         <option value="series">Series</option>
+         <option value="music">Music &amp; MV</option>
+         <option value="magazine">Magazines</option>
+         <option value="presenter">Brand Presenter</option>
+         <option value="variety">Variety</option>
+         <option value="interview">Interviews</option>
+         <option value="otherworks">Other Works</option>
+        </select>
+        <select id="admin-works-expired-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;outline:none;">
+         <option value="all">All Status</option>
+         <option value="active">Active</option>
+         <option value="expired">Expired</option>
+        </select>
+       </div>
        <div id="admin-works-list" style="display:flex;flex-direction:column;gap:8px;"></div>
        <div id="admin-works-empty" style="display:none;text-align:center;padding:3rem;color:#9ca3af;">
         <i data-lucide="inbox" style="width:36px;height:36px;display:block;margin:0 auto 0.75rem;stroke-width:1.5;"></i>
@@ -4024,7 +4047,7 @@ function renderHome() {
     const days = daysUntilEvent(next.dateStart);
     const color = getArtistColor(next.artists);
     const dayLabel = days === 0 ? t('next_today') : days === 1 ? t('next_1day') : days !== null && days <= 30 ? t('next_days', days) : t('next_event');
-    const _bg = ['linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
+    const _bg = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
     const dayBadgeGrad = _bg[days] || _bg[0];
     el('bento-next-label').innerHTML = `<span style="background:${dayBadgeGrad};color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">${dayLabel}</span>`;
     el('bento-next-label').style.color = '';
@@ -4139,7 +4162,7 @@ function _buildListItem(ev) {
   const dots = artistArr.map(a => { const ac = getArtistColor(a); return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:600;color:${ac};"><span style="width:5px;height:5px;border-radius:50%;background:${ac};display:inline-block;"></span>${a}</span>`; }).join(' ');
   const meta = [ev.dateStart ? fmtDate(ev.dateStart) : '', ev.startTime ? fmtTime(ev.startTime, ev.timezone||'') : '', ev.location ? escHtml(ev.location) : ''].filter(Boolean).join(' · ');
   const days = daysUntilEvent(ev.dateStart);
-  const _bg = ['linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
+  const _bg = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
   const badge = (days !== null && days >= 0 && days <= 7) ? `<span style="background:${_bg[days]||_bg[7]};color:#fff;font-size:0.62rem;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:0.06em;margin-left:auto;flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,0.3);">${days===0?'TODAY':days===1?'1 DAY':days+' DAYS'}</span>` : '';
   // Use data-src for lazy loading
   const imgHtml = ev.image
@@ -4554,7 +4577,7 @@ function buildCountdownImgBadge(ev, inline = false) {
   const days = daysUntilEvent(ev.dateStart);
   if (days === null || days < 0 || days > 7) return '';
   const styles = [
-    'background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);box-shadow:0 0 0 1.5px rgba(255,255,255,0.15) inset;',  // TODAY  — deep navy/black two-tone
+    'background:#ef4444;',  // TODAY — red
     'background:linear-gradient(135deg,#ff6b00 0%,#ff0080 100%);',  // 1 DAY  — orange → hot pink
     'background:linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%);',  // 2 DAYS — purple → blue
     'background:linear-gradient(135deg,#059669 0%,#0891b2 100%);',  // 3 DAYS — emerald → cyan
@@ -4567,9 +4590,7 @@ function buildCountdownImgBadge(ev, inline = false) {
   const st = styles[days] || styles[7];
   const pos = inline
     ? `display:inline-block;margin-bottom:6px;`
-    : days <= 1
-      ? `position:absolute;top:8px;left:8px;z-index:4;`
-      : `position:absolute;bottom:8px;left:8px;z-index:4;`;
+    : `position:absolute;bottom:8px;left:8px;z-index:4;`;
   return `<div style="${pos}${st}color:#fff;font-weight:900;padding:4px 12px;border-radius:99px;font-size:0.65rem;letter-spacing:0.08em;text-shadow:0 1px 2px rgba(0,0,0,0.35);">${label}</div>`;
 }
 
@@ -4698,10 +4719,10 @@ function createCard(ev) {
   card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetailModal(ev.__backendId); } };
   const hasHtml = v => !!v && /<[a-z][\s\S]*>/i.test(v);
 
-  const nextBadge = isNext ? `<div class="next-card-label"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>NEXT</div>` : '';
+  const nextBadge = ''; // NEXT badge removed
 
   const imgHtml = ev.image
-    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${isNext ? '' : buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
+    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
     : `<div style="height:4px;background:${color};flex-shrink:0;"></div>`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
@@ -4758,7 +4779,7 @@ function createCard(ev) {
   const shareBtn = ``;
   const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${t('view_details_hover')}</div></div></div>`;
   const imgSection = ev.image
-    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${isNext ? '' : buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
+    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
     : `<div style="height:3px;background:${color};flex-shrink:0;opacity:0.7;"></div>`;
 
   const noImgBadge = !ev.image ? buildCountdownImgBadge(ev, true) : '';
@@ -6866,7 +6887,7 @@ function renderAdminWorksList() {
   if (!list) return;
 
   // ── Fingerprint guard — skip re-render ถ้าข้อมูลไม่เปลี่ยน ──
-  const _awFP = allWorks.length + '|' + (yearSel ? yearSel.value : 'all') + '|' + (allWorks[0]?.__backendId || '') + '|' + (allWorks[allWorks.length-1]?.__backendId || '');
+  const _awFP = allWorks.length + '|' + (yearSel ? yearSel.value : 'all') + '|' + (document.getElementById('admin-works-search')?.value||'') + '|' + (document.getElementById('admin-works-cat-filter')?.value||'all') + '|' + (document.getElementById('admin-works-expired-filter')?.value||'all') + '|' + (allWorks[0]?.__backendId || '') + '|' + (allWorks[allWorks.length-1]?.__backendId || '');
   if (_awFP === _adminWorksListFP && list.children.length > 0) return;
   _adminWorksListFP = _awFP;
 
@@ -6880,7 +6901,31 @@ function renderAdminWorksList() {
   }
 
   const selectedYear = yearSel ? yearSel.value : 'all';
-  const filtered = selectedYear === 'all' ? allWorks : allWorks.filter(w => (w.year||'') === selectedYear);
+  const _searchQ = (document.getElementById('admin-works-search')?.value || '').trim().toLowerCase();
+  const _catQ = (document.getElementById('admin-works-cat-filter')?.value || 'all');
+  const _expQ = (document.getElementById('admin-works-expired-filter')?.value || 'all');
+  // map category filter value → partial match against w.category
+  const _catMap = {littlebigworld:'little big world',series:'series',music:'music',magazine:'magazine',presenter:'presenter',variety:'variety',interview:'interview',otherworks:'other'};
+  const filtered = allWorks.filter(w => {
+    if (selectedYear !== 'all' && (w.year||'') !== selectedYear) return false;
+    if (_searchQ) {
+      const hay = [(w.title||''),(w.artists||''),(w.brand||''),(w.category||''),(w.type||''),(w.year||'')].join(' ').toLowerCase();
+      if (!hay.includes(_searchQ)) return false;
+    }
+    if (_catQ !== 'all') {
+      const wcat = (w.category||'').toLowerCase();
+      const needle = _catMap[_catQ] || _catQ;
+      if (!wcat.includes(needle)) return false;
+    }
+    if (_expQ === 'active' && w.contract_end && w.contract_end !== '') return false;
+    if (_expQ === 'expired' && (!w.contract_end || w.contract_end === '')) return false;
+    return true;
+  });
+
+  // แสดง count
+  let _countEl = document.getElementById('admin-works-count');
+  if (!_countEl) { _countEl = document.createElement('div'); _countEl.id='admin-works-count'; _countEl.style.cssText='font-size:0.72rem;color:#9ca3af;font-weight:600;margin-bottom:8px;'; list.parentNode.insertBefore(_countEl, list); }
+  _countEl.textContent = filtered.length + ' item' + (filtered.length !== 1 ? 's' : '');
 
   if (!filtered.length) {
     list.innerHTML = ''; if (empty) empty.style.display = 'block'; return;
