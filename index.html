@@ -2353,8 +2353,8 @@
        </div>
        <div>
         <label class="form-label">Type</label>
-        <select class="form-input" id="wf-type" name="type">
-         <option value="">— Optional —</option>
+        <input class="form-input" id="wf-type" name="type" list="wf-type-list" placeholder="— Optional — หรือพิมพ์เอง" autocomplete="off">
+        <datalist id="wf-type-list">
          <option>Presenter</option>
          <option>Friend of Brand</option>
          <option>Brand Ambassador</option>
@@ -2369,7 +2369,7 @@
          <option>Special Project</option>
          <option>Cameo</option>
          <option>Behind the Scenes</option>
-        </select>
+        </datalist>
        </div>
        <div>
         <label class="form-label">Role / Character</label>
