@@ -515,13 +515,13 @@
   .bday-countdown { font-size:0.7rem;font-weight:800;padding:3px 8px;border-radius:99px;margin-left:auto;flex-shrink:0;letter-spacing:0.05em; }
   .month-group { margin-bottom: 2.5rem; padding-top: 1.5rem; }
   .month-group:first-child { padding-top: 0; }
-  .month-group-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; margin-top: 1.75rem; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+  .month-group-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; margin-top: 1.25rem; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
   .month-group-header-box { display: inline-flex; align-items: baseline; gap: 6px; }
   .month-group-header-dots { display: none; }
   .month-group-header-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .month-group-header-label { font-size: 1.4rem; font-weight: 700; color: #111; letter-spacing: -0.03em; line-height: 1; }
+  .month-group-header-label { font-size: 1.05rem; font-weight: 700; color: #111; letter-spacing: -0.01em; line-height: 1; }
   .month-group-header-line { display: none; }
-  .month-group-header-count { font-size: 0.72rem; font-weight: 600; color: #9ca3af; background: transparent; border-radius: 6px; padding: 2px 9px; border: 1px solid #e5e7eb; }
+  .month-group-header-count { font-size: 0.65rem; font-weight: 700; color: #fff; background: #6366f1; border-radius: 99px; padding: 2px 9px; border: none; letter-spacing: 0.02em; }
   /* Map embed */
   .map-embed-wrap { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
   .map-embed-wrap iframe { width: 100%; height: 300px; border: 0; display: block; }
@@ -643,7 +643,7 @@
 
     /* ── Section headers ── */
     .section-header { font-size: 1.15rem !important; }
-    .month-group-header-label { font-size: 1.3rem !important; }
+    .month-group-header-label { font-size: 1.0rem !important; }
     .month-group { margin-bottom: 1.5rem !important; }
     #page-home > div > div[style*="grid-template-columns:2fr"] { grid-template-columns: 1fr 1fr !important; }
 
@@ -913,7 +913,7 @@
   #home-title        { font-size: var(--text-3xl) !important; }
   #cal-section-title { font-size: var(--text-2xl) !important; }
   .section-header    { font-size: var(--text-xl)  !important; }
-  .month-group-header-label { font-size: clamp(1.3rem, 3vw, 1.8rem) !important; }
+  .month-group-header-label { font-size: clamp(1.0rem, 2.2vw, 1.2rem) !important; }
   .timeline-card-title, .list-card-title { font-size: var(--text-base) !important; }
   .timeline-card-meta, .list-card-meta   { font-size: var(--text-sm)   !important; }
 
@@ -1153,7 +1153,7 @@
 
   /* ── Section headers fluid ── */
   .section-header { font-size: clamp(1rem, 2.5vw, 1.5rem) !important; }
-  .month-group-header-label { font-size: clamp(1.2rem, 2.5vw, 1.6rem) !important; }
+  .month-group-header-label { font-size: clamp(0.95rem, 2vw, 1.15rem) !important; }
 
   /* ── Event card text fluid ── */
   .timeline-card-title, .list-card-title {
@@ -1332,7 +1332,7 @@
          style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-       <span id="events-count" style="font-size:0.68rem;font-weight:600;color:#6b7280;background:transparent;border:1px solid #e5e7eb;border-radius:6px;padding:2px 10px;"></span>
+       <span id="events-count" style="font-size:0.68rem;font-weight:700;color:#fff;background:#111;border:none;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;"></span>
 
       </div>
      </div>
@@ -2373,7 +2373,7 @@
        <div>
         <label class="form-label">Contract Status</label>
         <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:8px 14px;border-radius:10px;border:1px solid #e5e7eb;background:#f9fafb;width:100%;box-sizing:border-box;transition:background 0.15s;" id="wf-contractEnd-label">
-          <input type="checkbox" id="wf-contractEnd" name="contract_end" value="true" style="width:16px;height:16px;accent-color:#475569;cursor:pointer;flex-shrink:0;" onchange="document.getElementById('wf-contractEnd-label').style.background=this.checked?'#f1f5f9':'#f9fafb';document.getElementById('wf-contractEnd-text').style.color=this.checked?'#334155':'#6b7280';">
+          <input type="checkbox" id="wf-contractEnd" name="contract_end" value="true" style="width:16px;height:16px;accent-color:#475569;cursor:pointer;flex-shrink:0;" onchange="const _l=document.getElementById('wf-contractEnd-label');const _t=document.getElementById('wf-contractEnd-text');const _hd=document.getElementById('wf-contractEndDate');_l.style.background=this.checked?'#f1f5f9':'#f9fafb';_t.style.color=this.checked?'#334155':'#6b7280';if(!this.checked&&_hd){_hd.value=''}_t.textContent='Contract Ended';">
           <span id="wf-contractEnd-text" style="font-size:0.85rem;font-weight:600;color:#6b7280;transition:color 0.15s;">Contract Ended</span>
         </label>
        </div>
@@ -2851,12 +2851,12 @@ function fmtDate(dateStr, opts) {
   return d.toLocaleDateString(t('date_locale'), opts);
 }
 
-function fmtTime(timeStr) {
+function fmtTime(timeStr, evTz) {
   if (!timeStr) return '';
   const clean = timeStr.trim();
-  // extract timezone suffix e.g. "18:00 GMT+9"
+  // extract timezone suffix e.g. "18:00 GMT+9" — or use evTz passed in
   const tzMatch = clean.match(/(GMT[+-]\d{1,2}(?::\d{2})?)/i);
-  const tz = tzMatch ? tzMatch[1].toUpperCase() : 'GMT+7';
+  const tz = (tzMatch ? tzMatch[1].toUpperCase() : (evTz ? evTz.toUpperCase() : 'GMT+7'));
   const match = clean.match(/(\d{1,2})[:\.](\d{2})\s*(AM|PM|am|pm)?/);
   if (!match) return clean;
   let h = parseInt(match[1]);
@@ -2868,7 +2868,7 @@ function fmtTime(timeStr) {
   const ampm = h >= 12 ? 'PM' : 'AM';
   const h12 = h % 12 || 12;
   const timeFormatted = `${h12}:${m} ${ampm}`;
-  // Show GMT only if not Thailand (GMT+7)
+  // Show GMT only if not Thailand default (GMT+7)
   return tz === 'GMT+7' ? timeFormatted : `${timeFormatted} ${tz}`;
 }
 
@@ -4024,7 +4024,7 @@ function renderHome() {
     const days = daysUntilEvent(next.dateStart);
     const color = getArtistColor(next.artists);
     const dayLabel = days === 0 ? t('next_today') : days === 1 ? t('next_1day') : days !== null && days <= 30 ? t('next_days', days) : t('next_event');
-    const _bg = ['#111','#f97316','#7c3aed','#059669','#f97316','#0891b2','#d97706','#059669'];
+    const _bg = ['linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
     const dayBadgeGrad = _bg[days] || _bg[0];
     el('bento-next-label').innerHTML = `<span style="background:${dayBadgeGrad};color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">${dayLabel}</span>`;
     el('bento-next-label').style.color = '';
@@ -4137,10 +4137,10 @@ function _buildListItem(ev) {
   const grad = gradients[color] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
   const artistArr = ev.artists ? ev.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
   const dots = artistArr.map(a => { const ac = getArtistColor(a); return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:600;color:${ac};"><span style="width:5px;height:5px;border-radius:50%;background:${ac};display:inline-block;"></span>${a}</span>`; }).join(' ');
-  const meta = [ev.dateStart ? fmtDate(ev.dateStart) : '', ev.startTime ? fmtTime(ev.startTime) : '', ev.location ? escHtml(ev.location) : ''].filter(Boolean).join(' · ');
+  const meta = [ev.dateStart ? fmtDate(ev.dateStart) : '', ev.startTime ? fmtTime(ev.startTime, ev.timezone||'') : '', ev.location ? escHtml(ev.location) : ''].filter(Boolean).join(' · ');
   const days = daysUntilEvent(ev.dateStart);
-  const _bg = ['#111','#f97316','#7c3aed','#059669','#f97316','#0891b2','#d97706','#059669'];
-  const badge = (days !== null && days >= 0 && days <= 7) ? `<span style="background:${_bg[days]||_bg[7]};color:#fff;font-size:0.62rem;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:0.06em;margin-left:auto;flex-shrink:0;">${days===0?'TODAY':days===1?'1 DAY':days+' DAYS'}</span>` : '';
+  const _bg = ['linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
+  const badge = (days !== null && days >= 0 && days <= 7) ? `<span style="background:${_bg[days]||_bg[7]};color:#fff;font-size:0.62rem;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:0.06em;margin-left:auto;flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,0.3);">${days===0?'TODAY':days===1?'1 DAY':days+' DAYS'}</span>` : '';
   // Use data-src for lazy loading
   const imgHtml = ev.image
     ? `<img src="${_fixImgSrc(ev.image)}" style="width:68px;height:68px;border-radius:12px;object-fit:cover;object-position:top;display:block;flex-shrink:0;" loading="lazy" onerror="_onImgError(this)">`
@@ -4209,7 +4209,7 @@ function _vsInit(groups) {
       const hdr = document.createElement('div');
       hdr.className = 'month-group-header';
       const _lp1 = item.label.split(' '); const _m1 = _lp1[0]||''; const _y1 = _lp1[1]||'';
-      hdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m1}</span><span style="font-size:1.4rem;font-weight:300;color:#d1d5db;letter-spacing:-0.03em;line-height:1;">${_y1}</span><span class="month-group-header-count" style="margin-left:4px;">${item.total} event${item.total !== 1 ? 's' : ''}</span></div>`;
+      hdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m1}</span><span style="font-size:1.05rem;font-weight:400;color:#111;letter-spacing:-0.01em;line-height:1;">${_y1}</span><span class="month-group-header-count" style="margin-left:4px;">${item.total} event${item.total !== 1 ? 's' : ''}</span></div>`;
       gw.appendChild(hdr);
       let gridEl;
       if (item.mode === 'list') {
@@ -4554,14 +4554,14 @@ function buildCountdownImgBadge(ev, inline = false) {
   const days = daysUntilEvent(ev.dateStart);
   if (days === null || days < 0 || days > 7) return '';
   const styles = [
-    'background:#111;',                    // TODAY
-    'background:#f97316;',                 // 1 DAY
-    'background:#7c3aed;',                 // 2 DAYS
-    'background:#059669;',                 // 3 DAYS
-    'background:#f97316;',                 // 4 DAYS
-    'background:#0891b2;',                 // 5 DAYS
-    'background:#d97706;',                 // 6 DAYS
-    'background:#059669;',                 // 7 DAYS
+    'background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);box-shadow:0 0 0 1.5px rgba(255,255,255,0.15) inset;',  // TODAY  — deep navy/black two-tone
+    'background:linear-gradient(135deg,#ff6b00 0%,#ff0080 100%);',  // 1 DAY  — orange → hot pink
+    'background:linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%);',  // 2 DAYS — purple → blue
+    'background:linear-gradient(135deg,#059669 0%,#0891b2 100%);',  // 3 DAYS — emerald → cyan
+    'background:linear-gradient(135deg,#f97316 0%,#eab308 100%);',  // 4 DAYS — orange → yellow
+    'background:linear-gradient(135deg,#0891b2 0%,#6366f1 100%);',  // 5 DAYS — cyan → indigo
+    'background:linear-gradient(135deg,#d97706 0%,#dc2626 100%);',  // 6 DAYS — amber → red
+    'background:linear-gradient(135deg,#16a34a 0%,#0d9488 100%);',  // 7 DAYS — green → teal
   ];
   const label = days === 0 ? 'TODAY' : days === 1 ? '1 DAY' : `${days} DAYS`;
   const st = styles[days] || styles[7];
@@ -4570,7 +4570,7 @@ function buildCountdownImgBadge(ev, inline = false) {
     : days <= 1
       ? `position:absolute;top:8px;left:8px;z-index:4;`
       : `position:absolute;bottom:8px;left:8px;z-index:4;`;
-  return `<div style="${pos}${st}color:#fff;font-weight:900;padding:4px 12px;border-radius:99px;font-size:0.65rem;letter-spacing:0.08em;">${label}</div>`;
+  return `<div style="${pos}${st}color:#fff;font-weight:900;padding:4px 12px;border-radius:99px;font-size:0.65rem;letter-spacing:0.08em;text-shadow:0 1px 2px rgba(0,0,0,0.35);">${label}</div>`;
 }
 
 // Renders a card-body countdown (days/hrs/min/sec boxes)
@@ -4725,10 +4725,11 @@ function createCard(ev) {
     const datePill = `<span style="display:inline-flex;align-items:center;gap:4px;color:${color};font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;"><svg width="11" height="11" fill="none" stroke="${color}" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escHtml(dateLabel)}</span>`;
     let timePill = '';
     if (ev.startTime) {
-      const allTimes = ev.startTime.split('/').map(s => fmtTime(s.trim())).filter(Boolean).join(' / ');
-      const timeText = allTimes + (ev.endTime ? ' – ' + fmtTime(ev.endTime) : '');
+      const _evTz = ev.timezone || '';
+      const allTimes = ev.startTime.split('/').map(s => fmtTime(s.trim(), _evTz)).filter(Boolean).join(' / ');
+      const timeText = allTimes + (ev.endTime ? ' – ' + fmtTime(ev.endTime, _evTz) : '');
       // ── Time: inline icon + text, separator between date and time ──
-      timePill = `<span style="color:#d1d5db;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;color:#6b7280;font-size:0.72rem;font-weight:600;white-space:nowrap;flex-shrink:0;"><svg width="11" height="11" fill="none" stroke="#6b7280" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(timeText)}</span>`;
+      timePill = `<span style="color:#d1d5db;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;color:#111;font-size:0.72rem;font-weight:600;white-space:nowrap;flex-shrink:0;"><svg width="11" height="11" fill="none" stroke="#111" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(timeText)}</span>`;
     }
     dtRow = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;margin-bottom:5px;">${datePill}${timePill}</div>`;
   }
@@ -4802,7 +4803,7 @@ function openDetailModal(id) {
     const d = new Date(ev.dateStart + 'T00:00:00');
     const dateLabel = fmtDateRange(ev.dateStart, ev.dateEnd);
     const timeHtml = ev.startTime
-      ? `<span style="width:1px;height:14px;background:#e5e7eb;margin:0 10px;flex-shrink:0;display:inline-block;"></span><span style="display:flex;align-items:center;gap:5px;font-size:0.88rem;font-weight:700;color:#111;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(fmtTime(ev.startTime))}${ev.endTime?' – '+escHtml(fmtTime(ev.endTime)):''}</span>`
+      ? `<span style="width:1px;height:14px;background:#e5e7eb;margin:0 10px;flex-shrink:0;display:inline-block;"></span><span style="display:flex;align-items:center;gap:5px;font-size:0.88rem;font-weight:700;color:#111;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(fmtTime(ev.startTime, ev.timezone||''))}${ev.endTime?' – '+escHtml(fmtTime(ev.endTime, ev.timezone||'')):''}</span>`
       : '';
     metaRows.push(`<div style="display:flex;align-items:center;margin-bottom:2px;"><span style="display:flex;align-items:center;gap:5px;font-size:0.88rem;font-weight:700;color:${color};"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escHtml(dateLabel)}</span>${timeHtml}</div>`);
   }
@@ -6411,7 +6412,7 @@ function buildTimelineView(events) {
     const mhdr = document.createElement('div');
     mhdr.className = 'month-group-header';
     const _lp2 = label.split(' '); const _m2 = _lp2[0]||''; const _y2 = _lp2[1]||'';
-    mhdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m2}</span><span style="font-size:1.4rem;font-weight:300;color:#d1d5db;letter-spacing:-0.03em;line-height:1;">${_y2}</span><span class="month-group-header-count" style="margin-left:4px;">${group.length} event${group.length!==1?'s':''}</span></div>`;
+    mhdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m2}</span><span style="font-size:1.05rem;font-weight:400;color:#111;letter-spacing:-0.01em;line-height:1;">${_y2}</span><span class="month-group-header-count" style="margin-left:4px;">${group.length} event${group.length!==1?'s':''}</span></div>`;
     wrap.appendChild(mhdr);
     const tl = document.createElement('div');
     tl.className = 'timeline-wrap';
@@ -6655,11 +6656,16 @@ function _fillWorksForm(w) {
   set('wf-image', w.image); set('wf-releaseDate', w.release_date); set('wf-link', w.link);
   const _cbEnd = document.getElementById('wf-contractEnd');
   if (_cbEnd) {
-    _cbEnd.checked = !!(w.contract_end === 'true' || w.contract_end === true || w.contract_end === '1');
+    const _ceVal = w.contract_end || '';
+    const _isEnded = !!(_ceVal && _ceVal !== 'false');
+    _cbEnd.checked = _isEnded;
+    let _hiddenDate = document.getElementById('wf-contractEndDate');
+    if (!_hiddenDate) { _hiddenDate = document.createElement('input'); _hiddenDate.type='hidden'; _hiddenDate.id='wf-contractEndDate'; _cbEnd.parentNode.appendChild(_hiddenDate); }
+    _hiddenDate.value = (_ceVal && _ceVal !== 'true' && _ceVal !== '1') ? _ceVal : '';
     const _lbl = document.getElementById('wf-contractEnd-label');
     const _txt = document.getElementById('wf-contractEnd-text');
-    if (_lbl) _lbl.style.background = _cbEnd.checked ? '#f1f5f9' : '#f9fafb';
-    if (_txt) _txt.style.color = _cbEnd.checked ? '#334155' : '#6b7280';
+    if (_lbl) _lbl.style.background = _isEnded ? '#f1f5f9' : '#f9fafb';
+    if (_txt) { _txt.style.color = _isEnded ? '#334155' : '#6b7280'; _txt.textContent = (_isEnded && _hiddenDate.value) ? 'Contract Ended · ' + _hiddenDate.value : 'Contract Ended'; }
   }
   set('wf-description', w.description); set('wf-category', w.category); set('wf-type', w.type);
   const artistArr = (w.artists||'').split(',').map(a=>a.trim());
@@ -6673,7 +6679,7 @@ function _readWorksForm() {
     title: gv('wf-title'), category: gv('wf-category'), year: gv('wf-year'),
     artists, brand: gv('wf-brand'), magazine: gv('wf-magazine'),
     type: gv('wf-type'), role: gv('wf-role'), project: gv('wf-project'),
-    image: gv('wf-image'), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');return _cb&&_cb.checked?'true':'';})(), link: gv('wf-link'),
+    image: gv('wf-image'), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');if(!_cb||!_cb.checked)return '';const _ex=document.getElementById('wf-contractEndDate');if(_ex&&_ex.value)return _ex.value;const _d=new Date();return _d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');})(), link: gv('wf-link'),
     description: gv('wf-description')
   };
 }
