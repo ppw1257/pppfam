@@ -3281,98 +3281,100 @@ function hydrateFromCache() { _fastHydrateFromCache(); }
 
 // ── getAll: fetch 4 ไฟล์จาก GitHub Pages แบบ parallel ──
 let _fetchingAll = false;
+// ── helper: parse all-in-one response จาก all.json หรือ Apps Script getAll ──
+function _applyAllData(res, force, dataChangedRef) {
+  const _fp = arr => arr.length + '|' + (arr[0]?.__backendId||arr[0]?.title||'') + '|' + (arr[arr.length-1]?.__backendId||arr[arr.length-1]?.title||'');
+
+  // Events
+  const evData = res.events || [];
+  if (Array.isArray(evData) && evData.length) {
+    const processed = processEvents(evData);
+    if (_fp(processed) !== _fp(allEvents)) dataChangedRef.v = true;
+    allEvents = processed;
+    _memCache.set('events', processed);
+    Cache.set(LC.EVENTS, processed);
+    Cache.setTS(LC.TS_EV);
+    apiLoaded = true;
+  }
+  // Works
+  const wkData = res.works || [];
+  if (Array.isArray(wkData) && wkData.length) {
+    const wk = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+    if (_fp(wk) !== _fp(allWorks)) dataChangedRef.v = true;
+    allWorks = wk;
+    worksLoaded = true;
+    _memCache.set('works', allWorks);
+    Cache.set(LC.WORKS, allWorks);
+    Cache.setTS(LC.TS_WK);
+  }
+  // Birthdays
+  const bdData = res.birthdays || [];
+  if (Array.isArray(bdData)) {
+    allBirthdays = bdData.map(r => ({
+      __backendId: r.id || '',
+      artist_name: r.artist_name || '',
+      birthday_month: parseInt(r.birthday_month) || 0,
+      birthday_day: parseInt(r.birthday_day) || 0,
+      color: r.color || '#6b7280'
+    }));
+    _memCache.set('bdays', allBirthdays);
+    Cache.set(LC.BDAYS, allBirthdays);
+    Cache.setTS(LC.TS_BD);
+  }
+  // Anniversaries
+  const anData = res.anniversaries || [];
+  if (Array.isArray(anData)) {
+    allAnniversaries = anData.map(r => ({
+      __backendId: r.id || '',
+      anniversary_name: r.anniversary_name || '',
+      anniversary_month: parseInt(r.anniversary_month) || 0,
+      anniversary_day: parseInt(r.anniversary_day) || 0,
+      anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
+      color: r.color || '#a855f7'
+    }));
+    _memCache.set('annivs', allAnniversaries);
+    Cache.set(LC.ANNIVS, allAnniversaries);
+    Cache.setTS(LC.TS_AN);
+  }
+  _fmtDateCache.clear();
+}
+
 async function _fetchAllData(force = false) {
   if (_fetchingAll) return;
   if (!force && Cache.isFresh(LC.TS_EV) && Cache.isFresh(LC.TS_WK) && allEvents.length > 0 && allWorks.length > 0) return;
   _fetchingAll = true;
   try {
+    // ── 1 request เดียว: all.json จาก GitHub Pages (ไม่กิน Apps Script quota เลย) ──
     const t = Math.floor(Date.now() / 30000);
-    const base = JSON_BASE_URL;
-    const [evRes, wkRes, bdRes, anRes] = await Promise.all([
-      fetchWithTimeout(`${base}/events.json?t=${t}`),
-      fetchWithTimeout(`${base}/works.json?t=${t}`),
-      fetchWithTimeout(`${base}/birthdays.json?t=${t}`),
-      fetchWithTimeout(`${base}/anniversaries.json?t=${t}`),
-    ]);
-    // ── fingerprint ก่อนอัปเดต เพื่อตรวจว่าข้อมูลเปลี่ยนจริงหรือเปล่า ──
-    const _prevEvFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '');
-    const _prevWkFP = allWorks.length  + '|' + (allWorks[0]?.__backendId  || '');
-    let dataChanged = false;
-
-    // Events
-    const evData = evRes.events || evRes;
-    if (Array.isArray(evData) && evData.length) {
-      const processed = processEvents(evData);
-      const newFP = processed.length + '|' + (processed[0]?.__backendId || '');
-      if (newFP !== _prevEvFP) dataChanged = true;
-      allEvents = processed;
-      _memCache.set('events', processed);
-      Cache.set(LC.EVENTS, processed);
-      Cache.setTS(LC.TS_EV);
-      apiLoaded = true;
-    }
-    // Works
-    const wkData = wkRes.works || wkRes;
-    if (Array.isArray(wkData) && wkData.length) {
-      const wk = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
-      const newWkFP = wk.length + '|' + (wk[0]?.__backendId || '');
-      if (newWkFP !== _prevWkFP) dataChanged = true;
-      allWorks = wk;
-      worksLoaded = true;
-      _memCache.set('works', allWorks);
-      Cache.set(LC.WORKS, allWorks);
-      Cache.setTS(LC.TS_WK);
-    }
-    // Birthdays
-    const bdData = bdRes.birthdays || bdRes;
-    if (Array.isArray(bdData)) {
-      allBirthdays = bdData.map(r => ({
-        __backendId: r.id || '',
-        artist_name: r.artist_name || '',
-        birthday_month: parseInt(r.birthday_month) || 0,
-        birthday_day: parseInt(r.birthday_day) || 0,
-        color: r.color || '#6b7280'
-      }));
-      _memCache.set('bdays', allBirthdays);
-      Cache.set(LC.BDAYS, allBirthdays);
-      Cache.setTS(LC.TS_BD);
-    }
-    // Anniversaries
-    const anData = anRes.anniversaries || anRes;
-    if (Array.isArray(anData)) {
-      allAnniversaries = anData.map(r => ({
-        __backendId: r.id || '',
-        anniversary_name: r.anniversary_name || '',
-        anniversary_month: parseInt(r.anniversary_month) || 0,
-        anniversary_day: parseInt(r.anniversary_day) || 0,
-        anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
-        color: r.color || '#a855f7'
-      }));
-      _memCache.set('annivs', allAnniversaries);
-      Cache.set(LC.ANNIVS, allAnniversaries);
-      Cache.setTS(LC.TS_AN);
-    }
-    _fmtDateCache.clear();
+    const res = await fetchWithTimeout(`${JSON_BASE_URL}/all.json?t=${t}`);
+    const dataChangedRef = { v: false };
+    _applyAllData(res, force, dataChangedRef);
     hideConnectionError();
-    // ── Re-render เฉพาะเมื่อข้อมูลเปลี่ยนจริง หรือเป็น force fetch ──
-    if (dataChanged || force) {
-      _vsLastFingerprint = '';
-      _calLastFP = '';
-      _worksLastFP = '';
-      _adminListFP = '';
-      _adminWorksListFP = '';
+    if (dataChangedRef.v || force) {
+      _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
+      _adminListFP = ''; _adminWorksListFP = '';
       scheduleRender();
       renderBirthdayBanners();
     }
     _scheduleEventStartTimers();
   } catch(e) {
-    console.warn('GitHub fetch failed, falling back to Apps Script:', e.message);
-    await Promise.all([
-      loadEventsFromSheets(force),
-      loadBirthdaysFromSheets(force),
-      loadAnniversariesFromSheets(force),
-      loadWorksFromSheets(force)
-    ]).catch(()=>{});
+    // Fallback: ถ้า all.json ไม่มี ลอง Apps Script getAll (1 request เดียว)
+    try {
+      const res2 = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&t=${Date.now()}`);
+      const dataChangedRef = { v: false };
+      _applyAllData(res2, force, dataChangedRef);
+      hideConnectionError();
+      if (dataChangedRef.v || force) {
+        _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
+        _adminListFP = ''; _adminWorksListFP = '';
+        scheduleRender();
+        renderBirthdayBanners();
+      }
+      _scheduleEventStartTimers();
+    } catch(e2) {
+      console.warn('Fetch failed:', e2.message);
+      showConnectionError();
+    }
   } finally {
     _fetchingAll = false;
   }
@@ -3557,11 +3559,35 @@ function scheduleAutoRefresh() {
     }
   }, 1 * 60 * 1000 + jitter); // ทุก 1 นาที ตรงกับ cache TTL
 
+  // ── Cross-tab broadcast: รับ signal จาก admin tab ทันที ──
+  // เมื่อ admin save/edit/delete → broadcast 'ppp_data_updated'
+  // visitor tab รับแล้ว force fetch ทันที ไม่รอ 1 นาที
+  if (!window._pppStorageListenerAdded) {
+    window._pppStorageListenerAdded = true;
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'ppp_data_updated' && e.newValue && !isAdmin) {
+        if (!_fetchingAll) {
+          Cache.clearAll(); // ล้าง cache เก่าทิ้ง เพื่อ force fetch ใหม่
+          _fetchAllData(false).catch(() => {});
+        }
+      }
+    });
+  }
+
   // ── Precise midnight timer: fires exactly at 00:00:00 BKK ──
   _scheduleMidnightTimer();
 
   // ── Precise event-start timers: fires exactly when each event starts ──
   _scheduleEventStartTimers();
+}
+
+// ── broadcast ให้ visitor tab รู้ว่า admin เพิ่ง save ──
+function _broadcastDataUpdate() {
+  try {
+    localStorage.setItem('ppp_data_updated', Date.now().toString());
+    // ลบออกหลัง 100ms — แค่ trigger event ไม่ต้องเก็บค่าไว้
+    setTimeout(() => { try { localStorage.removeItem('ppp_data_updated'); } catch(_) {} }, 100);
+  } catch(_) {}
 }
 
 function _scheduleMidnightTimer() {
@@ -3583,11 +3609,8 @@ function _scheduleMidnightTimer() {
     _scheduleEventStartTimers(); // re-schedule timers สำหรับงานวันใหม่
     scheduleRender();
     renderBirthdayBanners();
-    Promise.all([
-      loadEventsFromSheets(true),
-      loadBirthdaysFromSheets(true),
-      loadAnniversariesFromSheets(true),
-    ]).catch(() => {});
+    _fetchingAll = false;
+    _fetchAllData(true).catch(() => {});
     _scheduleMidnightTimer();
   }, msUntilMidnight + 50); // +50ms buffer ให้แน่ใจว่าผ่านเที่ยงคืนแล้ว
 }
@@ -3706,85 +3729,21 @@ function _refreshAllPages() {
 // - re-render เฉพาะเมื่อ server data ต่างจาก optimistic ที่แสดงอยู่ (fingerprint check)
 // - ถ้า optimistic ถูกต้องแล้ว: ไม่ render ซ้ำ → ไม่กระตุกเลย
 async function _fetchFreshFromAppsScript() {
-  const base = APPS_SCRIPT_ADMIN_URL;
-  const t = Date.now();
-  let dataChanged = false;
+  // ── 1 request เดียว: getAll จาก Apps Script (admin path เท่านั้น) ──
+  // visitor ใช้ all.json จาก GitHub Pages แทน (ไม่กิน quota)
   try {
-    const [evRes, wkRes, bdRes, anRes] = await Promise.all([
-      fetchWithTimeout(`${base}?action=getEvents&t=${t}`),
-      fetchWithTimeout(`${base}?action=getWorks&t=${t}`),
-      fetchWithTimeout(`${base}?action=getBirthdays&t=${t}`),
-      fetchWithTimeout(`${base}?action=getAnniversaries&t=${t}`),
-    ]);
-
-    // Events — fingerprint check ก่อน render
-    const evData = evRes.events || evRes;
-    if (Array.isArray(evData) && evData.length) {
-      const processed = processEvents(evData);
-      const prevFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '') + '|' + (allEvents[allEvents.length-1]?.__backendId || '');
-      const newFP  = processed.length  + '|' + (processed[0]?.__backendId  || '') + '|' + (processed[processed.length-1]?.__backendId  || '');
-      if (newFP !== prevFP) dataChanged = true;
-      allEvents = processed; // อัปเดต backendId จริงจาก server (แทน tmp_xxx)
-      _memCache.set('events', allEvents);
-      Cache.set(LC.EVENTS, allEvents);
-      Cache.setTS(LC.TS_EV);
-      apiLoaded = true;
-    }
-
-    // Works — fingerprint check
-    const wkData = wkRes.works || wkRes;
-    if (Array.isArray(wkData)) {
-      const wk = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
-      const prevWkFP = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
-      const newWkFP  = wk.length       + '|' + (wk[0]?.__backendId       || '');
-      if (newWkFP !== prevWkFP) dataChanged = true;
-      allWorks = wk; // อัปเดต id จริง
-      worksLoaded = true;
-      _memCache.set('works', allWorks);
-      Cache.set(LC.WORKS, allWorks);
-      Cache.setTS(LC.TS_WK);
-    }
-
-    // Birthdays
-    const bdData = bdRes.birthdays || bdRes;
-    if (Array.isArray(bdData)) {
-      allBirthdays = bdData.map(r => ({
-        __backendId: r.id || '',
-        artist_name: r.artist_name || '',
-        birthday_month: parseInt(r.birthday_month) || 0,
-        birthday_day: parseInt(r.birthday_day) || 0,
-        color: r.color || '#6b7280'
-      }));
-      _memCache.set('bdays', allBirthdays);
-      Cache.set(LC.BDAYS, allBirthdays);
-      Cache.setTS(LC.TS_BD);
-    }
-
-    // Anniversaries
-    const anData = anRes.anniversaries || anRes;
-    if (Array.isArray(anData)) {
-      allAnniversaries = anData.map(r => ({
-        __backendId: r.id || '',
-        anniversary_name: r.anniversary_name || '',
-        anniversary_month: parseInt(r.anniversary_month) || 0,
-        anniversary_day: parseInt(r.anniversary_day) || 0,
-        anniversary_year: r.anniversary_year ? parseInt(r.anniversary_year) : null,
-        color: r.color || '#a855f7'
-      }));
-      _memCache.set('annivs', allAnniversaries);
-      Cache.set(LC.ANNIVS, allAnniversaries);
-      Cache.setTS(LC.TS_AN);
-    }
-
+    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&t=${Date.now()}`);
+    const dataChangedRef = { v: false };
+    _applyAllData(res, false, dataChangedRef);
     _fmtDateCache.clear();
-
-    // Re-render เฉพาะเมื่อ server data ต่างจาก optimistic — ป้องกัน double render กระตุก
-    if (dataChanged) {
+    // Broadcast ให้ visitor tab รู้ว่า data เปลี่ยน
+    _broadcastDataUpdate();
+    // Re-render เฉพาะเมื่อ server data ต่างจาก optimistic
+    if (dataChangedRef.v) {
       _refreshAllPages();
     }
   } catch(e) {
     console.warn('_fetchFreshFromAppsScript failed:', e.message);
-    // ถ้า server sync fail — optimistic ที่แสดงอยู่ยังถูกต้อง ไม่ต้อง render ซ้ำ
   }
 }
 
@@ -3896,11 +3855,7 @@ async function forceRefreshAll() {
   _fetchingEvents = false; _fetchingBdays = false; _fetchingAnnivs = false; _fetchingWorks = false;
   _fetchingAll = false;
   showSkeletons();
-  await Promise.all([
-    loadEventsFromSheets(true),
-    loadBirthdaysFromSheets(true),
-    loadAnniversariesFromSheets(true)
-  ]).catch(() => {});
+  await _fetchAllData(true).catch(() => {});
 
   if (icon) icon.style.animation = '';
   if (btn) btn.style.pointerEvents = '';
@@ -3908,13 +3863,9 @@ async function forceRefreshAll() {
 
 async function retryConnection() {
   Cache.clearAll();
-  _fetchingEvents = false; _fetchingBdays = false; _fetchingAnnivs = false; _fetchingWorks = false;
+  _fetchingAll = false;
   showSkeletons();
-  await Promise.all([
-    loadEventsFromSheets(true),
-    loadBirthdaysFromSheets(true),
-    loadAnniversariesFromSheets(true)
-  ]);
+  await _fetchAllData(true).catch(() => {});
 }
 
 // ═══════════════════════════════════════════════════════════════════
