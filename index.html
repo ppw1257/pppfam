@@ -3700,11 +3700,15 @@ function _refreshAllPages() {
   });
 }
 
-// ── _fetchFreshFromAppsScript: ดึงข้อมูลใหม่ตรงจาก Apps Script (bypass GitHub CDN cache)
-// เรียกหลัง save/edit/delete ทุก action — ผู้ใช้เห็นข้อมูลใหม่ทันที ไม่ต้องรอ GitHub rebuild
+// ── _fetchFreshFromAppsScript: silent background sync หลัง admin save/edit/delete
+// - ดึงข้อมูลจาก Apps Script โดยตรง (bypass GitHub CDN cache)
+// - อัปเดต memory + localStorage เงียบๆ
+// - re-render เฉพาะเมื่อ server data ต่างจาก optimistic ที่แสดงอยู่ (fingerprint check)
+// - ถ้า optimistic ถูกต้องแล้ว: ไม่ render ซ้ำ → ไม่กระตุกเลย
 async function _fetchFreshFromAppsScript() {
   const base = APPS_SCRIPT_ADMIN_URL;
   const t = Date.now();
+  let dataChanged = false;
   try {
     const [evRes, wkRes, bdRes, anRes] = await Promise.all([
       fetchWithTimeout(`${base}?action=getEvents&t=${t}`),
@@ -3712,22 +3716,36 @@ async function _fetchFreshFromAppsScript() {
       fetchWithTimeout(`${base}?action=getBirthdays&t=${t}`),
       fetchWithTimeout(`${base}?action=getAnniversaries&t=${t}`),
     ]);
+
+    // Events — fingerprint check ก่อน render
     const evData = evRes.events || evRes;
     if (Array.isArray(evData) && evData.length) {
-      allEvents = processEvents(evData);
+      const processed = processEvents(evData);
+      const prevFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '') + '|' + (allEvents[allEvents.length-1]?.__backendId || '');
+      const newFP  = processed.length  + '|' + (processed[0]?.__backendId  || '') + '|' + (processed[processed.length-1]?.__backendId  || '');
+      if (newFP !== prevFP) dataChanged = true;
+      allEvents = processed; // อัปเดต backendId จริงจาก server (แทน tmp_xxx)
       _memCache.set('events', allEvents);
       Cache.set(LC.EVENTS, allEvents);
       Cache.setTS(LC.TS_EV);
       apiLoaded = true;
     }
+
+    // Works — fingerprint check
     const wkData = wkRes.works || wkRes;
     if (Array.isArray(wkData)) {
-      allWorks = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      const wk = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      const prevWkFP = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
+      const newWkFP  = wk.length       + '|' + (wk[0]?.__backendId       || '');
+      if (newWkFP !== prevWkFP) dataChanged = true;
+      allWorks = wk; // อัปเดต id จริง
       worksLoaded = true;
       _memCache.set('works', allWorks);
       Cache.set(LC.WORKS, allWorks);
       Cache.setTS(LC.TS_WK);
     }
+
+    // Birthdays
     const bdData = bdRes.birthdays || bdRes;
     if (Array.isArray(bdData)) {
       allBirthdays = bdData.map(r => ({
@@ -3741,6 +3759,8 @@ async function _fetchFreshFromAppsScript() {
       Cache.set(LC.BDAYS, allBirthdays);
       Cache.setTS(LC.TS_BD);
     }
+
+    // Anniversaries
     const anData = anRes.anniversaries || anRes;
     if (Array.isArray(anData)) {
       allAnniversaries = anData.map(r => ({
@@ -3755,11 +3775,17 @@ async function _fetchFreshFromAppsScript() {
       Cache.set(LC.ANNIVS, allAnniversaries);
       Cache.setTS(LC.TS_AN);
     }
+
     _fmtDateCache.clear();
+
+    // Re-render เฉพาะเมื่อ server data ต่างจาก optimistic — ป้องกัน double render กระตุก
+    if (dataChanged) {
+      _refreshAllPages();
+    }
   } catch(e) {
     console.warn('_fetchFreshFromAppsScript failed:', e.message);
+    // ถ้า server sync fail — optimistic ที่แสดงอยู่ยังถูกต้อง ไม่ต้อง render ซ้ำ
   }
-  _refreshAllPages();
 }
 
 // ── Status helpers ────────────────────────────────────────────────
@@ -4497,8 +4523,10 @@ function getTypeStyle(type) {
     'private event':       { bg:'#fce7f3', color:'#9d174d', border:'#fbcfe8' },
     'event':               { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
     'variety & game show': { bg:'#eff6ff', color:'#1d4ed8', border:'#bfdbfe' },
-    'collab':              { bg:'#f9fafb', color:'#374151', border:'#e5e7eb' },
+    'collab':              { bg:'#f0fdfa', color:'#0f766e', border:'#99f6e4' },
     'tpop fest':           { bg:'#fefce8', color:'#854d0e', border:'#fde047' },
+    'fan meet':            { bg:'#fef0ff', color:'#a21caf', border:'#f0abfc' },
+    'fan meeting':         { bg:'#fef0ff', color:'#a21caf', border:'#f0abfc' },
     'fanmeet':             { bg:'#fef0ff', color:'#a21caf', border:'#f0abfc' },
     'fansign':             { bg:'#fdf2ff', color:'#86198f', border:'#e879f9' },
     'presstour':           { bg:'#faf5ff', color:'#6d28d9', border:'#ddd6fe' },
@@ -4514,7 +4542,7 @@ function getTypeStyle(type) {
     'onair':               { bg:'#fef2f2', color:'#b91c1c', border:'#fca5a5', dot:'#ef4444' },
     'birthday event':      { bg:'#fff0f6', color:'#be185d', border:'#fbcfe8', cake:true },
   };
-  return map[t] || { bg:'#f3f4f6', color:'#374151', border:'#e5e7eb' };
+  return map[t] || { bg:'#f1f5f9', color:'#475569', border:'#cbd5e1' };
 }
 function buildTypePill(type, size) {
   if (!type) return '';
@@ -5551,7 +5579,7 @@ function openWorksPreviewPopup() {
     if (c.includes('otherwork')||c.includes('other')) return 'otherworks';
     return c;
   }
-  const cat = _CC[_ck(data.category)] || { label: data.category||'—', color:'#374151', bg:'#f3f4f6', border:'#e5e7eb' };
+  const cat = _CC[_ck(data.category)] || { label: data.category||'—', color:'#475569', bg:'#f1f5f9', border:'#cbd5e1' };
   const artistArr = data.artists ? data.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
@@ -5967,12 +5995,30 @@ async function confirmDelete(key) {
   deleteConfirmIds.delete(key);
   const rowEl = document.querySelector(`#admin-events-list [data-event-id="${key}"]`);
   if (rowEl) rowEl.style.opacity = '0.5';
+  // ── OPTIMISTIC DELETE: ลบออกจาก memory ทันที ──
+  const _delKey = ev.__backendId || ev.__rawId;
+  const _delIdx = allEvents.findIndex(function(e){ return (e.__backendId || e.__rawId) === _delKey; });
+  var _removed = null;
+  if (_delIdx !== -1) { _removed = allEvents.splice(_delIdx, 1)[0]; }
+  _memCache.set('events', allEvents);
+  Cache.set(LC.EVENTS, allEvents);
+  _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+  requestAnimationFrame(function() {
+    renderHome(); renderCalendar();
+    if (isAdmin) renderAdminList();
+    debounceLucide();
+  });
+
   try {
     const result = await deleteEventInSheets(ev.__backendId || ev.__rawId, ev.__rowNumber);
     showToast(result.status === 'not_found' ? t('toast_removed') : t('toast_deleted'));
-    Cache.clearAll(); _fetchingAll = false;
-    await _fetchFreshFromAppsScript();
+    _fetchingAll = false;
+    _fetchFreshFromAppsScript().catch(function(){});
   } catch(err) {
+    // Rollback: คืน event กลับ ถ้า delete ล้มเหลว
+    if (_removed) { allEvents.splice(_delIdx, 0, _removed); _memCache.set('events', allEvents); Cache.set(LC.EVENTS, allEvents); }
+    _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+    requestAnimationFrame(function(){ renderHome(); renderCalendar(); if (isAdmin) renderAdminList(); debounceLucide(); });
     if (rowEl) rowEl.style.opacity = '1';
     showToast(t('toast_error') + ': ' + (err.message || ''));
   }
@@ -6006,15 +6052,19 @@ function renderAnniversaryAdmin() {
 async function deleteBirthday(id) {
   try {
     await deleteBirthdayInSheets(id); showToast(t('toast_bday_deleted'));
-    Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); _fetchingAll = false;
-    await _fetchFreshFromAppsScript();
+    allBirthdays = allBirthdays.filter(function(b){ return b.__backendId !== id; });
+    _memCache.set('bdays', allBirthdays); Cache.set(LC.BDAYS, allBirthdays);
+    requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
+    _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 async function deleteAnniversary(id) {
   try {
     await deleteAnniversaryInSheets(id); showToast(t('toast_anniv_deleted'));
-    Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); _fetchingAll = false;
-    await _fetchFreshFromAppsScript();
+    allAnniversaries = allAnniversaries.filter(function(a){ return a.__backendId !== id; });
+    _memCache.set('annivs', allAnniversaries); Cache.set(LC.ANNIVS, allAnniversaries);
+    requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
+    _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 
@@ -6036,8 +6086,10 @@ async function saveAnniversary() {
   try {
     await createAnniversaryInSheets({ anniversary_name:label, anniversary_month:String(month), anniversary_day:String(day), anniversary_year:year||'', color });
     closeAnnivForm(); showToast(t('toast_anniv_saved'));
-    Cache.del(LC.ANNIVS); Cache.del(LC.TS_AN); _fetchingAll = false;
-    await _fetchFreshFromAppsScript();
+    allAnniversaries.push({ __backendId:'tmp_'+Date.now(), anniversary_name:label, anniversary_month:month, anniversary_day:day, anniversary_year:year?parseInt(year):null, color:color });
+    _memCache.set('annivs', allAnniversaries); Cache.set(LC.ANNIVS, allAnniversaries);
+    requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
+    _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 function openBdayForm() { document.getElementById('bday-form-wrap').style.display = 'block'; }
@@ -6057,8 +6109,10 @@ async function saveBirthday() {
   try {
     await createBirthdayInSheets({ artist_name:name, birthday_month:String(month), birthday_day:String(day), color });
     closeBdayForm(); showToast(t('toast_bday_saved'));
-    Cache.del(LC.BDAYS); Cache.del(LC.TS_BD); _fetchingAll = false;
-    await _fetchFreshFromAppsScript();
+    allBirthdays.push({ __backendId:'tmp_'+Date.now(), artist_name:name, birthday_month:month, birthday_day:day, color:color });
+    _memCache.set('bdays', allBirthdays); Cache.set(LC.BDAYS, allBirthdays);
+    requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
+    _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
   } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
 }
 
@@ -6393,16 +6447,49 @@ async function handleEventFormSubmit() {
   if (success) {
     closeEventFormModal();
     showToast(editingEventId ? t('toast_updated') : t('toast_added'));
-    // Jump to the year+month of the event just saved/edited
     if (schema.dateStart && schema.dateStart.length >= 7) {
       _adminYearFilter = schema.dateStart.slice(0, 4);
       _adminOpenMonths.clear();
       _adminOpenMonths.add(schema.dateStart.slice(0, 7));
     }
     clearForm();
-    Cache.clearAll(); _fetchingEvents = false; _fetchingAll = false;
-    await _fetchFreshFromAppsScript();
-    if (worksLoaded) {} // works ไม่เปลี่ยน ไม่ต้อง reload
+
+    // ── OPTIMISTIC UPDATE: แทรก/อัปเดตข้อมูลใน memory ทันที ไม่รอ server ──
+    const _savedId = editingEventId;
+    const _savedRow = editingEventRowNumber;
+    const optimisticEvent = Object.assign({
+      __backendId: _savedId || ('tmp_' + Date.now()),
+      __rowNumber: _savedRow || 0,
+      __rawId: _savedId || '',
+      _isPast: payload.dateStart ? payload.dateStart < _todayInBKK() : false,
+      _daysUntil: payload.dateStart ? Math.round((new Date(payload.dateStart + 'T00:00:00') - new Date(_todayInBKK() + 'T00:00:00')) / 86400000) : null,
+    }, payload);
+
+    if (_savedId) {
+      const idx = allEvents.findIndex(e => (e.__backendId || e.__rawId) === _savedId);
+      if (idx !== -1) allEvents[idx] = Object.assign({}, allEvents[idx], optimisticEvent);
+    } else {
+      allEvents.push(optimisticEvent);
+      allEvents.sort(function(a, b) {
+        if (!a.dateStart) return 1; if (!b.dateStart) return -1;
+        var c = a.dateStart.localeCompare(b.dateStart);
+        return c !== 0 ? c : _timeToMinutes(a.startTime) - _timeToMinutes(b.startTime);
+      });
+    }
+    _memCache.set('events', allEvents);
+    Cache.set(LC.EVENTS, allEvents);
+
+    // Render ทันที 1 frame — ไม่กระตุก
+    _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+    requestAnimationFrame(function() {
+      renderHome(); renderCalendar();
+      if (isAdmin) renderAdminList();
+      renderBirthdayBanners(); debounceLucide();
+    });
+
+    // Sync กับ server ใน background (ไม่ await ไม่บล็อก UI)
+    _fetchingEvents = false; _fetchingAll = false;
+    _fetchFreshFromAppsScript().catch(function(){});
   }
 }
 
@@ -6551,7 +6638,7 @@ const CATEGORY_CONFIG = {
   ad:             { label: 'AD',               icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>', color: '#dc2626', bg: '#fff1f2', border: '#fecdd3' },
   variety:        { label: 'Variety',          icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>', color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe' },
   interview:      { label: 'Interviews',       icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>', color: '#0e7490', bg: '#ecfeff', border: '#a5f3fc' },
-  otherworks:     { label: 'Other Works',      icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' },
+  otherworks:     { label: 'Other Works',      icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', color: '#c2410c', bg: '#fff7ed', border: '#fed7aa' },
   bts:            { label: 'Behind the Scenes', icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>', color: '#9333ea', bg: '#fdf4ff', border: '#e9d5ff' },
   show:           { label: 'Show',             icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' },
 };
@@ -6737,14 +6824,30 @@ async function handleWorksFormSubmit() {
     }
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
-    // Auto switch to the year of saved work so it appears immediately
     if (data.year) { _worksYear = data.year; }
-    worksLoaded = false;
-    _adminWorksListFP = '';
-    _worksLastFP = ''; // force re-render
-    Cache.clearAll(); _fetchingAll = false;
-    await _fetchFreshFromAppsScript();
-    // Auto switch to works tab in admin so new work is visible immediately
+
+    // ── OPTIMISTIC UPDATE works ──
+    const _wSavedId = _editingWorkId;
+    const optimisticWork = Object.assign({ __backendId: _wSavedId || ('tmp_w_' + Date.now()), id: _wSavedId || '' }, data);
+    if (_wSavedId) {
+      var _wi = allWorks.findIndex(function(w){ return String(w.__backendId||w.id) === String(_wSavedId); });
+      if (_wi !== -1) allWorks[_wi] = Object.assign({}, allWorks[_wi], optimisticWork);
+    } else {
+      allWorks.unshift(optimisticWork);
+    }
+    worksLoaded = true;
+    _memCache.set('works', allWorks);
+    Cache.set(LC.WORKS, allWorks);
+    _worksLastFP = ''; _adminWorksListFP = '';
+    requestAnimationFrame(function(){
+      renderWorks();
+      if (isAdmin) renderAdminWorksList();
+      debounceLucide();
+    });
+
+    // Sync background
+    _fetchingAll = false;
+    _fetchFreshFromAppsScript().catch(function(){});
     _currentAdminTab = '';
     switchAdminTab('works');
   } catch(err) {
@@ -6810,11 +6913,16 @@ function deleteWork(backendId, title) {
       const res = await apiPost({ action: 'deleteWork', id });
       if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
       showToast('Work deleted ✓');
-      Cache.clearAll(); _fetchingAll = false;
-      worksLoaded = false;
-      _adminWorksListFP = '';
-      _memCache.del('works');
-      await _fetchFreshFromAppsScript();
+      // ── OPTIMISTIC DELETE works ──
+      var _wdi = allWorks.findIndex(function(w){ return String(w.__backendId||w.id) === String(backendId); });
+      if (_wdi !== -1) allWorks.splice(_wdi, 1);
+      worksLoaded = true;
+      _memCache.set('works', allWorks);
+      Cache.set(LC.WORKS, allWorks);
+      _worksLastFP = ''; _adminWorksListFP = '';
+      requestAnimationFrame(function(){ renderWorks(); if (isAdmin) renderAdminWorksList(); debounceLucide(); });
+      _fetchingAll = false;
+      _fetchFreshFromAppsScript().catch(function(){});
     } catch(err) {
       _restoreBtnWrap();
       showToast('❌ Error: ' + (err.message || 'Failed to delete'));
@@ -7234,7 +7342,7 @@ function renderWorks() {
   const _showCatBadge = (_worksTab === 'all');
 
   function buildCard(w) {
-    const cat = CATEGORY_CONFIG[_catToKey(w.category)] || { label: w.category||'', icon: '', color: '#374151', bg: '#f3f4f6', border: '#e5e7eb' };
+    const cat = CATEGORY_CONFIG[_catToKey(w.category)] || { label: w.category||'', icon: '', color: '#475569', bg: '#f1f5f9', border: '#cbd5e1' };
     const artistArr = w.artists ? w.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
     const mainColor = artistArr.length ? (artistColors[artistArr[0]] || '#64748b') : '#64748b';
     const grad = ({'#f97316':'linear-gradient(135deg,#fff7ed,#ffedd5)','#6b7280':'linear-gradient(135deg,#f9fafb,#f3f4f6)','#22c55e':'linear-gradient(135deg,#f0fdf4,#dcfce7)'})[mainColor] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
