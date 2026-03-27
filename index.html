@@ -6,7 +6,9 @@
   <meta name="theme-color" content="#ffffff">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <!-- Force no-cache on all clients including iPhone/PWA -->
-  <meta http-equiv="Cache-Control" content="max-age=300">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>PondPhuwinPermpoon Schedule</title>
   <!-- PWA / installable — enables instant load from home screen -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -43,11 +45,12 @@
     // bfcache fix — when user navigates back/forward, always refresh data
     window.addEventListener('pageshow', function(e) {
       if (e.persisted) {
+        // Real-time mode: ล้าง cache ทั้งหมดแล้ว force fetch ใหม่เสมอ
+        try {
+          localStorage.removeItem(CACHE_VERSION + '_ts_events');
+          localStorage.removeItem(CACHE_VERSION + '_ts_works');
+        } catch(_) {}
         if (typeof _fetchAllData === 'function') {
-          try {
-            localStorage.removeItem(CACHE_VERSION + '_ts_events');
-            localStorage.removeItem(CACHE_VERSION + '_ts_works');
-          } catch(_) {}
           _fetchAllData(true).catch(() => {});
         } else {
           window.location.reload();
@@ -2470,9 +2473,9 @@ async function hashPassword(pw) {
 }
 
 // ── PERFORMANCE CONFIG ────────────────────────────────────────────
-const CACHE_VERSION    = 'ppp_v16'; // bumped: 1-min cache TTL
-const CACHE_TTL_MS     = 1 * 60 * 1000;         // 1 min — fast refresh, no flicker
-const CACHE_MAX_AGE_MS = 168 * 60 * 60 * 1000;  // 7 days — always show stale data if offline, never blank
+const CACHE_VERSION    = 'ppp_v17'; // bumped: real-time mode, no cache
+const CACHE_TTL_MS     = 10 * 1000;              // 10s — real-time: ดึงใหม่เกือบทุกครั้ง
+const CACHE_MAX_AGE_MS = 5 * 60 * 1000;         // 5 min — fallback offline สั้นลง
 const FETCH_TIMEOUT_MS = 6000;
 const RETRY_DELAYS     = [1000, 3000, 6000];
 const DEBOUNCE_RENDER  = 16;
@@ -2995,7 +2998,7 @@ async function fetchStaticJSON(dataType) {
     const url = `${APPS_SCRIPT_ADMIN_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
     return fetchWithTimeout(url);
   } else {
-    const url = `${JSON_BASE_URL}/${dataType}.json?t=${Math.floor(Date.now() / 30000)}`;
+    const url = `${JSON_BASE_URL}/${dataType}.json?t=${Date.now()}`;
     try {
       return await fetchWithTimeout(url);
     } catch(e) {
@@ -3345,7 +3348,7 @@ async function _fetchAllData(force = false) {
   _fetchingAll = true;
   try {
     // ── 1 request เดียว: all.json จาก GitHub Pages (ไม่กิน Apps Script quota เลย) ──
-    const t = Math.floor(Date.now() / 30000);
+    const t = Date.now();
     const res = await fetchWithTimeout(`${JSON_BASE_URL}/all.json?t=${t}`);
     const dataChangedRef = { v: false };
     _applyAllData(res, force, dataChangedRef);
@@ -3554,10 +3557,10 @@ function scheduleAutoRefresh() {
   const jitter = Math.random() * 2000;
   _refreshTimer = setInterval(() => {
     if (document.hidden) return;
-    if (!Cache.isFresh(LC.TS_EV) && !_fetchingAll) {
-      _fetchAllData(false).catch(() => {});
+    if (!_fetchingAll) {
+      _fetchAllData(true).catch(() => {});
     }
-  }, 1 * 60 * 1000 + jitter); // ทุก 1 นาที ตรงกับ cache TTL
+  }, 15 * 1000); // ทุก 15 วินาที — real-time mode
 
   // ── Cross-tab broadcast: รับ signal จาก admin tab ทันที ──
   // เมื่อ admin save/edit/delete → broadcast 'ppp_data_updated'
@@ -6621,7 +6624,7 @@ async function loadWorksFromSheets(force = false) {
   if (_fetchingWorks) return;
   _fetchingWorks = true;
   try {
-    const t = Math.floor(Date.now() / 30000);
+    const t = Date.now();
     const res = await fetchWithTimeout(`${JSON_BASE_URL}/works.json?t=${t}`);
     const raw = res.works || res;
     if (Array.isArray(raw) && raw.length) {
@@ -7398,12 +7401,10 @@ document.addEventListener('touchmove',  () => {}, { passive: true });
 // Pause/resume background refresh when tab visibility changes
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    // Refresh when tab becomes visible — check if >60s since last fetch
-    // ส่ง force=false เพื่อให้ fingerprint check ทำงาน (ไม่ re-render ถ้า data ไม่เปลี่ยน)
-    const age = Date.now() - Cache.getTS(LC.TS_EV);
-    const evStale = age > 60000; // 1 min — matches cache TTL
-    if (evStale && !_fetchingAll) {
-      _fetchAllData(false).catch(()=>{});
+    // Real-time mode: force fetch ทันทีทุกครั้งที่กลับมาดูแท็บ ไม่รอ TTL
+    if (!_fetchingAll) {
+      Cache.clearAll();
+      _fetchAllData(true).catch(()=>{});
     }
   }
 });
@@ -7470,16 +7471,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ── STEP 3: Fetch fresh data — 1 request (all.json parallel fetch) ──
+  // ── STEP 3: Fetch fresh data — real-time: force fetch ทุกครั้ง ──
   const fetchData = (force = false) => _fetchAllData(force).catch(() => {});
   if (cacheHit) {
-    setTimeout(() => fetchData(false), 300);
+    // Real-time mode: fetch ทันที ไม่รอ delay
+    fetchData(true);
   } else {
     showSkeletons();
     debounceLucide();
-    fetchData(false);
+    fetchData(true);
   }
-  setTimeout(() => { if (!document.hidden) fetchData(false); }, 20000);
+  // ลบ setTimeout 20s เพราะ scheduleAutoRefresh จัดการทุก 15s แล้ว
 
   // ── STEP 4: Schedule recurring 5-minute background refresh ──
   scheduleAutoRefresh();
