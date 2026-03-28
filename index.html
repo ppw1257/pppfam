@@ -42,19 +42,11 @@
     if ('caches' in window) {
       caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
     }
-    // bfcache fix — when user navigates back/forward, always refresh data
+    // bfcache fix — when user navigates back/forward, always hard-reload
+    // ไม่พึ่ง CACHE_VERSION หรือ _fetchAllData เพราะอาจยังไม่ถูก define ตอน bfcache restore
     window.addEventListener('pageshow', function(e) {
       if (e.persisted) {
-        // Real-time mode: ล้าง cache ทั้งหมดแล้ว force fetch ใหม่เสมอ
-        try {
-          localStorage.removeItem(CACHE_VERSION + '_ts_events');
-          localStorage.removeItem(CACHE_VERSION + '_ts_works');
-        } catch(_) {}
-        if (typeof _fetchAllData === 'function') {
-          _fetchAllData(true).catch(() => {});
-        } else {
-          window.location.reload();
-        }
+        window.location.reload();
       }
     });
   }
@@ -1278,9 +1270,7 @@
       <span class="nav-link" data-page="calendar" onclick="navigate('calendar')"><i data-lucide="calendar" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Calendar</span></span>
       <span class="nav-link" data-page="works" onclick="navigate('works')"><i data-lucide="star" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Works</span></span>
       <span class="nav-link" data-page="admin" id="nav-admin-link" style="display:none;" onclick="navigate('admin')"><i data-lucide="settings" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Admin</span></span>
-      <button id="nav-refresh-btn" onclick="forceRefreshAll()" title="Refresh data" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:99px;border:none;background:transparent;cursor:pointer;color:#d1d5db;padding:0;flex-shrink:0;transition:color 0.15s,background 0.15s;">
-        <svg id="nav-refresh-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-      </button>
+
      </div>
     </div>
    </nav>
@@ -2473,7 +2463,7 @@ async function hashPassword(pw) {
 }
 
 // ── PERFORMANCE CONFIG ────────────────────────────────────────────
-const CACHE_VERSION    = 'ppp_v17'; // bumped: real-time mode, no cache
+const CACHE_VERSION    = 'ppp_v18'; // bumped: fix bfcache + stale cache issues
 const CACHE_TTL_MS     = 10 * 1000;              // 10s — real-time: ดึงใหม่เกือบทุกครั้ง
 const CACHE_MAX_AGE_MS = 5 * 60 * 1000;         // 5 min — fallback offline สั้นลง
 const FETCH_TIMEOUT_MS = 6000;
@@ -3069,7 +3059,11 @@ async function fetchWithTimeout(url, timeoutMs = FETCH_TIMEOUT_MS) {
     const res = await fetch(url, {
       signal: ctrl.signal,
       cache: 'no-store',           // always bypass browser cache for API calls
-      headers: { 'Accept': 'application/json' }
+      headers: {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
     });
     clearTimeout(tid);
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -3345,6 +3339,13 @@ function _applyAllData(res, force, dataChangedRef) {
 async function _fetchAllData(force = false) {
   if (_fetchingAll) return;
   if (!force && Cache.isFresh(LC.TS_EV) && Cache.isFresh(LC.TS_WK) && allEvents.length > 0 && allWorks.length > 0) return;
+  // ล้าง rate limiter เมื่อ force=true เพื่อไม่ให้ถูก block
+  if (force) {
+    _rateLimit.reset('events');
+    _rateLimit.reset('works');
+    _rateLimit.reset('bdays');
+    _rateLimit.reset('annivs');
+  }
   _fetchingAll = true;
   try {
     // ── 1 request เดียว: all.json จาก GitHub Pages (ไม่กิน Apps Script quota เลย) ──
@@ -3353,7 +3354,8 @@ async function _fetchAllData(force = false) {
     const dataChangedRef = { v: false };
     _applyAllData(res, force, dataChangedRef);
     hideConnectionError();
-    if (dataChangedRef.v || force) {
+    // render เฉพาะเมื่อ data เปลี่ยนจริง — ป้องกันกระตุกจาก background auto-refresh
+    if (dataChangedRef.v) {
       _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
       _adminListFP = ''; _adminWorksListFP = '';
       scheduleRender();
@@ -3367,7 +3369,7 @@ async function _fetchAllData(force = false) {
       const dataChangedRef = { v: false };
       _applyAllData(res2, force, dataChangedRef);
       hideConnectionError();
-      if (dataChangedRef.v || force) {
+      if (dataChangedRef.v) {
         _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
         _adminListFP = ''; _adminWorksListFP = '';
         scheduleRender();
@@ -3703,26 +3705,29 @@ function renderCurrentPage() {
   }
 }
 
-// ── _refreshAllPages: reset ทุก fingerprint แล้ว render ทุกหน้าพร้อมกัน 1 rAF ──
-// ใช้หลัง add / edit / delete ทุก action เพื่อให้ข้อมูลขึ้นทันทีทุกหน้า โดยไม่กระตุก
+// ── _refreshAllPages: render หน้าปัจจุบันก่อน แล้วหน้าอื่นใน frame ถัดไป — ไม่กระตุก
 function _refreshAllPages() {
-  // reset fingerprints ทั้งหมด — บังคับ re-render แม้ data fingerprint ตรงกัน
   _vsLastFingerprint = '';
   _calLastFP        = '';
   _worksLastFP      = '';
   _adminListFP      = '';
   _adminWorksListFP = '';
   _refreshIsPast();
+  // Frame 1: render หน้าที่ user กำลังดูอยู่ทันที
   requestAnimationFrame(() => {
-    renderHome();
-    renderCalendar();
-    if (isAdmin) {
-      renderAdminList();
-      if (worksLoaded) renderAdminWorksList();
-    }
-    renderWorks();
+    renderCurrentPage();
     renderBirthdayBanners();
     debounceLucide();
+    // Frame 2: render หน้าที่เหลือเบื้องหลัง (ไม่กระทบ paint frame แรก)
+    requestAnimationFrame(() => {
+      if (currentPage !== 'home') renderHome();
+      if (currentPage !== 'calendar') renderCalendar();
+      if (currentPage !== 'works' && allWorks.length) renderWorks();
+      if (isAdmin && currentPage !== 'admin') {
+        renderAdminList();
+        if (worksLoaded) renderAdminWorksList();
+      }
+    });
   });
 }
 
@@ -3841,27 +3846,17 @@ function hideConnectionError() {
 }
 
 async function forceRefreshAll() {
-  const btn = document.getElementById('nav-refresh-btn');
-  const icon = document.getElementById('nav-refresh-icon');
-  if (icon) icon.style.animation = 'spin 0.8s linear infinite';
-  if (btn) btn.style.pointerEvents = 'none';
-
-  // 1. Clear localStorage cache
+  // ปุ่ม nav-refresh ถูกลบออกแล้ว — function นี้ยังเรียกได้จาก admin/internal
   Cache.clearAll();
-  _vsLastFingerprint = ''; // force full grid re-render
-  // 2. Clear Service Worker API cache
+  _vsLastFingerprint = '';
   if ('caches' in window) {
     const keys = await caches.keys().catch(() => []);
     await Promise.all(keys.filter(k => k.includes('api')).map(k => caches.delete(k))).catch(() => {});
   }
-  // 3. Force fresh fetch from API
   _fetchingEvents = false; _fetchingBdays = false; _fetchingAnnivs = false; _fetchingWorks = false;
   _fetchingAll = false;
   showSkeletons();
   await _fetchAllData(true).catch(() => {});
-
-  if (icon) icon.style.animation = '';
-  if (btn) btn.style.pointerEvents = '';
 }
 
 async function retryConnection() {
@@ -7403,7 +7398,7 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     // Real-time mode: force fetch ทันทีทุกครั้งที่กลับมาดูแท็บ ไม่รอ TTL
     if (!_fetchingAll) {
-      Cache.clearAll();
+      Cache.clearAll(); // clearAll รีเซ็ต rate limiter ด้วยอยู่แล้ว
       _fetchAllData(true).catch(()=>{});
     }
   }
@@ -7473,6 +7468,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── STEP 3: Fetch fresh data — real-time: force fetch ทุกครั้ง ──
   const fetchData = (force = false) => _fetchAllData(force).catch(() => {});
+  // Reset flags ป้องกัน deadlock ถ้า flag ค้างจาก session ก่อน
+  _fetchingAll = false;
+  _fetchingEvents = false;
+  _fetchingWorks = false;
   if (cacheHit) {
     // Real-time mode: fetch ทันที ไม่รอ delay
     fetchData(true);
