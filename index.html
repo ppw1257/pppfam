@@ -3572,8 +3572,9 @@ function scheduleAutoRefresh() {
     window.addEventListener('storage', function(e) {
       if (e.key === 'ppp_data_updated' && e.newValue && !isAdmin) {
         if (!_fetchingAll) {
-          Cache.clearAll(); // ล้าง cache เก่าทิ้ง เพื่อ force fetch ใหม่
-          _fetchAllData(false).catch(() => {});
+          // ดึงตรงจาก Apps Script ทันที — ไม่รอ GitHub Pages sync (ช้า 1-5 นาที)
+          Cache.clearAll();
+          _fetchFreshFromAppsScript().catch(() => {});
         }
       }
     });
@@ -3740,12 +3741,13 @@ async function _fetchFreshFromAppsScript() {
   // ── 1 request เดียว: getAll จาก Apps Script (admin path เท่านั้น) ──
   // visitor ใช้ all.json จาก GitHub Pages แทน (ไม่กิน quota)
   try {
-    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&t=${Date.now()}`);
+    // ใช้ timeout 12s เพราะ Apps Script cold start อาจช้า
+    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&t=${Date.now()}`, 12000);
     const dataChangedRef = { v: false };
     _applyAllData(res, false, dataChangedRef);
     _fmtDateCache.clear();
-    // Broadcast ให้ visitor tab รู้ว่า data เปลี่ยน
-    _broadcastDataUpdate();
+    // Broadcast เฉพาะเมื่อ admin เป็นคน call — ป้องกัน visitor tab broadcast loop
+    if (isAdmin) _broadcastDataUpdate();
     // Re-render เฉพาะเมื่อ server data ต่างจาก optimistic
     if (dataChangedRef.v) {
       _refreshAllPages();
