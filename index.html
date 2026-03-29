@@ -2977,11 +2977,16 @@ function _applyAllData(res, force, dataChangedRef) {
   const evData = res.events || [];
   if (Array.isArray(evData) && evData.length) {
     const processed = processEvents(evData);
-    // block เมื่อ optimistic pending — ให้ _fetchFreshFromAppsScript จัดการแทน
     if (_optimisticPending) {
+      // ขณะที่มี optimistic pending: เก็บ optimistic event ไว้ก่อน
+      // แต่ต้องลบ optimistic ที่มี id ตรงกับ server data ออก (ป้องกันซ้ำ)
+      const serverIds = new Set(processed.map(x => String(x.__backendId||x.id||'')).filter(Boolean));
+      const kept = allEvents.filter(e => e.__isOptimistic && !serverIds.has(String(e.__rawId||e.__backendId||'')));
+      allEvents = [...processed, ...kept];
+      _memCache.set('events', allEvents);
       apiLoaded = true;
     } else {
-      // เปรียบเทียบกับ events ที่ไม่ใช่ optimistic เท่านั้น
+      // ไม่มี optimistic pending: ล้าง optimistic ทิ้งก่อนเสมอ แล้ว apply server data สะอาด
       const stableEvents = allEvents.filter(e => !e.__isOptimistic);
       const _fpDeep = arr => arr.map(x => (x.__backendId||x.id||'') + ':' + (x.title||'') + ':' + (x.dateStart||'') + ':' + (x.startTime||'')).join('|');
       if (_fpDeep(processed) !== _fpDeep(stableEvents)) dataChangedRef.v = true;
@@ -6186,6 +6191,16 @@ async function handleEventFormSubmit() {
     _fetchFreshFromAppsScript().catch(function(e) {
       clearTimeout(_optSafetyTimer);
       _optimisticPending = false;
+      // ลบ optimistic events ออกเมื่อ sync ล้มเหลว ป้องกันการ์ดซ้ำ
+      allEvents = allEvents.filter(function(ev) { return !ev.__isOptimistic; });
+      _memCache.set('events', allEvents);
+      Cache.set(LC.EVENTS, allEvents);
+      _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+      requestAnimationFrame(function() {
+        renderHome(); renderCalendar();
+        if (isAdmin) renderAdminList();
+        debounceLucide();
+      });
       console.warn('[PPP] background sync failed:', e && e.message);
     });
   }
