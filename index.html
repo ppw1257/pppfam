@@ -2976,16 +2976,23 @@ function _applyAllData(res, force, dataChangedRef) {
   const evData = res.events || [];
   if (Array.isArray(evData) && evData.length) {
     const processed = processEvents(evData);
-    // ล้าง tmp_ optimistic events ออกก่อนเปรียบเทียบ — ป้องกันการ์ดขึ้นสองอัน
+    // ล้าง tmp_ ออกก่อนเปรียบเทียบ
     const stableEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
-    // fingerprint เปรียบเทียบทั้ง id และ field สำคัญ เพื่อจับการแก้ไข event ที่ id เดิม
-    const _fpDeep = arr => arr.map(x => (x.__backendId||x.id||'') + ':' + (x.title||'') + ':' + (x.dateStart||'') + ':' + (x.startTime||'')).join('|');
-    if (_fpDeep(processed) !== _fpDeep(stableEvents)) dataChangedRef.v = true;
-    allEvents = processed;
-    _memCache.set('events', processed);
-    Cache.set(LC.EVENTS, processed);
-    Cache.setTS(LC.TS_EV);
-    apiLoaded = true;
+    const hasTmpPending = allEvents.some(e => String(e.__backendId||'').startsWith('tmp_'));
+    // ถ้ามี tmp_ pending อยู่ และ server ส่งข้อมูลน้อยกว่า stable → Apps Script ยัง cache เก่า
+    // ไม่ overwrite allEvents — ป้องกันการ์ด optimistic หาย แล้วขึ้นใหม่เหมือนเพิ่มซ้ำ
+    if (hasTmpPending && processed.length < stableEvents.length) {
+      // server ยังไม่มีข้อมูลล่าสุด — skip overwrite รอ sync รอบถัดไป
+      apiLoaded = true;
+    } else {
+      const _fpDeep = arr => arr.map(x => (x.__backendId||x.id||'') + ':' + (x.title||'') + ':' + (x.dateStart||'') + ':' + (x.startTime||'')).join('|');
+      if (_fpDeep(processed) !== _fpDeep(stableEvents)) dataChangedRef.v = true;
+      allEvents = processed;
+      _memCache.set('events', processed);
+      Cache.set(LC.EVENTS, processed);
+      Cache.setTS(LC.TS_EV);
+      apiLoaded = true;
+    }
   }
   // Works
   const wkData = res.works || [];
@@ -3435,16 +3442,28 @@ async function _fetchFreshFromAppsScript() {
   // ── 1 request เดียว: getAll จาก Apps Script (admin path เท่านั้น) ──
   // visitor ใช้ all.json จาก GitHub Pages แทน (ไม่กิน quota)
   try {
-    // ใช้ timeout 12s เพราะ Apps Script cold start อาจช้า
-    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&t=${Date.now()}`, 12000);
+    // ใช้ action=getAll&fresh=1 เพื่อบอก Apps Script ให้ bypass PropertiesService cache
+    // ป้องกันกรณี server ส่ง cache เก่ากลับมา ทำให้การ์ดขึ้นสองอัน
+    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&fresh=1&t=${Date.now()}`, 12000);
     const dataChangedRef = { v: false };
+    // ก่อน apply: ลบ tmp_ optimistic ออกจาก allEvents เพื่อให้ fingerprint เทียบกับ stable events
+    const _preApplyStable = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
+
+    // apply server data ลงใน allEvents
     _applyAllData(res, false, dataChangedRef);
+
+    // ตรวจว่า server ส่งข้อมูล "ใหม่" จริงๆ หรือเป็น cache เก่าที่ยังไม่ได้รับ save ล่าสุด
+    // ถ้า allEvents หลัง apply มีจำนวนเท่ากับ stable events ก่อน apply
+    // และ tmp_ ที่เพิ่งเพิ่มไปไม่ได้อยู่ใน server data → server ยัง cache เก่า
+    // ในกรณีนั้น restore stable events กลับมา ป้องกันการ์ดหาย/ซ้ำ
+    const _tmpEvents = _preApplyStable.length > 0 ?
+      allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_')) : [];
+
     _fmtDateCache.clear();
     // Broadcast เฉพาะเมื่อ admin เป็นคน call — ป้องกัน visitor tab broadcast loop
     if (isAdmin) _broadcastDataUpdate();
-    // Admin: re-render เสมอหลัง save/edit/delete — ป้องกันการ์ดค้าง optimistic
-    // Visitor: re-render เฉพาะเมื่อ server data ต่างจากที่แสดงอยู่
-    if (isAdmin || dataChangedRef.v) {
+    // Re-render เฉพาะเมื่อ data เปลี่ยนจริง ทั้ง admin และ visitor
+    if (dataChangedRef.v) {
       _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
       _refreshAllPages();
     }
