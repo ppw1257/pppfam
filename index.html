@@ -1465,13 +1465,13 @@
        </div>
        <!-- DOW headers -->
        <div id="cal-dow-headers" style="display:grid;grid-template-columns:repeat(7,36px);gap:2px;margin-bottom:3px;width:fit-content;">
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;" data-i18n-dow="0">S</div>
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;" data-i18n-dow="1">M</div>
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;" data-i18n-dow="2">T</div>
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;" data-i18n-dow="3">W</div>
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;" data-i18n-dow="4">T</div>
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;" data-i18n-dow="5">F</div>
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;" data-i18n-dow="6">S</div>
+        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;">S</div>
+        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;">M</div>
+        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;">T</div>
+        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;">W</div>
+        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;">T</div>
+        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;">F</div>
+        <div style="text-align:center;font-size:0.6rem;font-weight:700;color:#9ca3af;padding:4px 0;">S</div>
        </div>
        <!-- Calendar grid cells -->
        <div id="cal-date-strip" style="display:grid;grid-template-columns:repeat(7,36px);gap:2px;width:fit-content;"></div>
@@ -1480,7 +1480,7 @@
       <!-- ขวา: event cards -->
       <div style="min-width:0;">
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-size:0.72rem;color:#9ca3af;"><span id="cal-month-event-count">—</span> <span data-i18n="stat_events">events</span></div>
+        <div style="font-size:0.72rem;color:#9ca3af;"><span id="cal-month-event-count">—</span> <span>events</span></div>
        </div>
        <div id="cal-card-grid" style="display:flex;flex-direction:column;gap:10px;">
         <div style="text-align:center;padding:3rem;color:#9ca3af;font-size:0.85rem;">Loading...</div>
@@ -1572,16 +1572,16 @@
         <i data-lucide="lock" style="width:18px;height:18px;color:#fff;stroke-width:2;"></i>
        </div>
        <div>
-        <h2 style="font-weight:700;font-size:1.1rem;margin:0;" data-i18n="admin_login_title">Admin Login</h2>
-        <p style="font-size:0.72rem;color:#9ca3af;margin:2px 0 0;" data-i18n="admin_login_subtitle">PondPhuwin &amp; Permpoon Schedule Management</p>
+        <h2 style="font-weight:700;font-size:1.1rem;margin:0;">Admin Login</h2>
+        <p style="font-size:0.72rem;color:#9ca3af;margin:2px 0 0;">PondPhuwin &amp; Permpoon Schedule Management</p>
        </div>
       </div>
-      <label class="form-label" for="login-pw-field" data-i18n="admin_password">Password</label>
-      <input class="form-input" id="login-pw-field" type="password" placeholder="Enter admin password" data-i18n-placeholder="admin_pw_placeholder" style="margin-bottom:0.75rem;" autocomplete="current-password">
-      <div id="login-pw-err" style="font-size:0.8rem;color:#dc2626;margin-bottom:0.75rem;display:none;background:#fee2e2;padding:8px 12px;border-radius:6px;" data-i18n="login_error">Incorrect password. Try again.</div>
-      <button class="btn-primary" onclick="doAdminLogin()" style="width:100%;" data-i18n="admin_login_btn">Log In</button>
+      <label class="form-label" for="login-pw-field">Password</label>
+      <input class="form-input" id="login-pw-field" type="password" placeholder="Enter admin password" style="margin-bottom:0.75rem;" autocomplete="current-password">
+      <div id="login-pw-err" style="font-size:0.8rem;color:#dc2626;margin-bottom:0.75rem;display:none;background:#fee2e2;padding:8px 12px;border-radius:6px;">Incorrect password. Try again.</div>
+      <button class="btn-primary" onclick="doAdminLogin()" style="width:100%;">Log In</button>
       <div style="margin-top:1.25rem;text-align:center;">
-       <button style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:#9ca3af;" onclick="navigate('home')" data-i18n="admin_back">← Back to schedule</button>
+       <button style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:#9ca3af;" onclick="navigate('home')">← Back to schedule</button>
       </div>
      </div>
     </div>
@@ -1591,10 +1591,10 @@
       <!-- Header -->
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
        <div>
-        <h2 class="section-header" data-i18n="admin_panel">Admin Panel</h2>
-        <p style="font-size:0.82rem;color:#9ca3af;margin-top:2px;" data-i18n="admin_manage">Manage events, works &amp; more</p>
+        <h2 class="section-header">Admin Panel</h2>
+        <p style="font-size:0.82rem;color:#9ca3af;margin-top:2px;">Manage events, works &amp; more</p>
        </div>
-       <button class="btn-secondary" onclick="adminLogout()"><i data-lucide="log-out" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span data-i18n="admin_logout">Logout</span></button>
+       <button class="btn-secondary" onclick="adminLogout()"><i data-lucide="log-out" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span>Logout</span></button>
       </div>
 
       <!-- Tab bar -->
@@ -1616,8 +1616,8 @@
       <!-- TAB: Events -->
       <div id="admin-tab-events" class="admin-tab-panel">
        <div style="margin-bottom:1rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <button class="btn-primary" onclick="openAddModal()"><i data-lucide="plus" style="width:15px;height:15px;display:inline;vertical-align:-2px;margin-right:4px;"></i><span data-i18n="admin_add_event">Add Event</span></button>
-        <button class="btn-secondary" onclick="adminRefresh()" id="admin-refresh-btn" style="display:flex;align-items:center;gap:5px;"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i><span data-i18n="admin_refresh">Refresh</span></button>
+        <button class="btn-primary" onclick="openAddModal()"><i data-lucide="plus" style="width:15px;height:15px;display:inline;vertical-align:-2px;margin-right:4px;"></i><span>Add Event</span></button>
+        <button class="btn-secondary" onclick="adminRefresh()" id="admin-refresh-btn" style="display:flex;align-items:center;gap:5px;"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i><span>Refresh</span></button>
         <div style="flex:1;"></div>
         <div style="display:flex;align-items:center;gap:6px;">
          <span style="font-size:0.78rem;font-weight:600;color:#6b7280;">Year:</span>
@@ -1627,8 +1627,8 @@
        <div id="admin-events-list" style="display:flex;flex-direction:column;gap:10px;"></div>
        <div id="admin-no-events" style="display:none;text-align:center;padding:3rem;color:#9ca3af;">
         <i data-lucide="inbox" style="width:36px;height:36px;display:block;margin:0 auto 0.75rem;stroke-width:1.5;"></i>
-        <p style="font-weight:600;" id="admin-no-events-txt" data-i18n="admin_no_events">No events yet.</p>
-        <p style="font-size:0.82rem;margin-top:3px;" data-i18n="admin_click_add">Click "Add Event" to get started.</p>
+        <p style="font-weight:600;" id="admin-no-events-txt">No events yet.</p>
+        <p style="font-size:0.82rem;margin-top:3px;">Click "Add Event" to get started.</p>
        </div>
        <div id="admin-limit-warn" style="display:none;margin-top:1rem;background:#fef3c7;border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:#92400e;">
         <i data-lucide="alert-triangle" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px;"></i>Maximum of 999 events reached.
@@ -1683,37 +1683,37 @@
       <!-- TAB: Birthdays -->
       <div id="admin-tab-bdays" class="admin-tab-panel" style="display:none;">
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <p style="font-size:0.78rem;color:#9ca3af;" data-i18n="admin_bday_sub">Shows countdown banner on Home and Calendar</p>
+        <p style="font-size:0.78rem;color:#9ca3af;">Shows countdown banner on Home and Calendar</p>
         <button class="btn-primary" style="font-size:0.82rem;padding:6px 12px;" onclick="openBdayForm()">
          <i data-lucide="plus" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:3px;"></i>Add Birthday
         </button>
        </div>
        <div id="bday-form-wrap" style="display:none;background:#f9fafb;border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid #e5e7eb;">
-        <p style="font-weight:700;font-size:0.85rem;margin-bottom:1rem;" data-i18n="admin_bday_form_title">Add Artist Birthday</p>
+        <p style="font-weight:700;font-size:0.85rem;margin-bottom:1rem;">Add Artist Birthday</p>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
          <div style="grid-column:1/-1;">
-          <label class="form-label" data-i18n="admin_artist_name">Artist Name</label>
-          <input class="form-input" id="bday-artist-name" placeholder="e.g. Pond" data-i18n-placeholder="admin_artist_name">
+          <label class="form-label">Artist Name</label>
+          <input class="form-input" id="bday-artist-name" placeholder="e.g. Pond">
          </div>
          <div>
-          <label class="form-label" data-i18n="admin_month">Month (1–12)</label>
+          <label class="form-label">Month (1–12)</label>
           <input class="form-input" id="bday-month" type="number" min="1" max="12" placeholder="12">
          </div>
          <div>
-          <label class="form-label" data-i18n="admin_day">Day (1–31)</label>
+          <label class="form-label">Day (1–31)</label>
           <input class="form-input" id="bday-day" type="number" min="1" max="31" placeholder="7">
          </div>
          <div style="grid-column:3/-1;">
-          <label class="form-label" data-i18n="admin_color">Color</label>
+          <label class="form-label">Color</label>
           <div style="display:flex;align-items:center;gap:8px;">
            <input type="color" id="bday-color" value="#6b7280" style="width:40px;height:36px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;padding:2px;">
-           <span style="font-size:0.78rem;color:#9ca3af;" data-i18n="admin_banner_color">Banner color</span>
+           <span style="font-size:0.78rem;color:#9ca3af;">Banner color</span>
           </div>
          </div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
-         <button class="btn-secondary" style="font-size:0.82rem;" onclick="closeBdayForm()" data-i18n="admin_cancel_btn">Cancel</button>
-         <button class="btn-primary" style="font-size:0.82rem;" onclick="saveBirthday()" data-i18n="admin_save_btn">Save</button>
+         <button class="btn-secondary" style="font-size:0.82rem;" onclick="closeBdayForm()">Cancel</button>
+         <button class="btn-primary" style="font-size:0.82rem;" onclick="saveBirthday()">Save</button>
         </div>
        </div>
        <div id="bday-admin-list"></div>
@@ -1722,28 +1722,28 @@
       <!-- TAB: Anniversary -->
       <div id="admin-tab-anniv" class="admin-tab-panel" style="display:none;">
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <p style="font-size:0.78rem;color:#9ca3af;" data-i18n="admin_anniv_sub">Anniversaries, debuts, special dates</p>
+        <p style="font-size:0.78rem;color:#9ca3af;">Anniversaries, debuts, special dates</p>
         <button class="btn-primary" style="font-size:0.82rem;padding:6px 12px;" onclick="openAnnivForm()">
          <i data-lucide="plus" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:3px;"></i>Add Anniversary
         </button>
        </div>
        <div id="anniv-form-wrap" style="display:none;background:#f9fafb;border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid #e5e7eb;">
-        <p style="font-weight:700;font-size:0.85rem;margin-bottom:1rem;" data-i18n="admin_anniv_form_title">Add New Anniversary</p>
+        <p style="font-weight:700;font-size:0.85rem;margin-bottom:1rem;">Add New Anniversary</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
          <div style="grid-column:1/-1;">
-          <label class="form-label" data-i18n="admin_name">Name</label>
+          <label class="form-label">Name</label>
           <input class="form-input" id="anniv-label" placeholder="e.g. PondPhuwin Anniversary">
          </div>
          <div>
-          <label class="form-label" data-i18n="admin_month">Month (1–12)</label>
+          <label class="form-label">Month (1–12)</label>
           <input class="form-input" id="anniv-month" type="number" min="1" max="12">
          </div>
          <div>
-          <label class="form-label" data-i18n="admin_day">Day (1–31)</label>
+          <label class="form-label">Day (1–31)</label>
           <input class="form-input" id="anniv-day" type="number" min="1" max="31">
          </div>
          <div>
-          <label class="form-label"><span data-i18n="admin_start_year">Start Year</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="admin_optional">(optional)</span></label>
+          <label class="form-label"><span>Start Year</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
           <input class="form-input" id="anniv-year" type="number" min="2000" max="2099">
          </div>
          <div>
@@ -1790,7 +1790,7 @@
      </div>
      <div id="detail-cal-wrap" style="display:none;margin-bottom:1.25rem;"></div>
      <div id="detail-ticket-wrap" style="display:none;margin-bottom:1.25rem;">
-      <p style="font-size:0.75rem;font-weight:700;color:#f97316;letter-spacing:0.08em;margin-bottom:0.75rem;" data-i18n="detail_tickets">
+      <p style="font-size:0.75rem;font-weight:700;color:#f97316;letter-spacing:0.08em;margin-bottom:0.75rem;">
        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
        TICKETS
       </p>
@@ -1831,16 +1831,16 @@
      <form id="event-form" novalidate>
 
       <!-- ── Main Info ── -->
-      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;" data-i18n="form_main_info">Main Info</p>
+      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;">Main Info</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
 
        <div style="grid-column:1/-1;">
-        <label class="form-label" for="ev-title" style="font-weight:700;" data-i18n="form_event_name">Event Name <span style="color:#ec4899;">*</span></label>
+        <label class="form-label" for="ev-title" style="font-weight:700;">Event Name <span style="color:#ec4899;">*</span></label>
         <input class="form-input" id="ev-title" name="title" placeholder="e.g. Pond Concert Night" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
        </div>
 
        <div style="grid-column:1/-1;">
-        <label class="form-label" style="margin-bottom:0.5rem;font-weight:700;" data-i18n="form_artists">Artist(s) <span style="color:#ec4899;">*</span></label>
+        <label class="form-label" style="margin-bottom:0.5rem;font-weight:700;">Artist(s) <span style="color:#ec4899;">*</span></label>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
          <input type="checkbox" class="artist-check" id="ac-pond" value="Pond">
          <label class="artist-check-label" for="ac-pond">Pond</label>
@@ -1852,19 +1852,19 @@
        </div>
 
        <div>
-        <label class="form-label" for="ev-dateStart" style="font-weight:700;" data-i18n="form_date_start">Date Start <span style="color:#ec4899;">*</span></label>
+        <label class="form-label" for="ev-dateStart" style="font-weight:700;">Date Start <span style="color:#ec4899;">*</span></label>
         <input class="form-input" id="ev-dateStart" name="dateStart" type="date" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true">
        </div>
        <div>
-        <label class="form-label" style="font-weight:700;color:#9ca3af;"><span data-i18n="form_status">Status</span> <span style="font-weight:400;font-size:0.78rem;" data-i18n="form_status_auto">(auto)</span></label>
+        <label class="form-label" style="font-weight:700;color:#9ca3af;"><span>Status</span> <span style="font-weight:400;font-size:0.78rem;">(auto)</span></label>
         <div style="padding:0.6rem 0.95rem;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;font-size:0.82rem;color:#6b7280;display:flex;align-items:center;gap:6px;">
          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-         <span data-i18n="form_status_desc">Past if date &lt; today · Upcoming if date ≥ today</span>
+         <span>Past if date &lt; today · Upcoming if date ≥ today</span>
         </div>
        </div>
 
        <div>
-        <label class="form-label" for="ev-startTime" style="font-weight:700;" data-i18n="form_start_time">Start Time <span style="color:#ec4899;">*</span></label>
+        <label class="form-label" for="ev-startTime" style="font-weight:700;">Start Time <span style="color:#ec4899;">*</span></label>
         <div style="display:flex;align-items:center;gap:8px;">
           <input class="form-input" id="ev-startTime" name="startTime" type="time" style="border:1px solid #111;background:#f9f9f9;font-weight:600;flex:1;">
           <select id="ev-startTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;font-family:inherit;">
@@ -1908,10 +1908,10 @@
             <option value="GMT+14">GMT+14</option>
           </select>
         </div>
-        <div style="font-size:0.72rem;color:#9ca3af;margin-top:4px;" data-i18n="form_time_hint">ไม่เลือกก็ได้ — กรอกหรือปล่อยว่างไว้</div>
+        <div style="font-size:0.72rem;color:#9ca3af;margin-top:4px;">ไม่เลือกก็ได้ — กรอกหรือปล่อยว่างไว้</div>
        </div>
        <div>
-        <label class="form-label" for="ev-endTime"><span data-i18n="form_end_time">End Time</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-endTime"><span>End Time</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <div style="display:flex;align-items:center;gap:8px;">
           <input class="form-input" id="ev-endTime" name="endTime" type="time" style="flex:1;">
           <select id="ev-endTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;font-family:inherit;">
@@ -1961,11 +1961,11 @@
 
       <!-- ── Details ── -->
       <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;">
-      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;"><span data-i18n="form_details">Details</span> <span style="font-weight:400;text-transform:none;font-size:0.68rem;" data-i18n="form_optional">(optional)</span></p>
+      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;"><span>Details</span> <span style="font-weight:400;text-transform:none;font-size:0.68rem;">(optional)</span></p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
 
        <div style="grid-column:1/-1;">
-        <label class="form-label" for="ev-image"><span data-i18n="form_image_url">Image URL</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-image"><span>Image URL</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-image" name="image" placeholder="https://...jpg" oninput="previewAdminImg('ev-image','prev-image','pan-image')">
         <div id="prev-image" style="display:none;margin-top:8px;">
          <div style="font-size:0.72rem;color:#6b7280;margin-bottom:5px;display:flex;align-items:center;gap:5px;">
@@ -1981,7 +1981,7 @@
        </div>
 
        <div style="grid-column:1/-1;">
-        <label class="form-label" for="ev-heroImage"><span data-i18n="form_hero_image">Hero Image URL</span> <span style="font-weight:400;color:#9ca3af;">(Artist portrait — used in Hero banner instead of the main image)</span></label>
+        <label class="form-label" for="ev-heroImage"><span>Hero Image URL</span> <span style="font-weight:400;color:#9ca3af;">(Artist portrait — used in Hero banner instead of the main image)</span></label>
         <input class="form-input" id="ev-heroImage" name="heroImage" placeholder="https://...jpg" oninput="previewAdminImg('ev-heroImage','prev-heroImage','pan-heroImage')">
         <div id="prev-heroImage" style="display:none;margin-top:8px;">
          <div style="font-size:0.72rem;color:#6b7280;margin-bottom:5px;display:flex;align-items:center;gap:5px;">
@@ -2002,11 +2002,11 @@
        </div>
 
        <div>
-        <label class="form-label" for="ev-dateEnd"><span data-i18n="form_date_end">Date End</span> <span style="font-weight:400;color:#9ca3af;">(if multi-day)</span></label>
+        <label class="form-label" for="ev-dateEnd"><span>Date End</span> <span style="font-weight:400;color:#9ca3af;">(if multi-day)</span></label>
         <input class="form-input" id="ev-dateEnd" name="dateEnd" type="date">
        </div>
        <div>
-        <label class="form-label" for="ev-type"><span data-i18n="form_event_type">Event Type</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-type"><span>Event Type</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-type" name="type" placeholder="e.g. Fanmeet, Concert, Live">
        </div>
 
@@ -2068,26 +2068,26 @@
        </div>
 
        <div>
-        <label class="form-label" for="ev-country"><span data-i18n="form_country">Country</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-country"><span>Country</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-country" name="country" placeholder="e.g. Thailand">
        </div>
        <div>
-        <label class="form-label" for="ev-city"><span data-i18n="form_city">City</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-city"><span>City</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-city" name="city" placeholder="e.g. Bangkok">
        </div>
 
        <div style="grid-column:1/-1;">
-        <label class="form-label" for="ev-location"><span data-i18n="form_location">Location Name</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-location"><span>Location Name</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-location" name="location" placeholder="e.g. Impact Arena">
        </div>
 
        <div style="grid-column:1/-1;">
-        <label class="form-label" for="ev-description"><span data-i18n="form_description">Description</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-description"><span>Description</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <textarea class="form-input" id="ev-description" name="description" rows="3" placeholder="Event details..."></textarea>
        </div>
 
        <div style="grid-column:1/-1;">
-        <label class="form-label" for="ev-note"><span data-i18n="form_note">Note</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-note"><span>Note</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-note" name="note" placeholder="e.g. live on YouTube, time not confirmed">
        </div>
 
@@ -2124,7 +2124,7 @@
        <div style="grid-column:1/-1;">
         <label class="form-label" for="ev-tv">
          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:3px;color:#6b7280;"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
-         <span data-i18n="form_tv">TV Channel</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span>
+         <span>TV Channel</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span>
         </label>
         <input class="form-input" id="ev-tv" name="tv" placeholder="e.g. GMM25, ONE31, PPTV, NHK, Netflix...">
        </div>
@@ -2132,7 +2132,7 @@
        <div style="grid-column:1/-1;">
         <label class="form-label" for="ev-map">
          <svg width="13" height="13" viewBox="0 0 24 24" style="display:inline;vertical-align:-2px;margin-right:3px;" fill="none" stroke="#22c55e" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-         <span data-i18n="form_map">Google Maps Embed</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span>
+         <span>Google Maps Embed</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span>
         </label>
         <textarea class="form-input" id="ev-map" name="map" rows="2" placeholder='Paste Google Maps iframe embed code'></textarea>
        </div>
@@ -2141,7 +2141,7 @@
 
       <!-- ── Links ── -->
       <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;">
-      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;"><span data-i18n="form_links">Links</span> <span style="font-weight:400;text-transform:none;font-size:0.68rem;" data-i18n="form_all_optional">(all optional)</span></p>
+      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;"><span>Links</span> <span style="font-weight:400;text-transform:none;font-size:0.68rem;">(all optional)</span></p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
        <div>
         <label class="form-label" for="ev-youtube">YouTube</label>
@@ -2176,11 +2176,11 @@
         <input class="form-input" id="ev-shopee" name="shopee" placeholder="https://shopee.com/...">
        </div>
        <div>
-        <label class="form-label" for="ev-live" data-i18n="form_live_stream">Live Stream</label>
+        <label class="form-label" for="ev-live">Live Stream</label>
         <input class="form-input" id="ev-live" name="live" placeholder="YouTube/FB/TikTok/IG Live URL">
        </div>
        <div>
-        <label class="form-label" for="ev-download" data-i18n="form_download">Download</label>
+        <label class="form-label" for="ev-download">Download</label>
         <input class="form-input" id="ev-download" name="download" placeholder="https://...">
        </div>
        <div>
@@ -2193,45 +2193,45 @@
       <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;">
       <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f97316;margin-bottom:0.4rem;">
        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" style="display:inline;vertical-align:-1px;margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-       <span data-i18n="form_tickets">Ticket Links</span>
+       <span>Ticket Links</span>
       </p>
-      <p style="font-size:0.72rem;color:#9ca3af;margin-bottom:0.85rem;" data-i18n="form_ticket_sub">ThaiTicketMajor, AllTicket, Ticketmaster, Eventpop, LiveNation etc. — shows Buy Ticket button on event card</p>
+      <p style="font-size:0.72rem;color:#9ca3af;margin-bottom:0.85rem;">ThaiTicketMajor, AllTicket, Ticketmaster, Eventpop, LiveNation etc. — shows Buy Ticket button on event card</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
        <div>
         <label class="form-label" for="ev-ticket1">
          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" style="display:inline;vertical-align:-1px;margin-right:3px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-         <span data-i18n="form_ticket1">Ticket Link 1</span> <span style="font-size:0.7rem;font-weight:600;background:#fff7ed;color:#c2410c;padding:1px 6px;border-radius:4px;margin-left:3px;" data-i18n="form_ticket_main">Main</span>
+         <span>Ticket Link 1</span> <span style="font-size:0.7rem;font-weight:600;background:#fff7ed;color:#c2410c;padding:1px 6px;border-radius:4px;margin-left:3px;">Main</span>
         </label>
         <input class="form-input" id="ev-ticket1" name="ticket1" placeholder="https://www.thaiticketmajor.com/...">
        </div>
        <div>
-        <label class="form-label" for="ev-ticket2"><span data-i18n="form_ticket2">Ticket Link 2</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-ticket2"><span>Ticket Link 2</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-ticket2" name="ticket2" placeholder="https://www.allticket.com/...">
        </div>
        <div>
-        <label class="form-label" for="ev-ticket3"><span data-i18n="form_ticket3">Ticket Link 3</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span></label>
+        <label class="form-label" for="ev-ticket3"><span>Ticket Link 3</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-ticket3" name="ticket3" placeholder="https://www.eventpop.me/...">
        </div>
        <div>
         <label class="form-label" for="ev-ticket-live">
          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" style="display:inline;vertical-align:-1px;margin-right:3px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#ef4444"/></svg>
-         <span data-i18n="form_ticket_live">Live Stream Ticket</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span>
+         <span>Live Stream Ticket</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span>
         </label>
         <input class="form-input" id="ev-ticket-live" name="ticketLive" placeholder="https://...">
        </div>
        <div>
         <label class="form-label" for="ev-ticket-fanclub">
          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" style="display:inline;vertical-align:-1px;margin-right:3px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-         <span data-i18n="form_ticket_fanclub">Fanclub Ticket</span> <span style="font-weight:400;color:#9ca3af;" data-i18n="form_optional">(optional)</span>
+         <span>Fanclub Ticket</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span>
         </label>
         <input class="form-input" id="ev-ticket-fanclub" name="ticketFanclub" placeholder="https://...">
        </div>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center;">
-       <button type="button" class="btn-secondary" onclick="closeEventFormModal()" data-i18n="form_cancel">Cancel</button>
+       <button type="button" class="btn-secondary" onclick="closeEventFormModal()">Cancel</button>
        <button type="button" class="btn-secondary" onclick="openPreviewPopup()" style="display:flex;align-items:center;gap:5px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        <span data-i18n="form_preview">Preview</span>
+        <span>Preview</span>
        </button>
        <button type="button" class="btn-primary" id="form-submit-btn" onclick="handleEventFormSubmit()">
         <span id="form-submit-text">Save Event</span>
@@ -2534,333 +2534,6 @@ let homeFilter      = 'all';
 let homeSearch      = '';
 
 // ── i18n (English only) ───────────────────────────────────────────
-let currentLang = 'en';
-
-const i18n_en = {
-  nav_home: 'Home', nav_calendar: 'Calendar', nav_admin: 'Admin',
-  filter_all: 'All',
-  search_placeholder: 'Search events, venues, artists...',
-  next_today: 'TODAY', next_1day: 'NEXT · 1 DAY', next_days: 'NEXT · %d DAYS', next_event: 'NEXT EVENT',
-  cal_next_today: 'TODAY', cal_next_1day: 'NEXT EVENT · 1 DAY', cal_next_days: 'NEXT EVENT · %d DAYS',
-  events_count: (n) => `${n} event${n !== 1 ? 's' : ''}`,
-  no_events_title: 'No upcoming events',
-  no_events_sub: 'Stay tuned for updates from Pond · Phuwin · Permpoon',
-  cal_no_events: 'No events on this day',
-  add_calendar: 'Add to Calendar',
-  view_detail: 'View details →',
-  past_events: 'Past Events',
-  countdown_label: 'COUNTDOWN',
-  date_locale: 'en-US',
-  date_opts_short: { month: 'short', day: 'numeric', year: 'numeric' },
-  footer: '© 2026 made with <span class="blink-heart">💚</span>',
-  month_names: ['January','February','March','April','May','June','July','August','September','October','November','December'],
-  day_abbr: ['SUN','MON','TUE','WED','THU','FRI','SAT'],
-  login_error: 'Incorrect password. Try again.',
-  back_to_schedule: '← Back to schedule',
-  admin_manage: 'Manage events',
-  admin_password: 'Password',
-  admin_login: 'Login',
-  admin_logout: 'Logout',
-  admin_add_event: 'Add Event',
-  admin_edit_event: 'Edit Event',
-  admin_save_event: 'Save Event',
-  admin_update_event: 'Update Event',
-  admin_cancel: 'Cancel',
-  admin_delete: 'Delete',
-  admin_confirm_delete: 'Confirm Delete?',
-  admin_no_events: 'No events yet',
-  admin_refresh: 'Refresh',
-  admin_birthday_title: 'Birthdays & Anniversaries',
-  admin_add_birthday: 'Add Birthday',
-  admin_add_anniversary: 'Add Anniversary',
-  bday_suffix: (name) => `${name}'s Birthday`,
-  bday_today: (name) => `Happy Birthday ${name}! 🎂`,
-  anniv_today: (label) => `🥂 ${label} — Happy Anniversary!`,
-  toast_saved: 'Saved ✓',
-  toast_deleted: 'Deleted ✓',
-  toast_error: 'An error occurred',
-  toast_copied: 'Link copied ✓',
-  toast_refreshed: 'Refreshed ✓',
-  toast_logged_out: 'Logged out',
-  toast_limit: 'Limit reached.',
-  toast_removed: 'Removed. (already deleted from Sheet)',
-  toast_need_title: '❌ Please enter an Event title first',
-  toast_need_name: 'Please enter artist name',
-  toast_need_label: 'Please enter Anniversary label',
-  toast_invalid_month: 'Invalid month',
-  toast_invalid_day: 'Invalid day',
-  toast_added: 'Event added! ✓',
-  toast_updated: 'Event updated! ✓',
-  toast_bday_deleted: 'Birthday deleted ✓',
-  toast_anniv_saved: 'Anniversary saved ✓',
-  toast_anniv_deleted: 'Anniversary deleted ✓',
-  stat_total_year: 'Total this year',
-  stat_past: 'Completed',
-  stat_upcoming: 'Upcoming',
-  stat_progress: 'Progress',
-  stat_events: 'events',
-  cal_no_events_day: 'No events on selected date',
-  detail_add_cal: 'Google Calendar',
-  detail_ical: 'iCal / Outlook',
-  detail_map: 'Map',
-  detail_links: 'Links',
-  detail_tickets: 'TICKETS',
-  detail_desc: 'Description',
-  detail_share: 'Share',
-  admin_panel: 'Admin Panel',
-  admin_login_title: 'Admin Login',
-  admin_login_subtitle: 'PondPhuwin & Permpoon Schedule Management',
-  admin_pw_placeholder: 'Enter admin password',
-  admin_login_btn: 'Log In',
-  admin_back: '← Back to schedule',
-  admin_year: 'Year:',
-  admin_click_add: 'Click "Add Event" to get started.',
-  admin_limit: 'Maximum of 999 events reached.',
-  admin_bday_title: 'Artist Birthdays',
-  admin_bday_sub: 'Artist birthdays — shows countdown banner on Home and Calendar',
-  admin_add_btn: 'Add',
-  admin_bday_form_title: 'Add Artist Birthday',
-  admin_artist_name: 'Artist Name',
-  admin_month: 'Month (1–12)',
-  admin_day: 'Day (1–31)',
-  admin_color: 'Color',
-  admin_banner_color: 'Banner color',
-  admin_save_btn: 'Save',
-  admin_cancel_btn: 'Cancel',
-  admin_anniv_section: 'Anniversary & Special Dates',
-  admin_anniv_sub: 'Anniversaries, debuts, special dates',
-  admin_anniv_form_title: 'Add New Anniversary',
-  admin_name: 'Name',
-  admin_start_year: 'Start Year',
-  admin_optional: '(optional)',
-  form_main_info: 'Main Info',
-  form_event_name: 'Event Name',
-  form_artists: 'Artist(s)',
-  form_date_start: 'Date Start',
-  form_status: 'Status',
-  form_status_auto: '(auto)',
-  form_status_desc: 'Past if date < today · Upcoming if date ≥ today',
-  form_start_time: 'Start Time',
-  form_end_time: 'End Time',
-  form_time_hint: 'Optional — fill in or leave blank',
-  form_details: 'Details',
-  form_optional: '(optional)',
-  form_all_optional: '(all optional)',
-  form_image_url: 'Image URL',
-  form_hero_image: 'Hero Image URL',
-  form_date_end: 'Date End',
-  form_event_type: 'Event Type',
-  form_country: 'Country',
-  form_city: 'City',
-  form_location: 'Location / Venue',
-  form_description: 'Description',
-  form_note: 'Note',
-  form_tv: 'TV Channel',
-  form_map: 'Google Maps Embed',
-  form_links: 'Links',
-  form_live_stream: 'Live Stream',
-  form_download: 'Download',
-  form_tickets: 'Ticket Links',
-  form_ticket_sub: 'ThaiTicketMajor, AllTicket, Ticketmaster, Eventpop, LiveNation etc.',
-  form_ticket1: 'Ticket Link 1',
-  form_ticket_main: 'Main',
-  form_ticket2: 'Ticket Link 2',
-  form_ticket3: 'Ticket Link 3',
-  form_ticket_live: 'Live Stream Ticket',
-  form_ticket_fanclub: 'Fanclub Ticket',
-  form_preview: 'Preview',
-  form_cancel: 'Cancel',
-  stat_done: 'Done',
-  stat_left: 'Left',
-  upcoming_label: 'UPCOMING',
-  no_events_month: 'No events this month',
-  no_events_admin: 'No events yet.',
-  no_events_day: 'No events on this day',
-  view_details_hover: 'View details →',
-  past_events_label: 'Past Events',
-  today_label: 'Today',
-  in_days: (n) => `in ${n} day${n !== 1 ? 's' : ''}`,
-};
-
-const i18n_th = {
-  nav_home: 'หน้าแรก', nav_calendar: 'ปฏิทิน', nav_admin: 'แอดมิน',
-  filter_all: 'ทั้งหมด',
-  search_placeholder: 'ค้นหางาน สถานที่ ศิลปิน...',
-  next_today: 'วันนี้', next_1day: 'ถัดไป · 1 วัน', next_days: 'ถัดไป · %d วัน', next_event: 'งานถัดไป',
-  cal_next_today: 'วันนี้', cal_next_1day: 'งานถัดไป · 1 วัน', cal_next_days: 'งานถัดไป · %d วัน',
-  events_count: (n) => `${n} งาน`,
-  no_events_title: 'ไม่มีงานที่กำลังจะมาถึง',
-  no_events_sub: 'ติดตามข่าวสารจาก ป้อง · ภูวินทร์ · เพิ่มพูน',
-  cal_no_events: 'ไม่มีงานในวันนี้',
-  add_calendar: 'เพิ่มในปฏิทิน',
-  view_detail: 'ดูรายละเอียด →',
-  past_events: 'งานที่ผ่านมา',
-  countdown_label: 'นับถอยหลัง',
-  date_locale: 'th-TH',
-  date_opts_short: { month: 'short', day: 'numeric', year: 'numeric' },
-  footer: '© 2026 made with 💚',
-  month_names: ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'],
-  day_abbr: ['อา','จ','อ','พ','พฤ','ศ','ส'],
-  login_error: 'รหัสผ่านไม่ถูกต้อง ลองใหม่อีกครั้ง',
-  back_to_schedule: '← กลับไปตารางงาน',
-  admin_manage: 'จัดการงาน',
-  admin_password: 'รหัสผ่าน',
-  admin_login: 'เข้าสู่ระบบ',
-  admin_logout: 'ออกจากระบบ',
-  admin_add_event: 'เพิ่มงาน',
-  admin_edit_event: 'แก้ไขงาน',
-  admin_save_event: 'บันทึกงาน',
-  admin_update_event: 'อัปเดตงาน',
-  admin_cancel: 'ยกเลิก',
-  admin_delete: 'ลบ',
-  admin_confirm_delete: 'ยืนยันการลบ?',
-  admin_no_events: 'ยังไม่มีงาน',
-  admin_refresh: 'รีเฟรช',
-  admin_birthday_title: 'วันเกิดและวันครบรอบ',
-  admin_add_birthday: 'เพิ่มวันเกิด',
-  admin_add_anniversary: 'เพิ่มวันครบรอบ',
-  bday_suffix: (name) => `วันเกิด ${name}`,
-  bday_today: (name) => `สุขสันต์วันเกิด ${name}! 🎂`,
-  anniv_today: (label) => `🥂 ${label} — สุขสันต์วันครบรอบ!`,
-  toast_saved: 'บันทึกแล้ว ✓',
-  toast_deleted: 'ลบแล้ว ✓',
-  toast_error: 'เกิดข้อผิดพลาด',
-  toast_copied: 'คัดลอกลิงก์แล้ว ✓',
-  toast_refreshed: 'รีเฟรชแล้ว ✓',
-  toast_logged_out: 'ออกจากระบบแล้ว',
-  toast_limit: 'ถึงขีดจำกัดแล้ว',
-  toast_removed: 'ลบออกแล้ว (ถูกลบจาก Sheet แล้ว)',
-  toast_need_title: '❌ กรุณาใส่ชื่องานก่อน',
-  toast_need_name: 'กรุณาใส่ชื่อศิลปิน',
-  toast_need_label: 'กรุณาใส่ชื่อวันครบรอบ',
-  toast_invalid_month: 'เดือนไม่ถูกต้อง',
-  toast_invalid_day: 'วันไม่ถูกต้อง',
-  toast_added: 'เพิ่มงานแล้ว! ✓',
-  toast_updated: 'อัปเดตงานแล้ว! ✓',
-  toast_bday_deleted: 'ลบวันเกิดแล้ว ✓',
-  toast_anniv_saved: 'บันทึกวันครบรอบแล้ว ✓',
-  toast_anniv_deleted: 'ลบวันครบรอบแล้ว ✓',
-  stat_total_year: 'ทั้งหมดปีนี้',
-  stat_past: 'ผ่านไปแล้ว',
-  stat_upcoming: 'กำลังจะมาถึง',
-  stat_progress: 'ความคืบหน้า',
-  stat_events: 'งาน',
-  cal_no_events_day: 'ไม่มีงานในวันที่เลือก',
-  detail_add_cal: 'Google Calendar',
-  detail_ical: 'iCal / Outlook',
-  detail_map: 'แผนที่',
-  detail_links: 'ลิงก์',
-  detail_tickets: 'ตั๋ว',
-  detail_desc: 'รายละเอียด',
-  detail_share: 'แชร์',
-  admin_panel: 'แผงแอดมิน',
-  admin_login_title: 'เข้าสู่ระบบแอดมิน',
-  admin_login_subtitle: 'จัดการตารางงาน ป้อง · ภูวินทร์ · เพิ่มพูน',
-  admin_pw_placeholder: 'ใส่รหัสผ่านแอดมิน',
-  admin_login_btn: 'เข้าสู่ระบบ',
-  admin_back: '← กลับไปตารางงาน',
-  admin_year: 'ปี:',
-  admin_click_add: 'กด "เพิ่มงาน" เพื่อเริ่มต้น',
-  admin_limit: 'ถึงขีดจำกัด 999 งานแล้ว',
-  admin_bday_title: 'วันเกิดศิลปิน',
-  admin_bday_sub: 'วันเกิดศิลปิน — แสดง banner นับถอยหลังในหน้าแรกและปฏิทิน',
-  admin_add_btn: 'เพิ่ม',
-  admin_bday_form_title: 'เพิ่มวันเกิดศิลปิน',
-  admin_artist_name: 'ชื่อศิลปิน',
-  admin_month: 'เดือน (1–12)',
-  admin_day: 'วัน (1–31)',
-  admin_color: 'สี',
-  admin_banner_color: 'สี Banner',
-  admin_save_btn: 'บันทึก',
-  admin_cancel_btn: 'ยกเลิก',
-  admin_anniv_section: 'วันครบรอบและวันพิเศษ',
-  admin_anniv_sub: 'วันครบรอบ, เดบิวต์, วันสำคัญต่างๆ',
-  admin_anniv_form_title: 'เพิ่มวันครบรอบใหม่',
-  admin_name: 'ชื่อ',
-  admin_start_year: 'ปีเริ่มต้น',
-  admin_optional: '(ไม่บังคับ)',
-  form_main_info: 'ข้อมูลหลัก',
-  form_event_name: 'ชื่องาน',
-  form_artists: 'ศิลปิน',
-  form_date_start: 'วันเริ่มต้น',
-  form_status: 'สถานะ',
-  form_status_auto: '(อัตโนมัติ)',
-  form_status_desc: 'ผ่านไปแล้วถ้าวันที่ < วันนี้ · กำลังจะมาถึงถ้าวันที่ ≥ วันนี้',
-  form_start_time: 'เวลาเริ่ม',
-  form_end_time: 'เวลาสิ้นสุด',
-  form_time_hint: 'ไม่บังคับ — กรอกหรือปล่อยว่างไว้',
-  form_details: 'รายละเอียด',
-  form_optional: '(ไม่บังคับ)',
-  form_all_optional: '(ทั้งหมดไม่บังคับ)',
-  form_image_url: 'URL รูปภาพ',
-  form_hero_image: 'URL รูป Hero',
-  form_date_end: 'วันสิ้นสุด',
-  form_event_type: 'ประเภทงาน',
-  form_country: 'ประเทศ',
-  form_city: 'เมือง',
-  form_location: 'สถานที่',
-  form_description: 'รายละเอียด',
-  form_note: 'หมายเหตุ',
-  form_tv: 'ช่องทีวี',
-  form_map: 'Google Maps Embed',
-  form_links: 'ลิงก์',
-  form_live_stream: 'ถ่ายทอดสด',
-  form_download: 'ดาวน์โหลด',
-  form_tickets: 'ลิงก์ตั๋ว',
-  form_ticket_sub: 'ThaiTicketMajor, AllTicket, Ticketmaster, Eventpop, LiveNation ฯลฯ',
-  form_ticket1: 'ลิงก์ตั๋ว 1',
-  form_ticket_main: 'หลัก',
-  form_ticket2: 'ลิงก์ตั๋ว 2',
-  form_ticket3: 'ลิงก์ตั๋ว 3',
-  form_ticket_live: 'ตั๋วถ่ายทอดสด',
-  form_ticket_fanclub: 'ตั๋ว Fanclub',
-  form_preview: 'ดูตัวอย่าง',
-  form_cancel: 'ยกเลิก',
-  stat_done: 'ผ่านไป',
-  stat_left: 'เหลือ',
-  upcoming_label: 'กำลังจะมาถึง',
-  no_events_month: 'ไม่มีงานเดือนนี้',
-  no_events_admin: 'ยังไม่มีงาน',
-  no_events_day: 'ไม่มีงานในวันนี้',
-  view_details_hover: 'ดูรายละเอียด →',
-  past_events_label: 'งานที่ผ่านมา',
-  today_label: 'วันนี้',
-  in_days: (n) => `อีก ${n} วัน`,
-};
-
-const i18n = new Proxy({}, { get: (_, key) => (currentLang === 'th' ? i18n_th : i18n_en)[key] });
-
-function t(key, ...args) {
-  const src = currentLang === 'th' ? i18n_th : i18n_en;
-  let val = src[key] || key;
-  if (typeof val === 'function') return val(...args);
-  if (args.length && typeof val === 'string') val = val.replace('%d', args[0]);
-  return val;
-}
-
-function applyI18n() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    const val = t(key);
-    if (val && val !== key) el.textContent = val;
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    const val = t(key);
-    if (val && val !== key) el.placeholder = val;
-  });
-  // Update DOW headers
-  const abbr = t('day_abbr');
-  document.querySelectorAll('[data-i18n-dow]').forEach(el => {
-    const idx = parseInt(el.getAttribute('data-i18n-dow'));
-    if (abbr && abbr[idx]) el.textContent = abbr[idx].charAt(0);
-  });
-  // Update form submit button text
-  const submitText = document.getElementById('form-submit-text');
-  if (submitText) submitText.textContent = t('admin_save_event');
-}
-
-function setLang(lang) { /* language locked to English */ }
 
 function fmtDate(dateStr, opts) {
   if (!dateStr) return '';
@@ -2870,13 +2543,13 @@ function fmtDate(dateStr, opts) {
     if (cached) return cached;
     const d = new Date(dateStr + 'T00:00:00');
     if (isNaN(d)) return dateStr;
-    const result = d.toLocaleDateString(t('date_locale'), {month:'short', day:'numeric', year:'numeric'});
+    const result = d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
     if (_fmtDateCache.size < 500) _fmtDateCache.set(dateStr, result);
     return result;
   }
   const d = new Date(dateStr + 'T00:00:00');
   if (isNaN(d)) return dateStr;
-  return d.toLocaleDateString(t('date_locale'), opts);
+  return d.toLocaleDateString('en-US', opts);
 }
 
 function fmtTime(timeStr, evTz) {
@@ -3305,7 +2978,9 @@ function _applyAllData(res, force, dataChangedRef) {
     const processed = processEvents(evData);
     // ล้าง tmp_ optimistic events ออกก่อนเปรียบเทียบ — ป้องกันการ์ดขึ้นสองอัน
     const stableEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
-    if (_fp(processed) !== _fp(stableEvents)) dataChangedRef.v = true;
+    // fingerprint เปรียบเทียบทั้ง id และ field สำคัญ เพื่อจับการแก้ไข event ที่ id เดิม
+    const _fpDeep = arr => arr.map(x => (x.__backendId||x.id||'') + ':' + (x.title||'') + ':' + (x.dateStart||'') + ':' + (x.startTime||'')).join('|');
+    if (_fpDeep(processed) !== _fpDeep(stableEvents)) dataChangedRef.v = true;
     allEvents = processed;
     _memCache.set('events', processed);
     Cache.set(LC.EVENTS, processed);
@@ -3767,8 +3442,10 @@ async function _fetchFreshFromAppsScript() {
     _fmtDateCache.clear();
     // Broadcast เฉพาะเมื่อ admin เป็นคน call — ป้องกัน visitor tab broadcast loop
     if (isAdmin) _broadcastDataUpdate();
-    // Re-render เฉพาะเมื่อ server data ต่างจาก optimistic
-    if (dataChangedRef.v) {
+    // Admin: re-render เสมอหลัง save/edit/delete — ป้องกันการ์ดค้าง optimistic
+    // Visitor: re-render เฉพาะเมื่อ server data ต่างจากที่แสดงอยู่
+    if (isAdmin || dataChangedRef.v) {
+      _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
       _refreshAllPages();
     }
   } catch(e) {
@@ -3926,7 +3603,7 @@ function getArtistLabel(artists) {
 }
 function getFullDateDisplay(dateStr) {
   if (!dateStr) return '';
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString(t('date_locale'), { month: 'long', day: 'numeric', year: 'numeric' });
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 // Memoized escHtml — called thousands of times per render
 const _escCache = new Map();
@@ -4028,7 +3705,7 @@ function renderHome() {
   const count = document.getElementById('events-count');
   if (!grid) return;
 
-  if (count) count.textContent = t('events_count', events.length);
+  if (count) count.textContent = `${events.length} event${events.length !== 1 ? 's' : ''}`;
 
   // ── Bento grid update ──
   const upAll = allEvents.filter(ev => ev.title && !isEventPast(ev));
@@ -4046,7 +3723,7 @@ function renderHome() {
     _nextEventId = next.__backendId || null;
     const days = daysUntilEvent(next.dateStart);
     const color = getArtistColor(next.artists);
-    const dayLabel = days === 0 ? t('next_today') : days === 1 ? t('next_1day') : days !== null && days <= 30 ? t('next_days', days) : t('next_event');
+    const dayLabel = days === 0 ? 'TODAY' : days === 1 ? 'NEXT · 1 DAY' : days !== null && days <= 30 ? `NEXT · ${days} DAYS` : 'NEXT EVENT';
     const _bg = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
     const dayBadgeGrad = _bg[days] || _bg[0];
     el('bento-next-label').innerHTML = `<span style="background:${dayBadgeGrad};color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">${dayLabel}</span>`;
@@ -4072,7 +3749,7 @@ function renderHome() {
   if (next2 && el('bento-next2-title')) {
     const days2 = daysUntilEvent(next2.dateStart);
     const color2 = getArtistColor(next2.artists);
-    const dayLabel2 = days2 === 0 ? t('next_today') : days2 === 1 ? t('next_1day') : days2 !== null && days2 <= 30 ? t('next_days', days2) : t('next_event');
+    const dayLabel2 = days2 === 0 ? 'TODAY' : days2 === 1 ? 'NEXT · 1 DAY' : days2 !== null && days2 <= 30 ? `NEXT · ${days2} DAYS` : 'NEXT EVENT';
     const meta2 = [next2.dateStart ? fmtDate(next2.dateStart) : '', next2.startTime ? fmtTime(next2.startTime) : '', next2.location].filter(Boolean).join(' · ');
     const _bg2 = ['#111','#f97316','#7c3aed','#059669','#f97316','#0891b2','#d97706','#059669'];
     const dayBadgeGrad2 = _bg2[days2] || _bg2[0];
@@ -4112,7 +3789,7 @@ function renderHome() {
     if (!ev.dateStart) { key = 'zzz-no-date'; label = 'Date TBA'; }
     else {
       key = ev.dateStart.slice(0, 7);
-      label = new Date(ev.dateStart + 'T00:00:00').toLocaleDateString(t('date_locale'), { month: 'long', year: 'numeric' });
+      label = new Date(ev.dateStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     }
     if (!dateMap.has(key)) dateMap.set(key, { label, events: [] });
     dateMap.get(key).events.push(ev);
@@ -4331,7 +4008,7 @@ function renderPastEvents(grid) {
     const key = ev.dateStart.slice(0,7);
     if (!monthSet.has(key)) {
       const d = new Date(key+'-01');
-      monthSet.set(key, d.toLocaleDateString(t('date_locale'),{month:'short',year:'numeric'}));
+      monthSet.set(key, d.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
     }
   });
   const months = Array.from(monthSet.entries()).sort((a,b)=>b[0].localeCompare(a[0]));
@@ -4353,7 +4030,7 @@ function renderPastEvents(grid) {
     <div style="display:flex;align-items:center;gap:10px;padding:10px 0;margin-bottom:${isOpen?'0.75rem':'0'};">
       <div style="display:flex;gap:4px;"><div style="width:7px;height:7px;border-radius:50%;background:#d1d5db;"></div><div style="width:7px;height:7px;border-radius:50%;background:#d1d5db;"></div><div style="width:7px;height:7px;border-radius:50%;background:#d1d5db;"></div></div>
       <button onclick="togglePastEvents()" id="past-toggle-btn" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0;">
-        <span style="font-size:0.9rem;font-weight:700;color:#6b7280;">${t('past_events_label')}</span>
+        <span style="font-size:0.9rem;font-weight:700;color:#6b7280;">${'Past Events'}</span>
         <span style="font-size:0.72rem;font-weight:700;color:#9ca3af;background:#f3f4f6;border-radius:99px;padding:2px 10px;">${pastEvs.length} event${pastEvs.length!==1?'s':''}</span>
         <svg id="past-toggle-icon" width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2.5" viewBox="0 0 24 24" style="transform:rotate(${isOpen?'180':'0'}deg)"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
@@ -4527,10 +4204,10 @@ function buildTypePill(type, size) {
 function buildDateBadge(ev, color) {
   if (!ev.dateStart) return '';
   const d = new Date(ev.dateStart + 'T00:00:00');
-  const dow = d.toLocaleDateString(t('date_locale'), { weekday: 'short' }).toUpperCase();
+  const dow = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
   if (ev.dateEnd && ev.dateEnd !== ev.dateStart) {
     const d2 = new Date(ev.dateEnd + 'T00:00:00');
-    const dow2 = d2.toLocaleDateString(t('date_locale'), { weekday: 'short' }).toUpperCase();
+    const dow2 = d2.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
     return `<div style="position:absolute;top:12px;right:12px;background:${color};color:#fff;border-radius:10px;padding:0.4rem 0.6rem;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);"><div style="font-size:0.62rem;font-weight:700;letter-spacing:0.04em;">${dow} ${d.getDate()} – ${dow2} ${d2.getDate()}</div></div>`;
   }
   return `<div style="position:absolute;top:12px;right:12px;background:${color};color:#fff;border-radius:10px;padding:0.5rem 0.75rem;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);"><div style="font-size:0.7rem;font-weight:700;letter-spacing:0.05em;">${dow}</div><div style="font-size:1.3rem;font-weight:700;line-height:1;">${d.getDate()}</div></div>`;
@@ -4698,7 +4375,7 @@ function buildCountdownNoImg(ev) {
   if (!ev.dateStart) return '';
   const days = daysUntilEvent(ev.dateStart);
   if (days === null || days < 0 || days > 60) return '';
-  const label = days === 0 ? t('today_label') : t('in_days', days);
+  const label = days === 0 ? 'Today' : `in ${days} day${days !== 1 ? 's' : ''}`;
   return `<div style="font-size:0.72rem;font-weight:700;color:#9ca3af;padding:6px 0 2px;">${label}</div>`;
 }
 // Legacy stub
@@ -4779,7 +4456,7 @@ function createCard(ev) {
 
   const socialHtml = buildSocialIcons(ev);
   const shareBtn = ``;
-  const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${t('view_details_hover')}</div></div></div>`;
+  const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${'View details →'}</div></div></div>`;
   const imgSection = ev.image
     ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}</div>`
     : `<div style="height:3px;background:${color};flex-shrink:0;opacity:0.7;"></div>`;
@@ -5013,8 +4690,8 @@ function makeBannerHtml(item, days) {
   const isBday = item.type === 'birthday';
   const icon = isToday ? '🎉' : (isBday ? '🎂' : '🥂');
   const color = item.color || '#a855f7';
-  const label = isBday ? t('bday_suffix', item.name) : item.label;
-  const todayMsg = isBday ? t('bday_today', item.name) : t('anniv_today', item.label);
+  const label = isBday ? `${item.name}'s Birthday` : item.label;
+  const todayMsg = isBday ? `Happy Birthday ${item.name}! 🎂` : `🥂 ${item.label} — Happy Anniversary!`;
   const todayParts = _todayInBKK().split('-').map(Number);
   let nextYear = todayParts[0];
   let nextDateMs = Date.UTC(nextYear, item.month-1, item.day);
@@ -5023,7 +4700,7 @@ function makeBannerHtml(item, days) {
     nextDateMs = Date.UTC(nextYear, item.month-1, item.day);
   }
   const nextDate = new Date(nextDateMs);
-  const dateLabel = nextDate.toLocaleDateString(t('date_locale'), { month: 'long', day: 'numeric', timeZone: 'UTC' });
+  const dateLabel = nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' });
   let yearsHtml = '';
   if (!isBday && item.startYear) {
     const yrs = nextYear - item.startYear;
@@ -5092,7 +4769,7 @@ function renderCalendar() {
   _calStatYear = calYear;
   renderCalYearStats();
   const year = calYear, month = calMonth;
-  const monthNames = t('month_names');
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const labelEl = document.getElementById('cal-month-label');
   if (labelEl) labelEl.textContent = monthNames[month] + ' ' + year;
   const yearLabelEl = document.getElementById('cal-year-label');
@@ -5207,7 +4884,7 @@ function renderCalendar() {
     const next = upcomingAll[0];
     const days = daysUntilEvent(next.dateStart);
     const color = getArtistColor(next.artists);
-    const dayLabel = days === 0 ? t('cal_next_today') : days === 1 ? t('cal_next_1day') : t('cal_next_days', days);
+    const dayLabel = days === 0 ? 'TODAY' : days === 1 ? 'NEXT EVENT · 1 DAY' : `NEXT EVENT · ${days} DAYS`;
     const meta = [next.dateStart ? fmtDate(next.dateStart) : '', next.startTime ? fmtTime(next.startTime) : '', next.location].filter(Boolean).join(' · ');
     document.getElementById('cal-next-event-label').textContent = dayLabel;
     document.getElementById('cal-next-event-label').style.color = color;
@@ -5294,9 +4971,9 @@ function renderCalendarCardGrid(monthEvents) {
         const d = new Date(calSelectedDate+'T00:00:00');
         const dowNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         const monNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        noEv.innerHTML = `<p style="font-weight:700;color:#111;margin-bottom:4px;">${dowNames[d.getDay()]} ${d.getDate()} ${monNames[d.getMonth()]}</p><p style="font-size:0.82rem;color:#9ca3af;">${t('no_events_day')}</p>`;
+        noEv.innerHTML = `<p style="font-weight:700;color:#111;margin-bottom:4px;">${dowNames[d.getDay()]} ${d.getDate()} ${monNames[d.getMonth()]}</p><p style="font-size:0.82rem;color:#9ca3af;">${'No events on this day'}</p>`;
       } else {
-        noEv.innerHTML = `<p style="font-weight:600;color:#9ca3af;">${t('no_events_month')}</p>`;
+        noEv.innerHTML = `<p style="font-weight:600;color:#9ca3af;">${'No events this month'}</p>`;
       }
     }
     return;
@@ -5345,7 +5022,7 @@ function renderCalendarCardGrid(monthEvents) {
     const ab2 = getArtistBg(ev.artists);
     div.style.cssText = `background:#fff;border-radius:16px;border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-left:3px solid ${past?'#e5e7eb':color};display:flex;align-items:stretch;gap:0;cursor:pointer;opacity:${past?0.55:1};height:100%;box-sizing:border-box;overflow:hidden;`;
     div.onclick = () => openDetailModal(ev.__backendId);
-    div.innerHTML = `<div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="_onImgError(this)">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${t('next_today')}</div>`:''}</div>
+    div.innerHTML = `<div style="width:80px;flex-shrink:0;background:${grad};overflow:hidden;position:relative;">${ev.image?`<img src="${_fixImgSrc(ev.image)}" alt="" loading="lazy" style="width:80px;height:100%;object-fit:cover;object-position:top;display:block;" onerror="_onImgError(this)">`:''} ${calIsToday?`<div class="today-badge" style="top:6px;left:4px;font-size:0.52rem;padding:2px 6px;">${'TODAY'}</div>`:''}</div>
       <div style="flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;">${artistDots}${badge?`<span style="margin-left:auto;">${badge}</span>`:''}</div>
         <div style="font-size:0.85rem;font-weight:700;color:${past?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div>
@@ -5804,7 +5481,7 @@ function renderAdminList() {
     let monthLabel = 'No Date';
     if (monthKey !== 'no-date') {
       const d = new Date(monthKey + '-01T00:00:00');
-      monthLabel = d.toLocaleDateString(t('date_locale'), {month:'long', year:'numeric'});
+      monthLabel = d.toLocaleDateString('en-US', {month:'long', year:'numeric'});
     }
     const pastCount = evs.filter(e => isEventPast(e)).length;
     const upCount = evs.length - pastCount;
@@ -5914,7 +5591,7 @@ function updateAdminRow(row, ev) {
   if (past) {
     const pastBadge = document.createElement('span');
     pastBadge.style.cssText = 'font-size:0.7rem;background:#f3f4f6;color:#9ca3af;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;';
-    pastBadge.textContent = t('past_events');
+    pastBadge.textContent = 'Past Events';
     titleP.appendChild(pastBadge);
   }
 
@@ -5934,7 +5611,7 @@ function updateAdminRow(row, ev) {
     // Confirm-delete state
     const confirmTxt = document.createElement('span');
     confirmTxt.style.cssText = 'font-size:0.78rem;color:#dc2626;font-weight:600;';
-    confirmTxt.textContent = t('admin_confirm_delete');
+    confirmTxt.textContent = 'Confirm Delete?';
     btnArea.appendChild(confirmTxt);
 
     const yesBtn = document.createElement('button');
@@ -5946,7 +5623,7 @@ function updateAdminRow(row, ev) {
     const cancelBtn = document.createElement('button');
     cancelBtn.className = 'btn-secondary';
     cancelBtn.style.cssText = 'font-size:0.8rem;padding:5px 10px;';
-    cancelBtn.textContent = t('admin_cancel');
+    cancelBtn.textContent = 'Cancel';
     cancelBtn.addEventListener('click', function(e) { e.stopPropagation(); cancelDelete(rowKey); });
     btnArea.appendChild(cancelBtn);
   } else {
@@ -5961,7 +5638,7 @@ function updateAdminRow(row, ev) {
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-danger';
     delBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;';
-    delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>' + t('admin_delete');
+    delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>' + 'Delete';
     delBtn.addEventListener('click', function(e) { e.stopPropagation(); startDelete(rowKey); });
     btnArea.appendChild(delBtn);
   }
@@ -5993,7 +5670,7 @@ async function confirmDelete(key) {
 
   try {
     const result = await deleteEventInSheets(ev.__backendId || ev.__rawId, ev.__rowNumber);
-    showToast(result.status === 'not_found' ? t('toast_removed') : t('toast_deleted'));
+    showToast(result.status === 'not_found' ? 'Removed. (already deleted from Sheet)' : 'Deleted ✓');
     _fetchingAll = false;
     _fetchFreshFromAppsScript().catch(function(){});
   } catch(err) {
@@ -6002,7 +5679,7 @@ async function confirmDelete(key) {
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
     requestAnimationFrame(function(){ renderHome(); renderCalendar(); if (isAdmin) renderAdminList(); debounceLucide(); });
     if (rowEl) rowEl.style.opacity = '1';
-    showToast(t('toast_error') + ': ' + (err.message || ''));
+    showToast('An error occurred' + ': ' + (err.message || ''));
   }
 }
 
@@ -6033,21 +5710,21 @@ function renderAnniversaryAdmin() {
 
 async function deleteBirthday(id) {
   try {
-    await deleteBirthdayInSheets(id); showToast(t('toast_bday_deleted'));
+    await deleteBirthdayInSheets(id); showToast('Birthday deleted ✓');
     allBirthdays = allBirthdays.filter(function(b){ return b.__backendId !== id; });
     _memCache.set('bdays', allBirthdays); Cache.set(LC.BDAYS, allBirthdays);
     requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
     _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
-  } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
+  } catch(e) { showToast('An error occurred' + ': ' + (e.message||'')); }
 }
 async function deleteAnniversary(id) {
   try {
-    await deleteAnniversaryInSheets(id); showToast(t('toast_anniv_deleted'));
+    await deleteAnniversaryInSheets(id); showToast('Anniversary deleted ✓');
     allAnniversaries = allAnniversaries.filter(function(a){ return a.__backendId !== id; });
     _memCache.set('annivs', allAnniversaries); Cache.set(LC.ANNIVS, allAnniversaries);
     requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
     _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
-  } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
+  } catch(e) { showToast('An error occurred' + ': ' + (e.message||'')); }
 }
 
 function openAnnivForm() { document.getElementById('anniv-form-wrap').style.display = 'block'; }
@@ -6062,17 +5739,17 @@ async function saveAnniversary() {
   const day   = parseInt(document.getElementById('anniv-day').value);
   const year  = document.getElementById('anniv-year').value.trim();
   const color = document.getElementById('anniv-color').value || '#a855f7';
-  if (!label) { showToast(t('toast_need_label')); return; }
-  if (!month||month<1||month>12) { showToast(t('toast_invalid_month')); return; }
-  if (!day||day<1||day>31) { showToast(t('toast_invalid_day')); return; }
+  if (!label) { showToast('Please enter Anniversary label'); return; }
+  if (!month||month<1||month>12) { showToast('Invalid month'); return; }
+  if (!day||day<1||day>31) { showToast('Invalid day'); return; }
   try {
     await createAnniversaryInSheets({ anniversary_name:label, anniversary_month:String(month), anniversary_day:String(day), anniversary_year:year||'', color });
-    closeAnnivForm(); showToast(t('toast_anniv_saved'));
+    closeAnnivForm(); showToast('Anniversary saved ✓');
     allAnniversaries.push({ __backendId:'tmp_'+Date.now(), anniversary_name:label, anniversary_month:month, anniversary_day:day, anniversary_year:year?parseInt(year):null, color:color });
     _memCache.set('annivs', allAnniversaries); Cache.set(LC.ANNIVS, allAnniversaries);
     requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
     _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
-  } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
+  } catch(e) { showToast('An error occurred' + ': ' + (e.message||'')); }
 }
 function openBdayForm() { document.getElementById('bday-form-wrap').style.display = 'block'; }
 function closeBdayForm() {
@@ -6085,17 +5762,17 @@ async function saveBirthday() {
   const month = parseInt(document.getElementById('bday-month').value);
   const day   = parseInt(document.getElementById('bday-day').value);
   const color = document.getElementById('bday-color').value || '#6b7280';
-  if (!name)  { showToast(t('toast_need_name')); return; }
-  if (!month||month<1||month>12) { showToast(t('toast_invalid_month')); return; }
-  if (!day||day<1||day>31)       { showToast(t('toast_invalid_day')); return; }
+  if (!name)  { showToast('Please enter artist name'); return; }
+  if (!month||month<1||month>12) { showToast('Invalid month'); return; }
+  if (!day||day<1||day>31)       { showToast('Invalid day'); return; }
   try {
     await createBirthdayInSheets({ artist_name:name, birthday_month:String(month), birthday_day:String(day), color });
-    closeBdayForm(); showToast(t('toast_bday_saved'));
+    closeBdayForm(); showToast('Birthday saved ✓');
     allBirthdays.push({ __backendId:'tmp_'+Date.now(), artist_name:name, birthday_month:month, birthday_day:day, color:color });
     _memCache.set('bdays', allBirthdays); Cache.set(LC.BDAYS, allBirthdays);
     requestAnimationFrame(function(){ renderAnniversaryAdmin(); renderBirthdayBanners(); });
     _fetchingAll = false; _fetchFreshFromAppsScript().catch(function(){});
-  } catch(e) { showToast(t('toast_error') + ': ' + (e.message||'')); }
+  } catch(e) { showToast('An error occurred' + ': ' + (e.message||'')); }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -6148,7 +5825,7 @@ function adminLogout() {
   document.getElementById('login-pw-field').value = '';
   document.getElementById('login-pw-err').style.display = 'none';
   const navAdmin = _dom('nav-admin-link'); if(navAdmin) navAdmin.style.display = 'none';
-  navigate('home'); showToast(t('toast_logged_out'));
+  navigate('home'); showToast('Logged out');
 }
 
 async function adminRefresh() {
@@ -6158,7 +5835,7 @@ async function adminRefresh() {
   try { await apiPost({ action: 'clearCache' }); } catch(e) {}
   await loadEventsFromSheets(true);
   if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="refresh-cw" style="width:14px;height:14px;"></i>Refresh'; debounceLucide(); }
-  showToast(t('toast_refreshed'));
+  showToast('Refreshed ✓');
 }
 
 function navigate(page) {
@@ -6201,10 +5878,10 @@ function navigate(page) {
 // ADMIN EVENT FORM
 // ═══════════════════════════════════════════════════════════════════
 function openAddModal() {
-  if (allEvents.length >= 999) { showToast(t('toast_limit')); return; }
+  if (allEvents.length >= 999) { showToast('Limit reached.'); return; }
   editingEventId = null; editingEventRowNumber = null;
-  document.getElementById('form-modal-title').textContent = t('admin_add_event');
-  document.getElementById('form-submit-text').textContent = t('admin_save_event');
+  document.getElementById('form-modal-title').textContent = 'Add Event';
+  document.getElementById('form-submit-text').textContent = 'Save Event';
   document.getElementById('form-submit-btn').disabled = false;
   document.getElementById('form-submit-text').style.display = 'inline';
   document.getElementById('form-submit-spinner').style.display = 'none';
@@ -6218,8 +5895,8 @@ function openEditModal(key) {
   const ev = findEventByKey(key); if (!ev) return;
   editingEventId = ev.__backendId || null;
   editingEventRowNumber = ev.__rowNumber || null;
-  document.getElementById('form-modal-title').textContent = t('admin_edit_event');
-  document.getElementById('form-submit-text').textContent = t('admin_update_event');
+  document.getElementById('form-modal-title').textContent = 'Edit Event';
+  document.getElementById('form-submit-text').textContent = 'Update Event';
   document.getElementById('form-submit-btn').disabled = false;
   document.getElementById('form-submit-text').style.display = 'inline';
   document.getElementById('form-submit-spinner').style.display = 'none';
@@ -6397,7 +6074,7 @@ function closePreviewPopup() { const p=document.getElementById('preview-popup');
 async function handleEventFormSubmit() {
   const schema = readFormSchema();
   if (!schema.title || !schema.title.trim()) {
-    showToast(t('toast_need_title'));
+    showToast('❌ Please enter an Event title first');
     document.getElementById('ev-title').focus(); return;
   }
   const payload = {
@@ -6432,7 +6109,7 @@ async function handleEventFormSubmit() {
   btn.disabled = false; txt.style.display = 'inline'; spin.style.display = 'none';
   if (success) {
     closeEventFormModal();
-    showToast(editingEventId ? t('toast_updated') : t('toast_added'));
+    showToast(editingEventId ? 'Event updated! ✓' : 'Event added! ✓');
     if (schema.dateStart && schema.dateStart.length >= 7) {
       _adminYearFilter = schema.dateStart.slice(0, 4);
       _adminOpenMonths.clear();
@@ -6460,8 +6137,18 @@ async function handleEventFormSubmit() {
       );
       if (idx !== -1) {
         allEvents[idx] = Object.assign({}, allEvents[idx], optimisticEvent);
+      } else {
+        // ถ้าหาไม่เจอ (ID format ไม่ตรง) → filter แล้ว push เพื่อไม่ให้ค้าง
+        allEvents = allEvents.filter(e =>
+          e.__backendId !== _savedId && e.__rawId !== _savedId && e.id !== _savedId
+        );
+        allEvents.push(optimisticEvent);
+        allEvents.sort(function(a, b) {
+          if (!a.dateStart) return 1; if (!b.dateStart) return -1;
+          var c = a.dateStart.localeCompare(b.dateStart);
+          return c !== 0 ? c : _timeToMinutes(a.startTime) - _timeToMinutes(b.startTime);
+        });
       }
-      // ถ้าหาไม่เจอ ไม่ push ใหม่ — รอ server sync แทน (ป้องกันการ์ดซ้ำ)
     } else {
       // add ใหม่: ลบ tmp_ เก่าที่อาจค้างก่อน แล้วค่อย push
       allEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
@@ -6508,14 +6195,14 @@ function setViewMode(mode) {
 
 // ── Share event ───────────────────────────────────────────────────
 function buildTimelineView(events) {
-  const dowNames = t('day_abbr');
+  const dowNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
   const wrap = document.createElement('div');
   wrap.style.cssText = 'display:flex;flex-direction:column;gap:0;';
   const dateMap = new Map();
   events.forEach(ev => {
     const key = ev.dateStart ? ev.dateStart.slice(0,7) : 'zzz';
-    const label = ev.dateStart ? new Date(ev.dateStart+'T00:00:00').toLocaleDateString(t('date_locale'),{month:'long',year:'numeric'}) : 'Date TBA';
+    const label = ev.dateStart ? new Date(ev.dateStart+'T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'}) : 'Date TBA';
     if (!dateMap.has(key)) dateMap.set(key, { label, events:[] });
     dateMap.get(key).events.push(ev);
   });
@@ -6561,7 +6248,7 @@ function shareEvent(title, id) {
   if (navigator.share) {
     navigator.share({ title, url }).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
   } else {
-    navigator.clipboard?.writeText(url).then(() => showToast(t('toast_copied'))).catch(() => showToast('Copy: ' + url));
+    navigator.clipboard?.writeText(url).then(() => showToast('Link copied ✓')).catch(() => showToast('Copy: ' + url));
   }
 }
 
@@ -7463,7 +7150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   _pages.forEach(p => p.addEventListener('scroll', _updateNavScroll, { passive: true }));
 
   // ── STEP 0: Render UI shell instantly (< 1ms) ──
-  applyI18n();
   // checkPanelKey เป็น async (hash comparison) — รอผลก่อน render admin UI
   await checkPanelKey();
   const _initToday = _todayInBKK().split('-').map(Number);
