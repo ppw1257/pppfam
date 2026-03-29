@@ -3152,7 +3152,14 @@ async function apiPostFetch(body) {
   const tid = setTimeout(() => ctrl.abort(), 20000);
   try {
     // Inject admin password for server-side auth check in Code.gs
-    const adminPass = (function(){ try { return sessionStorage.getItem('pppAdminPass') || 'ppp1257pondphuwinppw'; } catch(e) { return 'ppp1257pondphuwinppw'; } })();
+    // ไม่มี fallback hardcode — ถ้า sessionStorage ว่างแสดงว่า session หมด
+    let adminPass = '';
+    try { adminPass = sessionStorage.getItem('pppAdminPass') || ''; } catch(e) {}
+    if (!adminPass) {
+      // session หมดหรือ sessionStorage ถูกล้าง — force logout
+      adminLogout();
+      throw new Error('Session expired — please log in again');
+    }
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
