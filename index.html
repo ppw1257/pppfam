@@ -1653,7 +1653,7 @@
        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;">
         <div style="position:relative;flex:1;min-width:200px;">
          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-         <input id="admin-works-search" type="text" placeholder="ค้นหาชื่อ, แบรนด์, artist..." oninput="_adminWorksListFP='';renderAdminWorksList()" style="width:100%;padding:7px 10px 7px 32px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.82rem;font-family:inherit;outline:none;box-sizing:border-box;background:#fff;">
+         <input id="admin-works-search" type="text" placeholder="Search name, brand, artist..." oninput="_adminWorksListFP='';renderAdminWorksList()" style="width:100%;padding:7px 10px 7px 32px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.82rem;font-family:inherit;outline:none;box-sizing:border-box;background:#fff;">
         </div>
         <select id="admin-works-cat-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;outline:none;">
          <option value="all">All Categories</option>
@@ -2347,7 +2347,7 @@
        </div>
        <div>
         <label class="form-label">Type</label>
-        <input class="form-input" id="wf-type" name="type" list="wf-type-list" placeholder="— Optional — หรือพิมพ์เอง" autocomplete="off">
+        <input class="form-input" id="wf-type" name="type" list="wf-type-list" placeholder="— Optional — or type your own" autocomplete="off">
         <datalist id="wf-type-list">
          <option>Presenter</option>
          <option>Friend of Brand</option>
@@ -2533,7 +2533,7 @@ let calFilter       = 'all';
 let homeFilter      = 'all';
 let homeSearch      = '';
 
-// ── i18n (English only) ───────────────────────────────────────────
+
 
 function fmtDate(dateStr, opts) {
   if (!dateStr) return '';
@@ -3724,7 +3724,7 @@ function renderHome() {
     const days = daysUntilEvent(next.dateStart);
     const color = getArtistColor(next.artists);
     const dayLabel = days === 0 ? 'TODAY' : days === 1 ? 'NEXT · 1 DAY' : days !== null && days <= 30 ? `NEXT · ${days} DAYS` : 'NEXT EVENT';
-    const _bg = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
+    const _bg = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#10b981 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#ec4899 0%,#a855f7 100%)'];
     const dayBadgeGrad = _bg[days] || _bg[0];
     el('bento-next-label').innerHTML = `<span style="background:${dayBadgeGrad};color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">${dayLabel}</span>`;
     el('bento-next-label').style.color = '';
@@ -3751,7 +3751,7 @@ function renderHome() {
     const color2 = getArtistColor(next2.artists);
     const dayLabel2 = days2 === 0 ? 'TODAY' : days2 === 1 ? 'NEXT · 1 DAY' : days2 !== null && days2 <= 30 ? `NEXT · ${days2} DAYS` : 'NEXT EVENT';
     const meta2 = [next2.dateStart ? fmtDate(next2.dateStart) : '', next2.startTime ? fmtTime(next2.startTime) : '', next2.location].filter(Boolean).join(' · ');
-    const _bg2 = ['#111','#f97316','#7c3aed','#059669','#f97316','#0891b2','#d97706','#059669'];
+    const _bg2 = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
     const dayBadgeGrad2 = _bg2[days2] || _bg2[0];
     el('bento-next2-label').innerHTML = `<span style="background:${dayBadgeGrad2};color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">${dayLabel2}</span>`;
     el('bento-next2-label').style.color = '';
@@ -3839,7 +3839,7 @@ function _buildListItem(ev) {
   const dots = artistArr.map(a => { const ac = getArtistColor(a); return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:600;color:${ac};"><span style="width:5px;height:5px;border-radius:50%;background:${ac};display:inline-block;"></span>${a}</span>`; }).join(' ');
   const meta = [ev.dateStart ? fmtDate(ev.dateStart) : '', ev.startTime ? fmtTime(ev.startTime, ev.timezone||'') : '', ev.location ? escHtml(ev.location) : ''].filter(Boolean).join(' · ');
   const days = daysUntilEvent(ev.dateStart);
-  const _bg = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#0891b2 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0891b2 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#16a34a 0%,#0d9488 100%)'];
+  const _bg = ['#ef4444','linear-gradient(135deg,#ff6b00 0%,#ff0080 100%)','linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%)','linear-gradient(135deg,#059669 0%,#10b981 100%)','linear-gradient(135deg,#f97316 0%,#eab308 100%)','linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%)','linear-gradient(135deg,#d97706 0%,#dc2626 100%)','linear-gradient(135deg,#ec4899 0%,#a855f7 100%)'];
   const badge = (days !== null && days >= 0 && days <= 7) ? `<span style="background:${_bg[days]||_bg[7]};color:#fff;font-size:0.62rem;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:0.06em;margin-left:auto;flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,0.3);">${days===0?'TODAY':days===1?'1 DAY':days+' DAYS'}</span>` : '';
   // Use data-src for lazy loading
   const imgHtml = ev.image
@@ -4179,7 +4179,8 @@ function getTypeStyle(type) {
     'presstour':           { bg:'#faf5ff', color:'#6d28d9', border:'#ddd6fe' },
     'fancon':              { bg:'#f0f9ff', color:'#0369a1', border:'#bae6fd' },
     'fanfest':             { bg:'#fff1f2', color:'#be123c', border:'#fda4af' },
-    'music mv':            { bg:'#fefce8', color:'#713f12', border:'#fef08a' },
+    'music mv':            { bg:'#f5f3ff', color:'#6d28d9', border:'#c4b5fd', dot:'#8b5cf6' },
+    'music video':        { bg:'#f5f3ff', color:'#6d28d9', border:'#c4b5fd', dot:'#8b5cf6' },
     'live':                { bg:'#fff7ed', color:'#9a3412', border:'#fdba74', dot:'#f97316' },
     'series':              { bg:'#f0fdf4', color:'#166534', border:'#86efac' },
     'fan party':           { bg:'#eff6ff', color:'#1e40af', border:'#93c5fd' },
@@ -4259,11 +4260,11 @@ function buildCountdownImgBadge(ev, inline = false) {
     'background:#ef4444;',  // TODAY — red
     'background:linear-gradient(135deg,#ff6b00 0%,#ff0080 100%);',  // 1 DAY  — orange → hot pink
     'background:linear-gradient(135deg,#7c3aed 0%,#3b82f6 100%);',  // 2 DAYS — purple → blue
-    'background:linear-gradient(135deg,#059669 0%,#0891b2 100%);',  // 3 DAYS — emerald → cyan
+    'background:linear-gradient(135deg,#059669 0%,#10b981 100%);',  // 3 DAYS — emerald (solid green)
     'background:linear-gradient(135deg,#f97316 0%,#eab308 100%);',  // 4 DAYS — orange → yellow
-    'background:linear-gradient(135deg,#0891b2 0%,#6366f1 100%);',  // 5 DAYS — cyan → indigo
+    'background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);',  // 5 DAYS — sky → indigo
     'background:linear-gradient(135deg,#d97706 0%,#dc2626 100%);',  // 6 DAYS — amber → red
-    'background:linear-gradient(135deg,#16a34a 0%,#0d9488 100%);',  // 7 DAYS — green → teal
+    'background:linear-gradient(135deg,#ec4899 0%,#a855f7 100%);',  // 7 DAYS — pink → purple
   ];
   const label = days === 0 ? 'TODAY' : days === 1 ? '1 DAY' : `${days} DAYS`;
   const st = styles[days] || styles[7];
@@ -6565,7 +6566,7 @@ function deleteWork(backendId, title) {
 
   const confirmTxt = document.createElement('span');
   confirmTxt.style.cssText = 'font-size:0.78rem;color:#dc2626;font-weight:600;white-space:nowrap;';
-  confirmTxt.textContent = 'ลบใช่ไหม?';
+  confirmTxt.textContent = 'Confirm Delete?';
 
   const yesBtn = document.createElement('button');
   yesBtn.className = 'btn-danger';
