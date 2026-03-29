@@ -2977,15 +2977,15 @@ function _applyAllData(res, force, dataChangedRef) {
   const evData = res.events || [];
   if (Array.isArray(evData) && evData.length) {
     const processed = processEvents(evData);
-    const stableEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
-    // ถ้ามี optimistic event pending อยู่ — block ไม่ให้ overwrite ป้องกันการ์ดขึ้นสองอัน
+    // block เมื่อ optimistic pending — ให้ _fetchFreshFromAppsScript จัดการแทน
     if (_optimisticPending) {
-      // skip overwrite — รอให้ _fetchFreshFromAppsScript จัดการเองหลัง server confirm
       apiLoaded = true;
     } else {
+      // เปรียบเทียบกับ events ที่ไม่ใช่ optimistic เท่านั้น
+      const stableEvents = allEvents.filter(e => !e.__isOptimistic);
       const _fpDeep = arr => arr.map(x => (x.__backendId||x.id||'') + ':' + (x.title||'') + ':' + (x.dateStart||'') + ':' + (x.startTime||'')).join('|');
       if (_fpDeep(processed) !== _fpDeep(stableEvents)) dataChangedRef.v = true;
-      allEvents = processed;
+      allEvents = processed; // overwrite ด้วย server data สะอาด (ไม่มี optimistic)
       _memCache.set('events', processed);
       Cache.set(LC.EVENTS, processed);
       Cache.setTS(LC.TS_EV);
@@ -3445,20 +3445,14 @@ async function _fetchFreshFromAppsScript() {
     // ป้องกันกรณี server ส่ง cache เก่ากลับมา ทำให้การ์ดขึ้นสองอัน
     const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&fresh=1&t=${Date.now()}`, 12000);
     const dataChangedRef = { v: false };
-    // ก่อน apply: ลบ tmp_ optimistic ออกจาก allEvents เพื่อให้ fingerprint เทียบกับ stable events
-    const _preApplyStable = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
 
-    // apply server data — ปลด flag ก่อนเพื่อให้ _applyAllData overwrite ได้
+    // ลบ optimistic events ออกก่อน apply server data — ป้องกันปนกัน
     _optimisticPending = false;
+    allEvents = allEvents.filter(e => !e.__isOptimistic);
+    _memCache.set('events', allEvents);
+
+    // apply server data ทับ (overwrite allEvents ด้วยข้อมูลจาก Sheets จริงๆ)
     _applyAllData(res, false, dataChangedRef);
-    // ลบ optimistic events ที่ยังค้างอยู่ออก (server data แทนที่แล้ว)
-    const hadOptimistic = allEvents.some(e => e.__isOptimistic);
-    if (hadOptimistic) {
-      allEvents = allEvents.filter(e => !e.__isOptimistic);
-      _memCache.set('events', allEvents);
-      Cache.set(LC.EVENTS, allEvents);
-      dataChangedRef.v = true;
-    }
     _fmtDateCache.clear();
     if (isAdmin) _broadcastDataUpdate();
     // render เสมอหลัง fetch จาก server
@@ -6179,7 +6173,9 @@ async function handleEventFormSubmit() {
 
     // fetch server ใน background — ไม่ await ไม่บล็อก UI
     _fetchingEvents = false; _fetchingAll = false;
-    Cache.clearAll();
+    // ล้างแค่ timestamp cache เพื่อบังคับ refetch — ไม่ล้าง events ที่มี optimistic
+    Cache.del(LC.TS_EV); Cache.del(LC.TS_WK);
+    _rateLimit.reset('events'); _rateLimit.reset('works');
     // safety timeout: ถ้า server ไม่ตอบใน 30 วินาที ปลด flag อัตโนมัติ
     const _optSafetyTimer = setTimeout(function() {
       if (_optimisticPending) {
