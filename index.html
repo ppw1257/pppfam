@@ -2595,6 +2595,7 @@ function fmtDateRange(dateStart, dateEnd) {
   return `${s} – ${fmtDate(dateEnd)}`;
 }
 let editingEventId  = null;
+let _optimisticPending = false; // true ขณะที่มี optimistic event รอ server confirm
 let editingEventRowNumber = null;
 let deleteConfirmIds = new Set();
 let panelUnlocked   = false;
@@ -2976,13 +2977,10 @@ function _applyAllData(res, force, dataChangedRef) {
   const evData = res.events || [];
   if (Array.isArray(evData) && evData.length) {
     const processed = processEvents(evData);
-    // ล้าง tmp_ ออกก่อนเปรียบเทียบ
     const stableEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
-    const hasTmpPending = allEvents.some(e => String(e.__backendId||'').startsWith('tmp_'));
-    // ถ้ามี tmp_ pending อยู่ และ server ส่งข้อมูลน้อยกว่า stable → Apps Script ยัง cache เก่า
-    // ไม่ overwrite allEvents — ป้องกันการ์ด optimistic หาย แล้วขึ้นใหม่เหมือนเพิ่มซ้ำ
-    if (hasTmpPending && processed.length < stableEvents.length) {
-      // server ยังไม่มีข้อมูลล่าสุด — skip overwrite รอ sync รอบถัดไป
+    // ถ้ามี optimistic event pending อยู่ — block ไม่ให้ overwrite ป้องกันการ์ดขึ้นสองอัน
+    if (_optimisticPending) {
+      // skip overwrite — รอให้ _fetchFreshFromAppsScript จัดการเองหลัง server confirm
       apiLoaded = true;
     } else {
       const _fpDeep = arr => arr.map(x => (x.__backendId||x.id||'') + ':' + (x.title||'') + ':' + (x.dateStart||'') + ':' + (x.startTime||'')).join('|');
@@ -3449,24 +3447,15 @@ async function _fetchFreshFromAppsScript() {
     // ก่อน apply: ลบ tmp_ optimistic ออกจาก allEvents เพื่อให้ fingerprint เทียบกับ stable events
     const _preApplyStable = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
 
-    // apply server data ลงใน allEvents
+    // apply server data ลงใน allEvents (ข้อมูลจาก Sheets โดยตรง fresh=1)
+    _optimisticPending = false;
     _applyAllData(res, false, dataChangedRef);
-
-    // ตรวจว่า server ส่งข้อมูล "ใหม่" จริงๆ หรือเป็น cache เก่าที่ยังไม่ได้รับ save ล่าสุด
-    // ถ้า allEvents หลัง apply มีจำนวนเท่ากับ stable events ก่อน apply
-    // และ tmp_ ที่เพิ่งเพิ่มไปไม่ได้อยู่ใน server data → server ยัง cache เก่า
-    // ในกรณีนั้น restore stable events กลับมา ป้องกันการ์ดหาย/ซ้ำ
-    const _tmpEvents = _preApplyStable.length > 0 ?
-      allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_')) : [];
-
     _fmtDateCache.clear();
-    // Broadcast เฉพาะเมื่อ admin เป็นคน call — ป้องกัน visitor tab broadcast loop
+    // Broadcast เฉพาะเมื่อ admin เป็นคน call
     if (isAdmin) _broadcastDataUpdate();
-    // Re-render เฉพาะเมื่อ data เปลี่ยนจริง ทั้ง admin และ visitor
-    if (dataChangedRef.v) {
-      _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
-      _refreshAllPages();
-    }
+    // Force render เสมอ — เพราะ caller อาจเป็น admin ที่เพิ่งกด save
+    _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+    _refreshAllPages();
   } catch(e) {
     console.warn('_fetchFreshFromAppsScript failed:', e.message);
   }
@@ -6137,62 +6126,23 @@ async function handleEventFormSubmit() {
     }
     clearForm();
 
-    // ── OPTIMISTIC UPDATE: แทรก/อัปเดตข้อมูลใน memory ทันที ไม่รอ server ──
-    const _savedId = editingEventId;
-    const _savedRow = editingEventRowNumber;
-    const optimisticEvent = Object.assign({
-      __backendId: _savedId || ('tmp_' + Date.now()),
-      __rowNumber: _savedRow || 0,
-      __rawId: _savedId || '',
-      _isPast: payload.dateStart ? payload.dateStart < _todayInBKK() : false,
-      _daysUntil: payload.dateStart ? Math.round((new Date(payload.dateStart + 'T00:00:00') - new Date(_todayInBKK() + 'T00:00:00')) / 86400000) : null,
-    }, payload);
-
-    if (_savedId) {
-      // edit: หา event เดิมแล้วอัพเดทในที่
-      const idx = allEvents.findIndex(e =>
-        (e.__backendId && e.__backendId === _savedId) ||
-        (e.__rawId && e.__rawId === _savedId) ||
-        (e.id && e.id === _savedId)
-      );
-      if (idx !== -1) {
-        allEvents[idx] = Object.assign({}, allEvents[idx], optimisticEvent);
-      } else {
-        // ถ้าหาไม่เจอ (ID format ไม่ตรง) → filter แล้ว push เพื่อไม่ให้ค้าง
-        allEvents = allEvents.filter(e =>
-          e.__backendId !== _savedId && e.__rawId !== _savedId && e.id !== _savedId
-        );
-        allEvents.push(optimisticEvent);
-        allEvents.sort(function(a, b) {
-          if (!a.dateStart) return 1; if (!b.dateStart) return -1;
-          var c = a.dateStart.localeCompare(b.dateStart);
-          return c !== 0 ? c : _timeToMinutes(a.startTime) - _timeToMinutes(b.startTime);
-        });
-      }
-    } else {
-      // add ใหม่: ลบ tmp_ เก่าที่อาจค้างก่อน แล้วค่อย push
-      allEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
-      allEvents.push(optimisticEvent);
-      allEvents.sort(function(a, b) {
-        if (!a.dateStart) return 1; if (!b.dateStart) return -1;
-        var c = a.dateStart.localeCompare(b.dateStart);
-        return c !== 0 ? c : _timeToMinutes(a.startTime) - _timeToMinutes(b.startTime);
+    // ── SYNC จาก server โดยตรง (ไม่ใช้ optimistic เพราะทำให้การ์ดซ้ำ) ──
+    // รอ Apps Script ส่งข้อมูลจริงกลับมา แล้วค่อย render
+    _optimisticPending = false;
+    _fetchingEvents = false; _fetchingAll = false;
+    Cache.clearAll(); // ล้าง cache เพื่อให้ดึงข้อมูลใหม่จริงๆ
+    try {
+      await _fetchFreshFromAppsScript();
+    } catch(e) {
+      console.warn('[PPP] sync after save failed:', e && e.message);
+      // fallback: render สิ่งที่มีอยู่
+      _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+      requestAnimationFrame(function() {
+        renderHome(); renderCalendar();
+        if (isAdmin) renderAdminList();
+        renderBirthdayBanners(); debounceLucide();
       });
     }
-    _memCache.set('events', allEvents);
-    Cache.set(LC.EVENTS, allEvents);
-
-    // Render ทันที 1 frame — ไม่กระตุก
-    _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
-    requestAnimationFrame(function() {
-      renderHome(); renderCalendar();
-      if (isAdmin) renderAdminList();
-      renderBirthdayBanners(); debounceLucide();
-    });
-
-    // Sync กับ server ใน background (ไม่ await ไม่บล็อก UI)
-    _fetchingEvents = false; _fetchingAll = false;
-    _fetchFreshFromAppsScript().catch(function(){});
   }
 }
 
