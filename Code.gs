@@ -3,81 +3,103 @@
 // Google Apps Script (Code.gs)
 // ════════════════════════════════════════════════════════════════════
 
-const ADMIN_PASSWORD = 'ppp1257pondphuwinppw';
+// ── ความปลอดภัย: ไม่เก็บ password plaintext ──
+// ใส่ password ใน Script Properties แทน:
+//   Apps Script → Project Settings → Script Properties
+//   Key: ADMIN_PASSWORD   Value: ppp1257pondphuwinppw
+//   Key: GITHUB_TOKEN     Value: ghp_xxxx
+function getAdminPassword_() {
+  return PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD') || '';
+}
+
 const TRIGGER_INTERVAL_MINUTES = 5;
 
 // ── GitHub export config ──
-// ⚠️ อย่าใส่ token ตรงนี้ — ให้ใส่ใน Apps Script > Project Settings > Script Properties
-// Key: GITHUB_TOKEN  Value: ghp_xxxx (สร้างใหม่จาก GitHub Settings > Developer settings > PAT)
 const GITHUB_TOKEN  = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN') || '';
 const GITHUB_OWNER  = 'ppw1257';
 const GITHUB_REPO   = 'pppfam';
 const GITHUB_BRANCH = 'main';
 
 // ═══════════════════════════════════════════════════════════════════
-// GITHUB PUSH — อัพเดตไฟล์ JSON บน repo แบบ parallel
+// GITHUB PUSH
 // ═══════════════════════════════════════════════════════════════════
 function pushToGitHub_(filename, data) {
+  if (!GITHUB_TOKEN) { Logger.log('GitHub push skipped: no GITHUB_TOKEN'); return false; }
   var url = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/data/' + filename;
-  var options = {
-    method: 'get',
-    headers: {
-      'Authorization': 'token ' + GITHUB_TOKEN,
-      'Accept': 'application/vnd.github.v3+json'
-    },
-    muteHttpExceptions: true
-  };
   var sha = '';
   try {
-    var getRes = UrlFetchApp.fetch(url, options);
+    var getRes = UrlFetchApp.fetch(url, {
+      method: 'get',
+      headers: { 'Authorization': 'token ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github.v3+json' },
+      muteHttpExceptions: true
+    });
     if (getRes.getResponseCode() === 200) {
       sha = JSON.parse(getRes.getContentText()).sha || '';
+    } else if (getRes.getResponseCode() === 401) {
+      Logger.log('GitHub Token หมดอายุหรือ invalid — กรุณาสร้าง token ใหม่');
+      return false;
     }
-  } catch(e) {
-    Logger.log('SHA fetch error: ' + e.message);
-  }
+  } catch(e) { Logger.log('SHA fetch error: ' + e.message); }
+
   var body = { message: 'auto: update data/' + filename, branch: GITHUB_BRANCH };
   body.content = Utilities.base64Encode(JSON.stringify(data), Utilities.Charset.UTF_8);
   if (sha) body.sha = sha;
-  var putOptions = {
-    method: 'put',
-    headers: {
-      'Authorization': 'token ' + GITHUB_TOKEN,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    },
-    payload: JSON.stringify(body),
-    muteHttpExceptions: true
-  };
+
   try {
-    var res = UrlFetchApp.fetch(url, putOptions);
+    var res = UrlFetchApp.fetch(url, {
+      method: 'put',
+      headers: {
+        'Authorization': 'token ' + GITHUB_TOKEN,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true
+    });
     var code = res.getResponseCode();
-    if (code !== 200 && code !== 201) {
-      Logger.log('GitHub FAILED [' + filename + ']: ' + code + ' ' + res.getContentText().slice(0,100));
-    } else {
+    if (code === 200 || code === 201) {
       Logger.log('GitHub OK: ' + filename);
+      return true;
+    } else if (code === 422) {
+      Logger.log('GitHub 422 (SHA conflict) [' + filename + '] — retrying without SHA...');
+      // retry without SHA (conflict resolution)
+      delete body.sha;
+      var retry = UrlFetchApp.fetch(url, {
+        method: 'put',
+        headers: { 'Authorization': 'token ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        payload: JSON.stringify(body),
+        muteHttpExceptions: true
+      });
+      Logger.log('Retry result: ' + retry.getResponseCode());
+      return retry.getResponseCode() === 200 || retry.getResponseCode() === 201;
+    } else {
+      Logger.log('GitHub FAILED [' + filename + ']: ' + code + ' ' + res.getContentText().slice(0,200));
+      return false;
     }
   } catch(e) {
     Logger.log('GitHub push exception [' + filename + ']: ' + e.message);
+    return false;
   }
 }
 
 function pushAllToGitHub_(evData, wkData, bdData, anData) {
-  if (!GITHUB_TOKEN) {
-    Logger.log('GitHub push skipped: no GITHUB_TOKEN');
-    return;
-  }
+  if (!GITHUB_TOKEN) { Logger.log('GitHub push skipped: no GITHUB_TOKEN'); return; }
+  var allOk = true;
+  // push all.json ก่อน (สำคัญที่สุด — website ดึงไฟล์นี้)
+  var ok = pushToGitHub_('all.json', {
+    events:        evData,
+    works:         wkData,
+    birthdays:     bdData,
+    anniversaries: anData,
+    generated:     new Date().toISOString()
+  });
+  if (!ok) allOk = false;
+  // push แต่ละไฟล์แยก (สำหรับ fallback)
   pushToGitHub_('events.json',        evData);
   pushToGitHub_('works.json',         wkData);
   pushToGitHub_('birthdays.json',     bdData);
   pushToGitHub_('anniversaries.json', anData);
-}
-
-// รัน function นี้ครั้งเดียวเพื่อ authorize UrlFetchApp
-function authorizeAndTest() {
-  var res = UrlFetchApp.fetch('https://api.github.com', { muteHttpExceptions: true });
-  Logger.log('Auth test: ' + res.getResponseCode());
-  Logger.log('UrlFetchApp authorized OK — รัน setupTriggers ได้เลย');
+  if (!allOk) Logger.log('WARNING: all.json push failed — website จะยังเห็นข้อมูลเก่า');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -86,7 +108,7 @@ function authorizeAndTest() {
 var WORKS_COLUMNS = [
   "id","category","title","artists","year",
   "image","type","role","brand","magazine","project",
-  "release_date","link","description"
+  "release_date","contract_end","link","description"
 ];
 
 function getSheetByName_(name) {
@@ -202,6 +224,16 @@ function getCacheTS_(key) {
 // REGENERATE ALL CACHES + PUSH TO GITHUB
 // ═══════════════════════════════════════════════════════════════════
 function regenerateAllCaches() {
+  // ── Lock flag: ป้องกัน trigger หลายตัวรันซ้อนกัน ──
+  var props = PropertiesService.getScriptProperties();
+  var lockTS = parseInt(props.getProperty('_regen_lock_ts') || '0');
+  var now = Date.now();
+  if (lockTS && (now - lockTS) < 4 * 60 * 1000) {
+    // มี lock ภายใน 4 นาทีที่ผ่านมา — skip (อีก trigger กำลังรันอยู่)
+    Logger.log('regenerateAllCaches() SKIPPED — lock active since ' + new Date(lockTS).toISOString());
+    return;
+  }
+  props.setProperty('_regen_lock_ts', String(now));
   Logger.log('regenerateAllCaches() started');
   var evData = getEventsFromSheet_();
   var wkData = getWorksFromSheet_();
@@ -212,14 +244,19 @@ function regenerateAllCaches() {
   saveCache_('ppp_works',         { status:'ok', generated: new Date().toISOString(), works: wkData });
   saveCache_('ppp_birthdays',     { status:'ok', generated: new Date().toISOString(), birthdays: bdData });
   saveCache_('ppp_anniversaries', { status:'ok', generated: new Date().toISOString(), anniversaries: anData });
+  saveCache_('ppp_all', {
+    status:'ok', generated: new Date().toISOString(),
+    events: evData, works: wkData, birthdays: bdData, anniversaries: anData
+  });
 
-  // Push static JSON to GitHub → Cloudflare CDN
   try {
     pushAllToGitHub_(evData, wkData, bdData, anData);
   } catch(e) {
     Logger.log('GitHub push error: ' + e.message);
   }
 
+  // ปลด lock หลังเสร็จ
+  props.deleteProperty('_regen_lock_ts');
   Logger.log('Done. events=' + evData.length + ' works=' + wkData.length +
              ' birthdays=' + bdData.length + ' anniversaries=' + anData.length);
 }
@@ -249,6 +286,31 @@ function doGet(e) {
       case "getAnniversaries":
         result = loadCache_('ppp_anniversaries');
         if (!result) { result = { status:'ok', anniversaries: getAnniversariesFromSheet_() }; saveCache_('ppp_anniversaries', result); }
+        break;
+      case "getAll":
+        // fresh=1: bypass PropertiesService cache — ดึงจาก Sheets โดยตรง
+        // ใช้โดย _fetchFreshFromAppsScript หลัง admin save เพื่อป้องกันการ์ดขึ้นสองอัน
+        var isFresh = e && e.parameter && e.parameter.fresh === '1';
+        if (isFresh) {
+          var evData2 = getEventsFromSheet_();
+          var wkData2 = getWorksFromSheet_();
+          var bdData2 = getBirthdaysFromSheet_();
+          var anData2 = getAnniversariesFromSheet_();
+          result = { status:'ok', generated: new Date().toISOString(),
+            events: evData2, works: wkData2, birthdays: bdData2, anniversaries: anData2 };
+          saveCache_('ppp_all', result);
+        } else {
+          result = loadCache_('ppp_all');
+          if (!result) {
+            var evData = getEventsFromSheet_();
+            var wkData = getWorksFromSheet_();
+            var bdData = getBirthdaysFromSheet_();
+            var anData = getAnniversariesFromSheet_();
+            result = { status:'ok', generated: new Date().toISOString(),
+              events: evData, works: wkData, birthdays: bdData, anniversaries: anData };
+            saveCache_('ppp_all', result);
+          }
+        }
         break;
       case "forceRegenerate":
         regenerateAllCaches();
@@ -280,7 +342,8 @@ function doPost(e) {
     var body   = JSON.parse(e.postData.contents);
     var action = body.action || "";
 
-    if (body.password && body.password !== ADMIN_PASSWORD) {
+    // ── ตรวจ password จาก Script Properties แทน hardcode ──
+    if (body.password && body.password !== getAdminPassword_()) {
       return corsOutput_({ status:"error", message:"Unauthorized" });
     }
 
@@ -300,6 +363,7 @@ function doPost(e) {
       default: result = { status:"error", message:"Unknown action: " + action };
     }
 
+    // regenerate cache + push GitHub ทุกครั้งที่ write สำเร็จ
     if (result && result.status === 'ok') {
       regenerateAllCaches();
     }
@@ -382,20 +446,21 @@ function getWorksFromSheet_() {
     var row = data[i]; var obj = {};
     headers.forEach(function(h,j){ obj[h]=row[j]; });
     var w = {
-      id:           str_(obj.id||""),
-      category:     safe_(obj.category||""),
-      title:        safe_(obj.title||""),
-      artists:      safe_(obj.artists||""),
-      year:         str_(obj.year||""),
-      image:        str_(obj.image||""),
-      description:  str_(obj.description||""),
-      link:         str_(obj.link||""),
-      type:         safe_(obj.type||""),
-      role:         safe_(obj.role||""),
-      brand:        safe_(obj.brand||""),
-      magazine:     safe_(obj.magazine||""),
-      project:      safe_(obj.project||""),
-      release_date: cleanDate_(obj.release_date||""),
+      id:            str_(obj.id||""),
+      category:      safe_(obj.category||""),
+      title:         safe_(obj.title||""),
+      artists:       safe_(obj.artists||""),
+      year:          str_(obj.year||""),
+      image:         str_(obj.image||""),
+      description:   str_(obj.description||""),
+      link:          str_(obj.link||""),
+      type:          safe_(obj.type||""),
+      role:          safe_(obj.role||""),
+      brand:         safe_(obj.brand||""),
+      magazine:      safe_(obj.magazine||""),
+      project:       safe_(obj.project||""),
+      release_date:  cleanDate_(obj.release_date||""),
+      contract_end:  str_(obj.contract_end||""),
     };
     if (w.title) works.push(w);
   }
@@ -549,28 +614,53 @@ function deleteWork(id) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TRIGGER SETUP
+// TRIGGER SETUP — แก้ปัญหา trigger ซ้อนกัน (สาเหตุ 8,398 runs)
 // ═══════════════════════════════════════════════════════════════════
 function setupTriggers() {
-  ScriptApp.getProjectTriggers().forEach(function(t) {
-    if (t.getHandlerFunction() === 'regenerateAllCaches') ScriptApp.deleteTrigger(t);
+  // ลบ trigger เก่าทั้งหมดก่อน (ป้องกัน trigger ซ้อนกัน)
+  var triggers = ScriptApp.getProjectTriggers();
+  var removed = 0;
+  triggers.forEach(function(t) {
+    if (t.getHandlerFunction() === 'regenerateAllCaches') {
+      ScriptApp.deleteTrigger(t);
+      removed++;
+    }
   });
+  Logger.log('Removed ' + removed + ' old triggers');
+
+  // สร้าง trigger ใหม่แค่ 1 ตัวเท่านั้น
   ScriptApp.newTrigger('regenerateAllCaches')
     .timeBased()
     .everyMinutes(TRIGGER_INTERVAL_MINUTES)
     .create();
-  Logger.log('Trigger set: every ' + TRIGGER_INTERVAL_MINUTES + ' min');
+  Logger.log('Created 1 new trigger: every ' + TRIGGER_INTERVAL_MINUTES + ' min');
+
+  // ตรวจสอบว่ามี trigger กี่ตัวตอนนี้
+  var remaining = ScriptApp.getProjectTriggers().filter(function(t){
+    return t.getHandlerFunction() === 'regenerateAllCaches';
+  });
+  Logger.log('Total regenerateAllCaches triggers now: ' + remaining.length);
+
   regenerateAllCaches();
-  Logger.log('Initial cache done.');
+  Logger.log('Initial cache + GitHub push done.');
 }
 
 function removeTriggers() {
-  ScriptApp.getProjectTriggers().forEach(function(t){ ScriptApp.deleteTrigger(t); });
-  Logger.log('All triggers removed.');
+  var count = 0;
+  ScriptApp.getProjectTriggers().forEach(function(t){ ScriptApp.deleteTrigger(t); count++; });
+  Logger.log('Removed ' + count + ' triggers.');
+}
+
+function checkTriggerCount() {
+  var triggers = ScriptApp.getProjectTriggers();
+  Logger.log('Total triggers: ' + triggers.length);
+  triggers.forEach(function(t){
+    Logger.log('  - ' + t.getHandlerFunction() + ' | ' + t.getEventType());
+  });
 }
 
 function checkCacheStatus() {
-  ['ppp_events','ppp_works','ppp_birthdays','ppp_anniversaries'].forEach(function(key) {
+  ['ppp_events','ppp_works','ppp_birthdays','ppp_anniversaries','ppp_all'].forEach(function(key) {
     var ts = getCacheTS_(key);
     var age = ts ? ((Date.now()-ts)/60000).toFixed(1)+'min ago' : 'never';
     var data = loadCache_(key);
@@ -578,10 +668,29 @@ function checkCacheStatus() {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// รันฟังก์ชันนี้ครั้งเดียวเพื่อขอ permission external request
-// ═══════════════════════════════════════════════════════════════════
+function checkGitHubToken() {
+  if (!GITHUB_TOKEN) { Logger.log('ERROR: ไม่มี GITHUB_TOKEN ใน Script Properties'); return; }
+  var res = UrlFetchApp.fetch('https://api.github.com/user', {
+    headers: { 'Authorization': 'token ' + GITHUB_TOKEN },
+    muteHttpExceptions: true
+  });
+  var code = res.getResponseCode();
+  if (code === 200) {
+    var user = JSON.parse(res.getContentText());
+    Logger.log('GitHub Token OK — logged in as: ' + user.login);
+  } else if (code === 401) {
+    Logger.log('GitHub Token หมดอายุหรือ invalid! กรุณาสร้าง token ใหม่');
+  } else {
+    Logger.log('GitHub Token check failed: ' + code);
+  }
+}
+
+function authorizeAndTest() {
+  var res = UrlFetchApp.fetch('https://api.github.com', { muteHttpExceptions: true });
+  Logger.log('Auth test: ' + res.getResponseCode());
+}
+
 function authorizeMe() {
   UrlFetchApp.fetch('https://api.github.com', { muteHttpExceptions: true });
-  Logger.log('Authorization OK — ตอนนี้รัน setupTriggers ได้แล้ว');
+  Logger.log('Authorization OK');
 }
