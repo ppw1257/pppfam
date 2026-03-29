@@ -119,7 +119,7 @@
   html { height: 100%; overflow: hidden; font-size: 105%; }
   body { height: 100%; background: #ffffff; background-attachment: fixed; color: #2d2d2d; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
   #app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-  .page { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; }
+  .page { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: env(safe-area-inset-bottom, 0px); }
   .page.active {
     display: flex;
     flex-direction: column;
@@ -830,6 +830,7 @@
     top: 0;
     z-index: 100;
     transition: box-shadow 0.2s, border-color 0.2s;
+    padding-top: env(safe-area-inset-top, 0px);
   }
   #main-nav.scrolled {
     box-shadow: 0 1px 16px rgba(0,0,0,0.06);
@@ -2451,7 +2452,7 @@
 
 // ── SECURITY CONFIG ──────────────────────────────────────────────
 // Passwords are stored as SHA-256 hashes — never as plaintext
-const PANEL_KEY       = 'pppsecret';
+const PANEL_KEY_HASH  = 'aa2ceadbc3f8c692eea73c8c81954d22b22b291568b12f5801570f9a84e655c4'; // SHA-256 of panel key
 // SHA-256 of 'ppp1257pondphuwinppw'
 const ADMIN_PASS_HASH = '5a4a4ec01a7430993f869b5d756c6fdf1aa376f81026d3aba6576554789eaa2d';
 const SESS_KEY        = 'pppAdminSess';
@@ -2515,6 +2516,14 @@ const LC = {
 let allEvents       = [];
 let allBirthdays    = [];
 let allAnniversaries= [];
+
+// ── DOM CACHE — elements ที่ query ซ้ำบ่อยใน render loop ──────────
+// เรียก _dom(id) แทน getElementById(id) เพื่อ cache result อัตโนมัติ
+const _domCache = {};
+function _dom(id) {
+  if (!_domCache[id]) _domCache[id] = document.getElementById(id);
+  return _domCache[id];
+}
 let isAdmin         = false;
 let currentPage     = 'home';
 let calMonth        = new Date().getMonth();
@@ -3280,13 +3289,16 @@ function hydrateFromCache() { _fastHydrateFromCache(); }
 let _fetchingAll = false;
 // ── helper: parse all-in-one response จาก all.json หรือ Apps Script getAll ──
 function _applyAllData(res, force, dataChangedRef) {
-  const _fp = arr => arr.length + '|' + (arr[0]?.__backendId||arr[0]?.title||'') + '|' + (arr[arr.length-1]?.__backendId||arr[arr.length-1]?.title||'');
+  // fingerprint แม่นขึ้น — ใช้ id ทุกตัว ไม่ใช่แค่ first+last
+  const _fp = arr => arr.length + '|' + arr.map(x => x.__backendId||x.id||x.title||'').join(',');
 
   // Events
   const evData = res.events || [];
   if (Array.isArray(evData) && evData.length) {
     const processed = processEvents(evData);
-    if (_fp(processed) !== _fp(allEvents)) dataChangedRef.v = true;
+    // ล้าง tmp_ optimistic events ออกก่อนเปรียบเทียบ — ป้องกันการ์ดขึ้นสองอัน
+    const stableEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
+    if (_fp(processed) !== _fp(stableEvents)) dataChangedRef.v = true;
     allEvents = processed;
     _memCache.set('events', processed);
     Cache.set(LC.EVENTS, processed);
@@ -3560,7 +3572,7 @@ function scheduleAutoRefresh() {
   _refreshTimer = setInterval(() => {
     if (document.hidden) return;
     if (!_fetchingAll) {
-      _fetchAllData(true).catch(() => {});
+      _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
     }
   }, 15 * 1000); // ทุก 15 วินาที — real-time mode
 
@@ -3574,7 +3586,7 @@ function scheduleAutoRefresh() {
         if (!_fetchingAll) {
           // ดึงตรงจาก Apps Script ทันที — ไม่รอ GitHub Pages sync (ช้า 1-5 นาที)
           Cache.clearAll();
-          _fetchFreshFromAppsScript().catch(() => {});
+          _fetchFreshFromAppsScript().catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
         }
       }
     });
@@ -3616,7 +3628,7 @@ function _scheduleMidnightTimer() {
     scheduleRender();
     renderBirthdayBanners();
     _fetchingAll = false;
-    _fetchAllData(true).catch(() => {});
+    _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
     _scheduleMidnightTimer();
   }, msUntilMidnight + 50); // +50ms buffer ให้แน่ใจว่าผ่านเที่ยงคืนแล้ว
 }
@@ -3783,8 +3795,8 @@ function isEventUpcoming(ev) { return !isEventPast(ev); }
 
 // ── Skeleton loader — prevents blank page flash ───────────────────
 function showSkeletons() {
-  const grid = document.getElementById('events-grid');
-  const noEv = document.getElementById('no-events');
+  const grid = _dom('events-grid');
+  const noEv = _dom('no-events');
   if (!grid) return;
   if (noEv) noEv.style.display = 'none';
   // Minimal DOM — reuse a shared skeleton template via cloneNode (fast)
@@ -3808,8 +3820,8 @@ function showSkeletons() {
 }
 
 function showConnectionError() {
-  const grid = document.getElementById('events-grid');
-  const noEv = document.getElementById('no-events');
+  const grid = _dom('events-grid');
+  const noEv = _dom('no-events');
   if (noEv) noEv.style.display = 'none';
   if (!grid) return;
   grid.innerHTML = `<div style="text-align:center;padding:4rem 1rem;color:#9ca3af;">
@@ -3826,7 +3838,7 @@ function showConnectionError() {
 
 function showStaleWarning() {
   // Non-intrusive banner at top of grid to inform user data may be stale
-  const grid = document.getElementById('events-grid');
+  const grid = _dom('events-grid');
   if (!grid) return;
   const existing = document.getElementById('stale-warn');
   if (existing) return;
@@ -3839,7 +3851,7 @@ function showStaleWarning() {
 }
 
 function hideConnectionError() {
-  const grid = document.getElementById('events-grid');
+  const grid = _dom('events-grid');
   if (grid && grid.querySelector('button[onclick="retryConnection()"]')) {
     grid.innerHTML = '';
   }
@@ -3853,19 +3865,19 @@ async function forceRefreshAll() {
   _vsLastFingerprint = '';
   if ('caches' in window) {
     const keys = await caches.keys().catch(() => []);
-    await Promise.all(keys.filter(k => k.includes('api')).map(k => caches.delete(k))).catch(() => {});
+    await Promise.all(keys.filter(k => k.includes('api')).map(k => caches.delete(k))).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
   }
   _fetchingEvents = false; _fetchingBdays = false; _fetchingAnnivs = false; _fetchingWorks = false;
   _fetchingAll = false;
   showSkeletons();
-  await _fetchAllData(true).catch(() => {});
+  await _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
 }
 
 async function retryConnection() {
   Cache.clearAll();
   _fetchingAll = false;
   showSkeletons();
-  await _fetchAllData(true).catch(() => {});
+  await _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -4004,8 +4016,8 @@ function renderHome() {
     }
   }
 
-  const grid = document.getElementById('events-grid');
-  const noEv = document.getElementById('no-events');
+  const grid = _dom('events-grid');
+  const noEv = _dom('no-events');
   const count = document.getElementById('events-count');
   if (!grid) return;
 
@@ -4172,7 +4184,7 @@ function _buildGridCard(ev) {
 function _renderHomeEnd() {
   debounceLucide();
   startCardCountdowns();
-  _observeLazyImages(document.getElementById('events-grid'));
+  _observeLazyImages(_dom('events-grid'));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -4190,7 +4202,7 @@ function _vsComputeFingerprint(groups) {
 
 function _vsInit(groups) {
   const fp = _vsComputeFingerprint(groups);
-  const grid = document.getElementById('events-grid');
+  const grid = _dom('events-grid');
   // Skip re-render only when fingerprint matches AND grid has real rendered content
   const hasRealCards = grid && grid.querySelector('.event-card, .list-card, .month-group');
   if (fp && fp === _vsLastFingerprint && hasRealCards && grid.children.length > 1) {
@@ -4634,7 +4646,7 @@ function startCardCountdowns() {
       if (stillUpcoming.length === 0) {
         Cache.del(LC.TS_EV);
         _memCache.del('events');
-        loadEventsFromSheets(true).catch(()=>{});
+        loadEventsFromSheets(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
       }
       if (!window._cdRenderPending) {
         window._cdRenderPending = true;
@@ -4861,9 +4873,21 @@ function openDetailModal(id) {
   const mapWrap = document.getElementById('detail-map-wrap');
   if (ev.map && ev.map.trim()) {
     mapWrap.style.display = 'block';
-    document.getElementById('detail-map').innerHTML = ev.map
-      .replace(/width="[^"]*"/g, 'width="100%"')
-      .replace(/height="[^"]*"/g, 'height="300"');
+    // ความปลอดภัย: กรองให้เหลือแค่ <iframe> เท่านั้น ป้องกัน XSS จาก script injection
+    const _mapRaw = ev.map.trim();
+    const _iframeMatch = _mapRaw.match(/<iframe[^>]*>[\s\S]*?<\/iframe>|<iframe[^>]*\/>/i);
+    if (_iframeMatch) {
+      const _safe = _iframeMatch[0]
+        .replace(/width="[^"]*"/gi, 'width="100%"')
+        .replace(/height="[^"]*"/gi, 'height="300"')
+        .replace(/onclick\s*=/gi, 'data-onclick=')
+        .replace(/onload\s*=/gi, 'data-onload=')
+        .replace(/onerror\s*=/gi, 'data-onerror=')
+        .replace(/javascript:/gi, '');
+      document.getElementById('detail-map').innerHTML = _safe;
+    } else {
+      mapWrap.style.display = 'none'; // ไม่ใช่ iframe — ไม่แสดง
+    }
   } else mapWrap.style.display = 'none';
 
   // Hashtags
@@ -4892,7 +4916,7 @@ function openDetailModal(id) {
     kwWrap.style.display = 'none';
   }
 
-  document.getElementById('detail-modal').style.display = 'flex';
+  _dom('detail-modal').style.display = 'flex';
   const modalBox = document.querySelector('#detail-modal .modal-box');
   if (modalBox) {
     modalBox.scrollTop = 0;
@@ -4931,11 +4955,11 @@ function copyPill(el, text) {
       el.style.background = origBg;
       el.style.color = origColor;
     }, 1200);
-  }).catch(() => {});
+  }).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
 }
 
 function closeDetailModal() {
-  const modal = document.getElementById('detail-modal');
+  const modal = _dom('detail-modal');
   if (modal) {
     modal.style.display = 'none';
     const mapDiv = document.getElementById('detail-map');
@@ -4947,7 +4971,7 @@ function closeDetailModal() {
     activePage.scrollTop = parseFloat(activePage.dataset.scrollY) || 0;
   }
 }
-function closeDetailModalBackdrop(e) { if (e.target === document.getElementById('detail-modal')) closeDetailModal(); }
+function closeDetailModalBackdrop(e) { if (e.target === _dom('detail-modal')) closeDetailModal(); }
 
 // ═══════════════════════════════════════════════════════════════════
 // BIRTHDAY / ANNIVERSARY BANNERS
@@ -5002,7 +5026,7 @@ function makeBannerHtml(item, days) {
   return `<div class="bday-banner" style="border-left:4px solid ${color};background:${color}0d;"><span class="bday-icon">${icon}</span><div><span style="font-weight:700;color:${color};">${label}</span>${yearsHtml}<span style="font-size:0.78rem;color:#6b7280;margin-left:6px;">in <strong>${days} day${days!==1?'s':''}</strong> · ${dateLabel}</span></div><div class="bday-countdown" style="background:${color};color:#fff;">${days}d</div></div>`;
 }
 function renderBirthdayBanners() {
-  const wrap = document.getElementById('bday-banners');
+  const wrap = _dom('bday-banners');
   if (!wrap) return;
   const allSpecial = [
     ...allBirthdays.map(b => ({ name: b.artist_name, month: b.birthday_month, day: b.birthday_day, color: b.color || '#6b7280', type: 'birthday' })),
@@ -5182,9 +5206,9 @@ function renderCalendar() {
     document.getElementById('cal-next-event-label').style.color = color;
     document.getElementById('cal-next-event-title').textContent = next.title;
     document.getElementById('cal-next-event-meta').textContent = meta;
-    document.getElementById('cal-next-event-icon').style.background = color + '18';
-    document.getElementById('cal-next-event-icon').style.borderColor = color + '44';
-    document.getElementById('cal-next-event-icon').querySelector('svg').style.stroke = color;
+    _dom('cal-next-event-icon').style.background = color + '18';
+    _dom('cal-next-event-icon').style.borderColor = color + '44';
+    _dom('cal-next-event-icon').querySelector('svg').style.stroke = color;
     calBanner.dataset.eventId = next.__backendId;
     calBanner.style.display = 'flex';
   } else if (calBanner) {
@@ -6070,12 +6094,16 @@ async function saveBirthday() {
 // ═══════════════════════════════════════════════════════════════════
 // SECURITY + NAVIGATION
 // ═══════════════════════════════════════════════════════════════════
-function checkPanelKey() {
+async function checkPanelKey() {
   const p = new URLSearchParams(window.location.search);
-  if (p.get('panel') === PANEL_KEY) {
-    panelUnlocked = true;
-    try { sessionStorage.setItem(PANL_FLAG, '1'); } catch(e) {}
-    history.replaceState(null, '', window.location.pathname);
+  const key = p.get('panel');
+  if (key) {
+    const hash = await hashPassword(key);
+    if (hash === PANEL_KEY_HASH) {
+      panelUnlocked = true;
+      try { sessionStorage.setItem(PANL_FLAG, '1'); } catch(e) {}
+      history.replaceState(null, '', window.location.pathname);
+    }
   } else {
     try { panelUnlocked = sessionStorage.getItem(PANL_FLAG) === '1'; } catch(e) {}
   }
@@ -6092,9 +6120,9 @@ async function doAdminLogin() {
     isAdmin = true;
     err.style.display = 'none';
     document.getElementById('login-pw-field').value = '';
-    const n = document.getElementById('nav-admin-link'); if(n) n.style.display = 'inline-flex';
-    document.getElementById('admin-login').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'flex';
+    const n = _dom('nav-admin-link'); if(n) n.style.display = 'inline-flex';
+    _dom('admin-login').style.display = 'none';
+    _dom('admin-panel').style.display = 'flex';
     navigate('admin'); renderAdminList(); renderAnniversaryAdmin();
     _currentAdminTab = ''; // reset ก่อนเสมอ เพื่อให้ switchAdminTab ไม่ถูก skip
     switchAdminTab('events');
@@ -6109,10 +6137,10 @@ function adminLogout() {
   isAdmin = false;
   try { sessionStorage.removeItem(SESS_KEY); } catch(e) {}
   try { sessionStorage.removeItem('pppAdminPass'); } catch(e) {}
-  document.getElementById('admin-login').style.display = 'flex';
+  _dom('admin-login').style.display = 'flex';
   document.getElementById('login-pw-field').value = '';
   document.getElementById('login-pw-err').style.display = 'none';
-  const navAdmin = document.getElementById('nav-admin-link'); if(navAdmin) navAdmin.style.display = 'none';
+  const navAdmin = _dom('nav-admin-link'); if(navAdmin) navAdmin.style.display = 'none';
   navigate('home'); showToast(t('toast_logged_out'));
 }
 
@@ -6174,7 +6202,7 @@ function openAddModal() {
   document.getElementById('form-submit-text').style.display = 'inline';
   document.getElementById('form-submit-spinner').style.display = 'none';
   clearForm();
-  document.getElementById('event-form-modal').style.display = 'flex';
+  _dom('event-form-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
   setTimeout(() => { const n=document.getElementById('ev-title'); if(n)n.focus(); }, 50);
   debounceLucide();
@@ -6189,12 +6217,12 @@ function openEditModal(key) {
   document.getElementById('form-submit-text').style.display = 'inline';
   document.getElementById('form-submit-spinner').style.display = 'none';
   fillForm(ev);
-  document.getElementById('event-form-modal').style.display = 'flex';
+  _dom('event-form-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
   debounceLucide();
 }
 function closeEventFormModal() {
-  document.getElementById('event-form-modal').style.display = 'none';
+  _dom('event-form-modal').style.display = 'none';
   document.body.style.overflow = '';
   document.documentElement.style.overflow = '';
   editingEventId = null; editingEventRowNumber = null;
@@ -6417,9 +6445,19 @@ async function handleEventFormSubmit() {
     }, payload);
 
     if (_savedId) {
-      const idx = allEvents.findIndex(e => (e.__backendId || e.__rawId) === _savedId);
-      if (idx !== -1) allEvents[idx] = Object.assign({}, allEvents[idx], optimisticEvent);
+      // edit: หา event เดิมแล้วอัพเดทในที่
+      const idx = allEvents.findIndex(e =>
+        (e.__backendId && e.__backendId === _savedId) ||
+        (e.__rawId && e.__rawId === _savedId) ||
+        (e.id && e.id === _savedId)
+      );
+      if (idx !== -1) {
+        allEvents[idx] = Object.assign({}, allEvents[idx], optimisticEvent);
+      }
+      // ถ้าหาไม่เจอ ไม่ push ใหม่ — รอ server sync แทน (ป้องกันการ์ดซ้ำ)
     } else {
+      // add ใหม่: ลบ tmp_ เก่าที่อาจค้างก่อน แล้วค่อย push
+      allEvents = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
       allEvents.push(optimisticEvent);
       allEvents.sort(function(a, b) {
         if (!a.dateStart) return 1; if (!b.dateStart) return -1;
@@ -6514,7 +6552,7 @@ function buildTimelineView(events) {
 function shareEvent(title, id) {
   const url = window.location.href.split('?')[0] + '?event=' + id;
   if (navigator.share) {
-    navigator.share({ title, url }).catch(() => {});
+    navigator.share({ title, url }).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
   } else {
     navigator.clipboard?.writeText(url).then(() => showToast(t('toast_copied'))).catch(() => showToast('Copy: ' + url));
   }
@@ -6523,11 +6561,11 @@ function shareEvent(title, id) {
 function syncBentoHeight() { /* no-op: flex + aspect-ratio handles height */ }
 
 function bentoNextClick() {
-  const el = document.getElementById('bento-next');
+  const el = _dom('bento-next');
   if (el && el.dataset.id) openDetailModal(el.dataset.id);
 }
 function bentoNextClick2() {
-  const el = document.getElementById('bento-ev2');
+  const el = _dom('bento-ev2');
   if (el && el.dataset.id) openDetailModal(el.dataset.id);
 }
 
@@ -6676,7 +6714,7 @@ function openAddWorksModal() {
   _clearWorksForm();
   const prevImg = document.getElementById('wf-prev-image');
   if (prevImg) prevImg.style.display = 'none';
-  document.getElementById('works-form-modal').style.display = 'flex';
+  _dom('works-form-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
   setTimeout(() => { const n=document.getElementById('wf-title'); if(n) n.focus(); }, 50);
   debounceLucide();
@@ -6692,7 +6730,7 @@ function openEditWorksModal(work) {
   const prevImg = document.getElementById('wf-prev-image');
   if (prevImg) prevImg.style.display = 'none';
   if (work.image) previewWorksImg();
-  const modal = document.getElementById('works-form-modal');
+  const modal = _dom('works-form-modal');
   modal.style.display = 'flex';
   // Reset scroll to top of modal box
   const box = modal.querySelector('.modal-box');
@@ -6704,7 +6742,7 @@ function openEditWorksModal(work) {
 }
 
 function closeWorksFormModal() {
-  document.getElementById('works-form-modal').style.display = 'none';
+  _dom('works-form-modal').style.display = 'none';
   document.body.style.overflow = '';
   document.documentElement.style.overflow = '';
   _clearWorksForm();
@@ -7401,14 +7439,14 @@ document.addEventListener('visibilitychange', () => {
     // Real-time mode: force fetch ทันทีทุกครั้งที่กลับมาดูแท็บ ไม่รอ TTL
     if (!_fetchingAll) {
       Cache.clearAll(); // clearAll รีเซ็ต rate limiter ด้วยอยู่แล้ว
-      _fetchAllData(true).catch(()=>{});
+      _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
     }
   }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // ── NAV SCROLL BLUR ──
-  const _nav = document.getElementById('main-nav');
+  const _nav = _dom('main-nav');
   const _pages = document.querySelectorAll('.page');
   function _updateNavScroll() {
     let scrolled = false;
@@ -7419,7 +7457,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── STEP 0: Render UI shell instantly (< 1ms) ──
   applyI18n();
-  checkPanelKey();
+  // checkPanelKey เป็น async (hash comparison) — รอผลก่อน render admin UI
+  await checkPanelKey();
   const _initToday = _todayInBKK().split('-').map(Number);
   calYear = _initToday[0]; calMonth = _initToday[1] - 1;
 
@@ -7431,9 +7470,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (panelUnlocked && isLoggedIn()) {
     isAdmin = true;
-    const n = document.getElementById('nav-admin-link'); if(n) n.style.display = 'inline-flex';
-    document.getElementById('admin-login').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'flex';
+    const n = _dom('nav-admin-link'); if(n) n.style.display = 'inline-flex';
+    _dom('admin-login').style.display = 'none';
+    _dom('admin-panel').style.display = 'flex';
     renderAnniversaryAdmin();
     // reset tab state so switchAdminTab ไม่ถูก skip
     _currentAdminTab = '';
@@ -7454,22 +7493,22 @@ document.addEventListener('DOMContentLoaded', () => {
   if (addWorkBtn) addWorkBtn.addEventListener('click', function() { openAddWorksModal(); });
 
   const pwField = document.getElementById('login-pw-field');
-  if (pwField) pwField.addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin().catch(()=>{}); });
+  if (pwField) pwField.addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin().catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); }); });
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      const detail = document.getElementById('detail-modal');
+      const detail = _dom('detail-modal');
       if (detail && detail.style.display !== 'none') { closeDetailModal(); return; }
-      const modal = document.getElementById('event-form-modal');
+      const modal = _dom('event-form-modal');
       if (modal && modal.style.display !== 'none') { e.preventDefault(); closeEventFormModal(); }
     }
     if (e.key === 'Enter') {
-      const modal = document.getElementById('event-form-modal');
+      const modal = _dom('event-form-modal');
       if (modal && modal.style.display !== 'none' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); e.stopPropagation(); }
     }
   });
 
   // ── STEP 3: Fetch fresh data — real-time: force fetch ทุกครั้ง ──
-  const fetchData = (force = false) => _fetchAllData(force).catch(() => {});
+  const fetchData = (force = false) => _fetchAllData(force).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
   // Reset flags ป้องกัน deadlock ถ้า flag ค้างจาก session ก่อน
   _fetchingAll = false;
   _fetchingEvents = false;
@@ -7547,19 +7586,21 @@ function _fastHydrateFromCache() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// PERFORMANCE MONITOR (shows stats in ?debug mode)
+// PERFORMANCE MONITOR (shows stats in ?debug mode only)
 // ═══════════════════════════════════════════════════════════════════
 (function() {
   const params = new URLSearchParams(window.location.search);
-  if (!params.has('debug')) return;
-  const badge = document.getElementById('perf-badge');
+  if (!params.has('debug')) return;  // ออกทันทีถ้าไม่มี ?debug — ไม่มี side effects เลย
+  const badge = _dom('perf-badge');
   if (!badge) return;
   badge.style.display = 'block';
   const t0 = performance.now();
   let renderCount = 0;
   const origSchedule = scheduleRender;
+  // override scheduleRender เฉพาะ debug mode
   window.scheduleRender = function() { renderCount++; origSchedule(); };
-  setInterval(() => {
+  // setInterval เฉพาะ debug mode — ไม่รันใน production
+  const _debugTimer = setInterval(() => {
     const mem = performance.memory ? (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + 'MB' : 'n/a';
     const cacheAge = Date.now() - Cache.getTS(LC.TS_EV);
     const cacheMin = (cacheAge / 60000).toFixed(1);
@@ -7572,6 +7613,8 @@ function _fastHydrateFromCache() {
       `uptime: ${((performance.now()-t0)/1000).toFixed(0)}s`
     ].join(' | ');
   }, 2000);
+  // clear เมื่อ unload
+  window.addEventListener('pagehide', () => clearInterval(_debugTimer));
 })();
   </script>
  </body>
