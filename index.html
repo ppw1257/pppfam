@@ -3447,13 +3447,20 @@ async function _fetchFreshFromAppsScript() {
     // ก่อน apply: ลบ tmp_ optimistic ออกจาก allEvents เพื่อให้ fingerprint เทียบกับ stable events
     const _preApplyStable = allEvents.filter(e => !String(e.__backendId||'').startsWith('tmp_'));
 
-    // apply server data ลงใน allEvents (ข้อมูลจาก Sheets โดยตรง fresh=1)
+    // apply server data — ปลด flag ก่อนเพื่อให้ _applyAllData overwrite ได้
     _optimisticPending = false;
     _applyAllData(res, false, dataChangedRef);
+    // ลบ optimistic events ที่ยังค้างอยู่ออก (server data แทนที่แล้ว)
+    const hadOptimistic = allEvents.some(e => e.__isOptimistic);
+    if (hadOptimistic) {
+      allEvents = allEvents.filter(e => !e.__isOptimistic);
+      _memCache.set('events', allEvents);
+      Cache.set(LC.EVENTS, allEvents);
+      dataChangedRef.v = true;
+    }
     _fmtDateCache.clear();
-    // Broadcast เฉพาะเมื่อ admin เป็นคน call
     if (isAdmin) _broadcastDataUpdate();
-    // Force render เสมอ — เพราะ caller อาจเป็น admin ที่เพิ่งกด save
+    // render เสมอหลัง fetch จาก server
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
     _refreshAllPages();
   } catch(e) {
@@ -6126,23 +6133,56 @@ async function handleEventFormSubmit() {
     }
     clearForm();
 
-    // ── SYNC จาก server โดยตรง (ไม่ใช้ optimistic เพราะทำให้การ์ดซ้ำ) ──
-    // รอ Apps Script ส่งข้อมูลจริงกลับมา แล้วค่อย render
-    _optimisticPending = false;
-    _fetchingEvents = false; _fetchingAll = false;
-    Cache.clearAll(); // ล้าง cache เพื่อให้ดึงข้อมูลใหม่จริงๆ
-    try {
-      await _fetchFreshFromAppsScript();
-    } catch(e) {
-      console.warn('[PPP] sync after save failed:', e && e.message);
-      // fallback: render สิ่งที่มีอยู่
-      _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
-      requestAnimationFrame(function() {
-        renderHome(); renderCalendar();
-        if (isAdmin) renderAdminList();
-        renderBirthdayBanners(); debounceLucide();
+    // ── SAFE OPTIMISTIC UPDATE ──────────────────────────────────────
+    // 1. แสดงผลทันที (ไม่รอ server)
+    // 2. ใช้ _optimisticId พิเศษเพื่อ replace ตอน server กลับมา ไม่ duplicate
+    const _savedId = editingEventId;
+    const _optId = _savedId || ('opt_' + Date.now()); // id ชั่วคราว ถ้าเป็น add ใหม่
+    const optimisticEvent = Object.assign({
+      __backendId: _optId,
+      __rowNumber: editingEventRowNumber || 0,
+      __rawId: _savedId || '',
+      __isOptimistic: true, // mark ว่าเป็น optimistic
+      _isPast: payload.dateStart ? payload.dateStart < _todayInBKK() : false,
+      _daysUntil: payload.dateStart ? Math.round((new Date(payload.dateStart + 'T00:00:00') - new Date(_todayInBKK() + 'T00:00:00')) / 86400000) : null,
+    }, payload);
+
+    if (_savedId) {
+      // edit: replace event เดิมด้วย optimistic version
+      const idx = allEvents.findIndex(e =>
+        String(e.__backendId||e.__rawId||e.id||'') === String(_savedId)
+      );
+      if (idx !== -1) allEvents[idx] = optimisticEvent;
+      else allEvents.push(optimisticEvent);
+    } else {
+      // add ใหม่: ลบ optimistic เก่าออกก่อน แล้ว push
+      allEvents = allEvents.filter(e => !e.__isOptimistic);
+      allEvents.push(optimisticEvent);
+      allEvents.sort(function(a, b) {
+        if (!a.dateStart) return 1; if (!b.dateStart) return -1;
+        const c = a.dateStart.localeCompare(b.dateStart);
+        return c !== 0 ? c : _timeToMinutes(a.startTime) - _timeToMinutes(b.startTime);
       });
     }
+    _memCache.set('events', allEvents);
+    Cache.set(LC.EVENTS, allEvents);
+
+    // render ทันที
+    _optimisticPending = true;
+    _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+    requestAnimationFrame(function() {
+      renderHome(); renderCalendar();
+      if (isAdmin) renderAdminList();
+      renderBirthdayBanners(); debounceLucide();
+    });
+
+    // fetch server ใน background — ไม่ await ไม่บล็อก UI
+    _fetchingEvents = false; _fetchingAll = false;
+    Cache.clearAll();
+    _fetchFreshFromAppsScript().catch(function(e) {
+      _optimisticPending = false;
+      console.warn('[PPP] background sync failed:', e && e.message);
+    });
   }
 }
 
