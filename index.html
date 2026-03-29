@@ -3258,6 +3258,7 @@ function scheduleAutoRefresh() {
   const jitter = Math.random() * 2000;
   _refreshTimer = setInterval(() => {
     if (document.hidden) return;
+    if (_optimisticPending) return; // block ถ้ามี optimistic event รอ server confirm
     if (!_fetchingAll) {
       _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
     }
@@ -6179,7 +6180,15 @@ async function handleEventFormSubmit() {
     // fetch server ใน background — ไม่ await ไม่บล็อก UI
     _fetchingEvents = false; _fetchingAll = false;
     Cache.clearAll();
+    // safety timeout: ถ้า server ไม่ตอบใน 30 วินาที ปลด flag อัตโนมัติ
+    const _optSafetyTimer = setTimeout(function() {
+      if (_optimisticPending) {
+        _optimisticPending = false;
+        console.warn('[PPP] optimistic safety timeout — releasing lock');
+      }
+    }, 30000);
     _fetchFreshFromAppsScript().catch(function(e) {
+      clearTimeout(_optSafetyTimer);
       _optimisticPending = false;
       console.warn('[PPP] background sync failed:', e && e.message);
     });
@@ -7140,9 +7149,9 @@ document.addEventListener('touchmove',  () => {}, { passive: true });
 // Pause/resume background refresh when tab visibility changes
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    // Real-time mode: force fetch ทันทีทุกครั้งที่กลับมาดูแท็บ ไม่รอ TTL
+    if (_optimisticPending) return; // block ถ้ามี optimistic pending
     if (!_fetchingAll) {
-      Cache.clearAll(); // clearAll รีเซ็ต rate limiter ด้วยอยู่แล้ว
+      Cache.clearAll();
       _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
     }
   }
