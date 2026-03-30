@@ -462,29 +462,29 @@
     }
   }
   /* works-tabs: scroll บน desktop, wrap บนมือถือ */
-  #works-tabs, #trends-tabs {
+  #works-tabs {
     flex-wrap: wrap !important;
     overflow-x: visible !important;
     gap: 6px !important;
     row-gap: 6px !important;
   }
   @media (min-width: 768px) {
-    #works-tabs, #trends-tabs {
+    #works-tabs {
       flex-wrap: nowrap !important;
       overflow-x: auto !important;
       overflow-y: hidden !important;
       scrollbar-width: none !important;
     }
-    #works-tabs::-webkit-scrollbar, #trends-tabs::-webkit-scrollbar { display: none !important; }
+    #works-tabs::-webkit-scrollbar { display: none !important; }
   }
   @media (max-width: 767px) {
-    #works-tabs, #trends-tabs {
+    #works-tabs {
       flex-wrap: wrap !important;
       overflow: visible !important;
       gap: 5px !important;
       row-gap: 5px !important;
     }
-    #works-tabs button, #trends-tabs button {
+    #works-tabs button {
       font-size: 0.72rem !important;
       padding: 5px 11px !important;
       flex-shrink: 0 !important;
@@ -1201,24 +1201,15 @@
   * { box-sizing: border-box; }
   img { max-width: 100%; height: auto; }
 
-  /* ══ Works + Trends grid: 6 col desktop, responsive ══ */
-  #works-grid, #works-loading, .works-year-grid,
-  #trends-grid, #trends-loading, .trends-year-grid {
+  /* ══ Works grid: 6 col desktop, responsive ══ */
+  #works-grid, #works-loading, .works-year-grid {
     grid-template-columns: repeat(6, 1fr) !important;
     gap: clamp(6px, 1vw, 10px) !important;
   }
-  @media (max-width: 1100px) { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(5, 1fr) !important; } }
-  @media (max-width: 900px)  { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(4, 1fr) !important; } }
-  @media (max-width: 600px)  { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; } }
-  @media (max-width: 400px)  { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; } }
-
-  /* Trends: portrait cards — wider columns */
-  #trends-grid, #trends-loading, .trends-year-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-    gap: clamp(8px, 1.5vw, 16px) !important;
-  }
-  @media (max-width: 900px)  { #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-  @media (max-width: 500px)  { #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; } }
+  @media (max-width: 1100px) { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(5, 1fr) !important; } }
+  @media (max-width: 900px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+  @media (max-width: 600px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; } }
+  @media (max-width: 400px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; } }
 
   /* ══ Works filter tabs: wrap บนมือถือ ══ */
   #works-tabs {
@@ -1261,6 +1252,26 @@
   /* ══ Never overflow ══ */
   body, #app { overflow-x: hidden !important; }
   * { box-sizing: border-box; }
+  /* ── Trend card grid: responsive ── */
+  #trend-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)) !important;
+    gap: 14px !important;
+    align-items: start !important;
+  }
+  @media (max-width: 480px) {
+    #trend-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  }
+  @media (min-width: 481px) and (max-width: 700px) {
+    #trend-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+  @media (min-width: 701px) and (max-width: 1000px) {
+    #trend-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  }
+  @media (min-width: 1001px) {
+    #trend-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  }
+  .trend-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12) !important; transform: translateY(-3px) !important; }
   </style>
  </head>
  <body>
@@ -1279,7 +1290,7 @@
       <span class="nav-link active" data-page="home" onclick="navigate('home')"><i data-lucide="home" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label" >Home</span></span>
       <span class="nav-link" data-page="calendar" onclick="navigate('calendar')"><i data-lucide="calendar" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Calendar</span></span>
       <span class="nav-link" data-page="works" onclick="navigate('works')"><i data-lucide="star" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Works</span></span>
-      <span class="nav-link" data-page="trends" onclick="navigate('trends')"><i data-lucide="trending-up" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Trends</span></span>
+      <span class="nav-link" data-page="trend" onclick="navigate('trend')"><i data-lucide="trending-up" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Trend</span></span>
       <span class="nav-link" data-page="admin" id="nav-admin-link" style="display:none;" onclick="navigate('admin')"><i data-lucide="settings" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Admin</span></span>
 
      </div>
@@ -1574,61 +1585,22 @@
     <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
    </div>
 
-   <!-- TRENDS PAGE — mirrors Works page layout exactly -->
-   <div class="page" id="page-trends">
+   <!-- TREND PAGE -->
+   <div class="page" id="page-trend">
     <div style="width:100%;padding:2rem 1rem;box-sizing:border-box;overflow-x:hidden;">
-
-     <!-- Header -->
-     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.25rem;">
-      <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#111;margin:0;">Trends</h2>
+     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.5rem;">
+      <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;color:#111;margin:0;">Trend</h2>
+      <div id="trend-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
      </div>
-
-     <!-- Filter bars — identical structure to Works page -->
-     <div style="margin-bottom:0.75rem;">
-      <!-- Artist filter -->
-      <div class="filter-bar" style="margin-bottom:6px;" id="trends-artist-bar">
-       <button onclick="setTrendsArtist('all')" id="twa-all"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;">✦ All</button>
-       <button onclick="setTrendsArtist('Pond')" id="twa-Pond"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;"><span style="width:6px;height:6px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>Pond</button>
-       <button onclick="setTrendsArtist('Phuwin')" id="twa-Phuwin"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;"><span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;flex-shrink:0;"></span>Phuwin</button>
-       <button onclick="setTrendsArtist('Permpoon')" id="twa-Permpoon"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
-      </div>
-      <!-- Year filter bar — built dynamically -->
-      <div class="filter-bar" id="trends-year-bar" style="margin-bottom:6px;"></div>
-      <!-- Category tabs — hidden -->
-      <div id="trends-tabs" style="display:none;"></div>
+     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:start;"></div>
+     <div id="trend-empty" style="display:none;text-align:center;padding:4rem 1rem;color:#9ca3af;">
+      <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 1rem;display:block;opacity:0.4;"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      <p style="font-weight:600;color:#6b7280;">ยังไม่มีข้อมูล Trend</p>
      </div>
-
-     <!-- Content — same IDs pattern as works but prefixed trends- -->
-     <div id="trends-accordion" style="display:none;"></div>
-     <div id="trends-grid" style="display:none;align-items:stretch;"></div>
-     <div id="trends-empty" style="display:none;padding:3rem 1rem;">
-      <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
-       <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-        <i data-lucide="trending-up" style="width:24px;height:24px;color:#a855f7;stroke-width:1.8;"></i>
-       </div>
-       <p style="font-size:1rem;font-weight:700;color:#111;margin-bottom:6px;">No data yet</p>
-       <div style="display:flex;justify-content:center;gap:6px;">
-        <div style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div>
-        <div style="width:7px;height:7px;border-radius:50%;background:#6b7280;"></div>
-        <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
-       </div>
-      </div>
-     </div>
-     <div id="trends-loading" style="display:grid;gap:0 8px;">
-      <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="flex:1;"><div style="height:13px;width:90%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:55%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
-      <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="flex:1;"><div style="height:13px;width:80%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
-      <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="flex:1;"><div style="height:13px;width:85%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:45%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
-     </div>
-
     </div>
-    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
    </div>
 
-   <div class="page" id="page-admin">
+      <div class="page" id="page-admin">
     <div id="admin-login" style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;">
      <div style="background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,0.08);padding:2.5rem;max-width:380px;width:100%;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
@@ -1671,6 +1643,9 @@
        </button>
        <button class="admin-tab-btn" id="atb-bdays" onclick="switchAdminTab('bdays')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
         <i data-lucide="cake" style="width:13px;height:13px;"></i>Birthdays
+       </button>
+       <button class="admin-tab-btn" id="atb-trend" onclick="switchAdminTab('trend')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+        <i data-lucide="trending-up" style="width:14px;height:14px;"></i>Trend
        </button>
        <button class="admin-tab-btn" id="atb-anniv" onclick="switchAdminTab('anniv')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
         <i data-lucide="heart" style="width:13px;height:13px;"></i>Anniversary
@@ -1745,6 +1720,16 @@
       </div>
 
       <!-- TAB: Birthdays -->
+      <div id="admin-tab-trend" class="admin-tab-panel" style="display:none;">
+       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <span style="font-size:0.9rem;font-weight:600;color:#111;">Trend Posts</span>
+        <button onclick="openAddTrendModal()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;background:#111;color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;">
+         <i data-lucide="plus" style="width:14px;height:14px;"></i> Add Trend
+        </button>
+       </div>
+       <div id="admin-trend-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
       <div id="admin-tab-bdays" class="admin-tab-panel" style="display:none;">
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <p style="font-size:0.78rem;color:#9ca3af;">Shows countdown banner on Home and Calendar</p>
@@ -2469,33 +2454,9 @@
 
       <!-- Description -->
       <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;">
-      <div style="margin-bottom:1rem;">
+      <div style="margin-bottom:1.25rem;">
        <label class="form-label">Description <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
        <textarea class="form-input" id="wf-description" name="description" rows="3" placeholder="Details..."></textarea>
-      </div>
-
-      <!-- Trends fields -->
-      <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;">
-      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#a855f7;margin-bottom:0.75rem;">
-       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:4px;"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-       Trends <span style="font-weight:400;text-transform:none;color:#9ca3af;">(used in Trends page)</span>
-      </p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
-       <div style="grid-column:1/-1;">
-        <label class="form-label">Tags <span style="font-weight:400;color:#9ca3af;">(optional — คั่นด้วย comma)</span></label>
-        <input class="form-input" id="wf-tags" name="tags" placeholder="e.g. brand deal, cover, collab">
-        <div style="font-size:0.65rem;color:#9ca3af;margin-top:4px;">ใช้สำหรับ filter และ breakdown ในหน้า Trends</div>
-       </div>
-       <div style="grid-column:1/-1;">
-        <label class="form-label" style="margin-bottom:0.5rem;">Featured Work</label>
-        <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:8px 14px;border-radius:10px;border:1px solid #e9d5ff;background:#faf5ff;width:100%;box-sizing:border-box;transition:background 0.15s;" id="wf-featured-label">
-         <input type="checkbox" id="wf-featured" name="featured" value="true" style="width:16px;height:16px;accent-color:#a855f7;cursor:pointer;flex-shrink:0;" onchange="const _l=document.getElementById('wf-featured-label');_l.style.background=this.checked?'#f3e8ff':'#faf5ff';_l.style.borderColor=this.checked?'#a855f7':'#e9d5ff';">
-         <div>
-          <div style="font-size:0.85rem;font-weight:600;color:#7e22ce;">⭐ Featured</div>
-          <div style="font-size:0.68rem;color:#9ca3af;margin-top:1px;">ปักหมุดเป็นงานเด่น — แสดงในหน้า Trends</div>
-         </div>
-        </label>
-       </div>
       </div>
 
       <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center;">
@@ -3096,6 +3057,14 @@ function _applyAllData(res, force, dataChangedRef) {
       Cache.setTS(LC.TS_WK);
     }
   }
+  // Trends
+  const trData = res.trends || [];
+  if (Array.isArray(trData)) {
+    if (!_optimisticPending) {
+      allTrends = trData.map(t => Object.assign({ __backendId: t.id||'' }, t));
+      trendsLoaded = true;
+    }
+  }
   // Birthdays
   const bdData = res.birthdays || [];
   if (Array.isArray(bdData)) {
@@ -3201,10 +3170,8 @@ async function loadEventsFromSheets(force = false) {
     if (data && data.status === 'ok') {
       const raw = data.events || [];
       const processed = processEvents(raw);
-      // fingerprint ครอบคลุม startTime + hashtags ด้วย — ตรวจจับการเปลี่ยนแปลงที่ length/id ไม่เปลี่ยน
-      const _fpDeepEv = arr => arr.map(e => (e.__backendId||'') + ':' + (e.startTime||'') + ':' + (e.hashtags||'')).join('|');
-      const prevFP = _fpDeepEv(allEvents);
-      const newFP  = _fpDeepEv(processed);
+      const prevFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '');
+      const newFP  = processed.length + '|' + (processed[0]?.__backendId || '');
       allEvents = processed;
       _memCache.set('events', processed);   // L1 write
       Cache.set(LC.EVENTS, processed);      // L2 write
@@ -3520,7 +3487,6 @@ function _refreshAllPages() {
       if (currentPage !== 'home') renderHome();
       if (currentPage !== 'calendar') renderCalendar();
       if (currentPage !== 'works' && allWorks.length) renderWorks();
-      if (currentPage !== 'trends' && allWorks.length) { _trendsLastFP = ''; renderTrends(); }
       if (isAdmin && currentPage !== 'admin') {
         renderAdminList();
         if (worksLoaded) renderAdminWorksList();
@@ -3562,14 +3528,241 @@ async function _fetchFreshFromAppsScript() {
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
     _refreshAllPages();
   } catch(e) {
-    // ล้าง optimistic events เสมอแม้จะ error — ป้องกันการ์ดขึ้นสองอัน
-    _optimisticPending = false;
-    allEvents = allEvents.filter(e => !e.__isOptimistic);
-    allWorks  = allWorks.filter(function(w){ return !w.__isOptimistic; });
-    _memCache.set('events', allEvents);
-    _memCache.set('works', allWorks);
     console.warn('_fetchFreshFromAppsScript failed:', e.message);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TREND — state, render, CRUD
+// ═══════════════════════════════════════════════════════════════════
+let allTrends = [];
+let trendsLoaded = false;
+let _editingTrendId = null;
+let _trendFilter = 'all';
+const TREND_ARTISTS = ['Pond', 'Phuwin', 'Permpoon'];
+
+// ── render Trend page ─────────────────────────────────────────────
+function renderTrend() {
+  const grid = document.getElementById('trend-grid');
+  const empty = document.getElementById('trend-empty');
+  const filterBar = document.getElementById('trend-filter-bar');
+  if (!grid) return;
+
+  // Filter bar
+  if (filterBar) {
+    const artistColors = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
+    const artistBg = { Pond:'#fff7ed', Phuwin:'#f1f5f9', Permpoon:'#f0fdf4' };
+    const artistBorder = { Pond:'#fed7aa', Phuwin:'#cbd5e1', Permpoon:'#bbf7d0' };
+    const artistText = { Pond:'#c2410c', Phuwin:'#334155', Permpoon:'#15803d' };
+    const filters = [{ v:'all', label:'✦ All' }, ...TREND_ARTISTS.map(a => ({ v:a, label:a }))];
+    filterBar.innerHTML = filters.map(f => {
+      const isActive = _trendFilter === f.v;
+      const isArtist = f.v !== 'all';
+      let bg, border, color, fontW;
+      if (isActive) { bg='#111'; border='#111'; color='#fff'; fontW='700'; }
+      else if (isArtist) { bg=artistBg[f.v]||'#fff'; border=artistBorder[f.v]||'#e5e7eb'; color=artistText[f.v]||'#6b7280'; fontW='600'; }
+      else { bg='#fff'; border='#e5e7eb'; color='#6b7280'; fontW='500'; }
+      const dot = isArtist && !isActive ? `<span style="width:6px;height:6px;border-radius:50%;background:${artistColors[f.v]||'#6b7280'};display:inline-block;flex-shrink:0;"></span>` : '';
+      return `<button onclick="setTrendFilter('${f.v}')" style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid ${border};background:${bg};color:${color};font-size:0.78rem;font-weight:${fontW};cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s;">${dot}${f.label}</button>`;
+    }).join('');
+  }
+
+  const filtered = _trendFilter === 'all'
+    ? allTrends
+    : allTrends.filter(t => (t.artists||'').split(',').map(a=>a.trim()).includes(_trendFilter));
+
+  if (!filtered.length) {
+    grid.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  // ── Responsive card grid ──
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:start;';
+
+  grid.innerHTML = filtered.map(t => {
+    const artistColor = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
+    const artistTextColor = { Pond:'#c2410c', Phuwin:'#334155', Permpoon:'#15803d' };
+    const artistBg = { Pond:'#fff7ed', Phuwin:'#f1f5f9', Permpoon:'#f0fdf4' };
+    const artistBorder = { Pond:'#fed7aa', Phuwin:'#cbd5e1', Permpoon:'#bbf7d0' };
+    const artists = (t.artists||'').split(',').map(a=>a.trim()).filter(Boolean);
+    const dateStr = t.date ? new Date(t.date+'T00:00:00').toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}) : '';
+    const isLink = !!t.link;
+    const isX = t.link && (t.link.includes('x.com')||t.link.includes('twitter.com'));
+    const isIG = t.link && t.link.includes('instagram.com');
+
+    // Artist badges row
+    const badgesHtml = artists.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+      ${artists.map(a => `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:0.65rem;font-weight:700;background:${artistBg[a]||'#f3f4f6'};color:${artistTextColor[a]||'#374151'};border:1px solid ${artistBorder[a]||'#e5e7eb'};"><span style="width:5px;height:5px;border-radius:50%;background:${artistColor[a]||'#6b7280'};display:inline-block;flex-shrink:0;"></span>${a}</span>`).join('')}
+      ${dateStr ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;color:#9ca3af;margin-left:auto;padding:2px 0;">${dateStr}</span>` : ''}
+    </div>` : (dateStr ? `<div style="margin-bottom:6px;"><span style="font-size:0.65rem;color:#9ca3af;">${dateStr}</span></div>` : '');
+
+    // Source link chip
+    const sourceBadge = t.link ? `<div style="display:flex;align-items:center;gap:4px;margin-top:10px;padding:5px 8px;border-radius:7px;background:#f9fafb;border:1px solid #f0f0f0;">
+      ${isX ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="#111"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>` : isIG ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="#e1306c"/></svg>` : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>`}
+      <span style="font-size:0.68rem;font-weight:600;color:#374151;">ดูโพสต์ต้นทาง</span>
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" style="margin-left:auto;"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </div>` : '';
+
+    // Main color for accent
+    const mainColor = artists.length ? (artistColor[artists[0]]||'#e5e7eb') : '#e5e7eb';
+
+    return `<div class="trend-card" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:${isLink?'pointer':'default'};transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')" onmouseenter="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';this.style.transform=''"`:''}>
+      ${t.image ? `<div style="width:100%;aspect-ratio:1/1;overflow:hidden;background:#f3f4f6;position:relative;flex-shrink:0;">
+        <img src="${escHtml(t.image)}" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform 0.3s;" loading="lazy" onerror="_onImgError(this)" ${isLink?`onmouseenter="this.style.transform='scale(1.04)'" onmouseleave="this.style.transform=''"`:''}">
+        ${artists.length ? `<div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(to top,rgba(0,0,0,0.35),transparent);"></div>` : ''}
+      </div>` : `<div style="width:100%;height:6px;flex-shrink:0;background:${mainColor};opacity:0.7;"></div>`}
+      <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">
+        ${badgesHtml}
+        ${t.caption ? `<p style="font-size:0.83rem;line-height:1.55;color:#374151;margin:0;word-break:break-word;flex:1;">${escHtml(t.caption)}</p>` : ''}
+        ${sourceBadge}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setTrendFilter(v) {
+  _trendFilter = v;
+  renderTrend();
+}
+
+// ── Admin: render list ─────────────────────────────────────────────
+function renderAdminTrendList() {
+  const list = document.getElementById('admin-trend-list');
+  if (!list) return;
+  if (!allTrends.length) {
+    list.innerHTML = '<p style="color:#9ca3af;font-size:0.85rem;">ยังไม่มีข้อมูล</p>';
+    return;
+  }
+  list.innerHTML = allTrends.map(t => {
+    const artistLabel = (t.artists||'').split(',').map(a=>a.trim()).filter(Boolean).join(', ');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid #f0f0f0;background:#fff;">
+      ${t.image ? `<img src="${escHtml(t.image)}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="_onImgError(this)">` : '<div style="width:48px;height:48px;border-radius:8px;background:#f3f4f6;flex-shrink:0;"></div>'}
+      <div style="flex:1;min-width:0;">
+       <div style="font-size:0.85rem;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(t.caption||'(ไม่มี caption)')}</div>
+       <div style="font-size:0.72rem;color:#9ca3af;">${escHtml(artistLabel)} ${t.date?'· '+t.date:''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+       <button onclick="openEditTrendModal('${escHtml(t.__backendId||t.id||'')}')" style="padding:5px 10px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;color:#374151;font-family:inherit;">Edit</button>
+       <button onclick="deleteTrend('${escHtml(t.__backendId||t.id||'')}','${escHtml(t.caption||'').slice(0,20)}')" style="padding:5px 10px;border-radius:6px;border:none;background:#fee2e2;font-size:0.75rem;font-weight:600;cursor:pointer;color:#dc2626;font-family:inherit;">Delete</button>
+      </div>
+     </div>`;
+  }).join('');
+}
+
+// ── Modal open/close ──────────────────────────────────────────────
+function openAddTrendModal() {
+  _editingTrendId = null;
+  document.getElementById('trend-modal-title').textContent = 'Add Trend';
+  document.getElementById('tf-image').value = '';
+  document.getElementById('tf-caption').value = '';
+  document.getElementById('tf-date').value = '';
+  document.getElementById('tf-link').value = '';
+  document.querySelectorAll('.trend-artist-check').forEach(c => c.checked = false);
+  document.getElementById('trend-form-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function openEditTrendModal(id) {
+  const t = allTrends.find(x => String(x.__backendId||x.id||'') === String(id));
+  if (!t) return;
+  _editingTrendId = id;
+  document.getElementById('trend-modal-title').textContent = 'Edit Trend';
+  document.getElementById('tf-image').value = t.image || '';
+  document.getElementById('tf-caption').value = t.caption || '';
+  document.getElementById('tf-date').value = t.date || '';
+  document.getElementById('tf-link').value = t.link || '';
+  const artists = (t.artists||'').split(',').map(a=>a.trim());
+  document.querySelectorAll('.trend-artist-check').forEach(c => { c.checked = artists.includes(c.value); });
+  document.getElementById('trend-form-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTrendModal() {
+  document.getElementById('trend-form-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ── Form submit ───────────────────────────────────────────────────
+async function handleTrendFormSubmit() {
+  const image = document.getElementById('tf-image').value.trim();
+  const caption = document.getElementById('tf-caption').value.trim();
+  if (!image) { showToast('กรุณาใส่ URL รูปภาพ'); return; }
+  if (!caption) { showToast('กรุณาใส่ caption'); return; }
+  const artists = [...document.querySelectorAll('.trend-artist-check:checked')].map(c=>c.value).join(',');
+  const date = document.getElementById('tf-date').value;
+  const link = document.getElementById('tf-link').value.trim();
+  const data = { image, caption, artists, date, link };
+
+  const btn = document.getElementById('trend-submit-btn');
+  const txt = document.getElementById('trend-submit-text');
+  const spin = document.getElementById('trend-submit-spin');
+  btn.disabled = true; txt.style.display = 'none'; spin.style.display = 'inline';
+
+  try {
+    let res;
+    if (_editingTrendId) {
+      res = await apiPost({ action: 'updateTrend', id: _editingTrendId, trend: data });
+    } else {
+      res = await apiPost({ action: 'createTrend', trend: data });
+    }
+    if (res.status !== 'ok') throw new Error(res.message || 'Failed');
+    closeTrendModal();
+    showToast(_editingTrendId ? 'Trend updated ✓' : 'Trend added ✓');
+
+    // optimistic update
+    const _optId = _editingTrendId || ('opt_t_' + Date.now());
+    const optimistic = Object.assign({ __backendId: _optId, __isOptimistic: true, id: _optId }, data);
+    if (_editingTrendId) {
+      const idx = allTrends.findIndex(t => String(t.__backendId||t.id||'') === String(_editingTrendId));
+      if (idx !== -1) allTrends[idx] = optimistic; else allTrends.unshift(optimistic);
+    } else {
+      allTrends = allTrends.filter(t => !t.__isOptimistic);
+      allTrends.unshift(optimistic);
+    }
+    renderTrend();
+    renderAdminTrendList();
+    debounceLucide();
+
+    // background sync
+    _fetchFreshFromAppsScript().catch(function(){});
+  } catch(err) {
+    showToast('❌ ' + (err.message || 'Error'));
+    console.error('[trend]', err);
+  } finally {
+    btn.disabled = false; txt.style.display = 'inline'; spin.style.display = 'none';
+  }
+}
+
+// ── Delete ────────────────────────────────────────────────────────
+async function deleteTrend(id, title) {
+  if (!confirm('ลบ "' + title + '" ออกไหม?')) return;
+  try {
+    const res = await apiPost({ action: 'deleteTrend', id });
+    if (res.status !== 'ok') throw new Error(res.message || 'Failed');
+    allTrends = allTrends.filter(t => String(t.__backendId||t.id||'') !== String(id));
+    showToast('Deleted ✓');
+    renderTrend();
+    renderAdminTrendList();
+    _fetchFreshFromAppsScript().catch(function(){});
+  } catch(err) {
+    showToast('❌ ' + (err.message || 'Error'));
+  }
+}
+
+// ── Load from Apps Script ─────────────────────────────────────────
+async function loadTrendsFromSheets(force = false) {
+  if (trendsLoaded && !force) return;
+  try {
+    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getTrends&t=${Date.now()}`, 12000);
+    if (res && res.status === 'ok' && Array.isArray(res.trends)) {
+      allTrends = res.trends.map(t => Object.assign({ __backendId: t.id||'' }, t));
+      trendsLoaded = true;
+      renderTrend();
+      renderAdminTrendList();
+    }
+  } catch(e) { console.warn('[trend] load failed:', e.message); }
 }
 
 // ── Status helpers ────────────────────────────────────────────────
@@ -5517,6 +5710,7 @@ function switchAdminTab(tab) {
       if (worksLoaded) renderAdminWorksList();
       else loadWorksFromSheets().then(renderAdminWorksList);
     }
+    if (tab === 'trend') { loadTrendsFromSheets(); renderAdminTrendList(); }
     if (tab === 'bdays') renderAnniversaryAdmin();
     if (tab === 'anniv') renderAnniversaryAdmin();
     debounceLucide();
@@ -5974,6 +6168,14 @@ function navigate(page) {
   const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
   if (navEl) navEl.classList.add('active');
 
+  // Trend
+  if (page === 'trend') {
+    loadTrendsFromSheets();
+    renderTrend();
+    debounceLucide();
+    return;
+  }
+
   // Works: render from cache instantly, then fetch fresh in background
   if (page === 'works') {
     if (allWorks.length) { renderWorks(); }
@@ -5985,14 +6187,6 @@ function navigate(page) {
   // Calendar: fingerprint check ภายใน renderCalendar เองอยู่แล้ว — เรียกตรงได้เลย
   if (page === 'calendar') {
     renderCalendar();
-    debounceLucide();
-    return;
-  }
-
-  // Trends: render works grid (same data as Works page)
-  if (page === 'trends') {
-    if (allWorks.length) { renderTrends(); }
-    loadWorksFromSheets(); // always refresh in background
     debounceLucide();
     return;
   }
@@ -6260,13 +6454,12 @@ async function handleEventFormSubmit() {
     }, payload);
 
     if (_savedId) {
-      // edit: ลบ optimistic เก่าออกก่อนเสมอ ป้องกัน duplicate กรณี findIndex พลาด
-      allEvents = allEvents.filter(e => !e.__isOptimistic);
+      // edit: replace event เดิมด้วย optimistic version
       const idx = allEvents.findIndex(e =>
         String(e.__backendId||e.__rawId||e.id||'') === String(_savedId)
       );
       if (idx !== -1) allEvents[idx] = optimisticEvent;
-      // ถ้าหา index ไม่เจอ ไม่ push — รอ server data แทน ป้องกันการ์ดขึ้นสองอัน
+      else allEvents.push(optimisticEvent);
     } else {
       // add ใหม่: ลบ optimistic เก่าออกก่อน แล้ว push
       allEvents = allEvents.filter(e => !e.__isOptimistic);
@@ -6576,14 +6769,13 @@ function closeWorksFormModal() {
 }
 
 function _clearWorksForm() {
-  ['wf-title','wf-year','wf-brand','wf-magazine','wf-role','wf-project','wf-image','wf-releaseDate','wf-contractEnd','wf-link','wf-description','wf-tags'].forEach(id => {
+  ['wf-title','wf-year','wf-brand','wf-magazine','wf-role','wf-project','wf-image','wf-releaseDate','wf-contractEnd','wf-link','wf-description'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   ['wf-category','wf-type'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.querySelectorAll('.artist-check-w').forEach(c => c.checked = false);
-  const _wff = document.getElementById('wf-featured'); if (_wff) { _wff.checked = false; const _lbl=document.getElementById('wf-featured-label'); if(_lbl){_lbl.style.background='#faf5ff';_lbl.style.borderColor='#e9d5ff';} }
 }
 
 function _fillWorksForm(w) {
@@ -6605,8 +6797,6 @@ function _fillWorksForm(w) {
     if (_txt) { _txt.style.color = _isEnded ? '#334155' : '#6b7280'; _txt.textContent = (_isEnded && _hiddenDate.value) ? 'Contract Ended · ' + _hiddenDate.value : 'Contract Ended'; }
   }
   set('wf-description', w.description); set('wf-category', w.category); set('wf-type', w.type);
-  set('wf-tags', w.tags);
-  const _wff2 = document.getElementById('wf-featured'); if (_wff2) { const _fv = !!(w.featured && w.featured !== 'false' && w.featured !== '0'); _wff2.checked = _fv; const _lbl2=document.getElementById('wf-featured-label'); if(_lbl2){_lbl2.style.background=_fv?'#f3e8ff':'#faf5ff';_lbl2.style.borderColor=_fv?'#a855f7':'#e9d5ff';} }
   const artistArr = (w.artists||'').split(',').map(a=>a.trim());
   document.querySelectorAll('.artist-check-w').forEach(c => { c.checked = artistArr.includes(c.value); });
 }
@@ -6619,9 +6809,7 @@ function _readWorksForm() {
     artists, brand: gv('wf-brand'), magazine: gv('wf-magazine'),
     type: gv('wf-type'), role: gv('wf-role'), project: gv('wf-project'),
     image: gv('wf-image'), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');if(!_cb||!_cb.checked)return '';const _ex=document.getElementById('wf-contractEndDate');if(_ex&&_ex.value)return _ex.value;const _d=new Date();return _d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');})(), link: gv('wf-link'),
-    description: gv('wf-description'),
-    tags: gv('wf-tags'),
-    featured: (()=>{ const _f=document.getElementById('wf-featured'); return (_f && _f.checked) ? 'true' : ''; })()
+    description: gv('wf-description')
   };
 }
 
@@ -6646,6 +6834,7 @@ async function handleWorksFormSubmit() {
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
     if (data.year) { _worksYear = data.year; }
+
     // ── OPTIMISTIC UPDATE works ──
     const _wSavedId = _editingWorkId;
     const optimisticWork = Object.assign({
@@ -7434,267 +7623,6 @@ function _fastHydrateFromCache() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TRENDS PAGE — mirrors Works page exactly, newest first
-// ═══════════════════════════════════════════════════════════════════
-let _trendsTab    = 'all';
-let _trendsArtist = 'all';
-let _trendsYear   = 'all';
-let _trendsLastFP = '';
-
-function renderTrends() {
-  const accordion = document.getElementById('trends-accordion');
-  const grid      = document.getElementById('trends-grid');
-  const empty     = document.getElementById('trends-empty');
-  const loading   = document.getElementById('trends-loading');
-  if (!accordion) return;
-
-  const tFP = `${_trendsYear}|${_trendsTab}|${_trendsArtist}|${allWorks.length}`;
-  if (tFP === _trendsLastFP && accordion.innerHTML.trim() !== '') return;
-  _trendsLastFP = tFP;
-
-  if (loading) loading.style.display = 'none';
-
-  if (!worksLoaded && !allWorks.length) {
-    if (loading) loading.style.display = 'grid';
-    accordion.style.display = 'none';
-    if (grid) grid.style.display = 'none';
-    if (empty) empty.style.display = 'none';
-    return;
-  }
-
-  _buildTrendsYearButtons();
-  _refreshTrendsYearButtons();
-  if (grid) grid.style.display = 'none';
-
-  function _catToKey(cat) {
-    const c = (cat||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-    if (c.includes('littlebig')) return 'littlebigworld';
-    if (c.includes('series'))    return 'series';
-    if (c.includes('music')||c.includes('mv')) return 'music';
-    if (c.includes('magazine'))  return 'magazine';
-    if (c.includes('presenter')||c.includes('brand')) return 'presenter';
-    if (c.includes('variety'))   return 'variety';
-    if (c.includes('interview')) return 'interview';
-    if (c.includes('behind')||c.includes('bts')) return 'bts';
-    if (c.includes('otherwork')||c.includes('other')) return 'otherworks';
-    return c;
-  }
-
-  let filtered = allWorks;
-  if (_trendsYear && _trendsYear !== 'all') {
-    filtered = filtered.filter(w => (w.year||'') === _trendsYear);
-  }
-  if (_trendsTab !== 'all') {
-    if (_trendsTab === 'bts') {
-      filtered = filtered.filter(w => _catToKey(w.category) === 'bts' || (w.type||'').toLowerCase().includes('behind'));
-    } else {
-      filtered = filtered.filter(w => _catToKey(w.category) === _trendsTab);
-    }
-  }
-  if (_trendsArtist !== 'all') {
-    filtered = filtered.filter(w => {
-      if (!w.artists) return false;
-      return w.artists.split(',').map(a=>a.trim()).includes(_trendsArtist);
-    });
-  }
-
-  // Sort: newest year first, then newest release_date first, then reverse original order
-  const _origOrder = new Map(filtered.map((w, i) => [w.__backendId || w.rowNumber || i, i]));
-  filtered = [...filtered].sort((a, b) => {
-    const ya = Number(a.year) || 0, yb = Number(b.year) || 0;
-    if (yb !== ya) return yb - ya;
-    const da = a.release_date || '', db = b.release_date || '';
-    if (da && db) return db.localeCompare(da);
-    if (da) return -1; if (db) return 1;
-    const ia = _origOrder.get(a.__backendId || a.rowNumber) ?? 0;
-    const ib = _origOrder.get(b.__backendId || b.rowNumber) ?? 0;
-    return ib - ia;
-  });
-
-  if (filtered.length === 0) {
-    accordion.style.display = 'none';
-    if (empty) empty.style.display = 'block';
-    return;
-  }
-  if (empty) empty.style.display = 'none';
-
-  // Group by year desc
-  const yearMap = {};
-  filtered.forEach(w => {
-    const y = w.year || 'Unknown';
-    if (!yearMap[y]) yearMap[y] = [];
-    yearMap[y].push(w);
-  });
-  const years = Object.keys(yearMap).sort((a, b) => {
-    if (a === 'Unknown') return 1;
-    if (b === 'Unknown') return -1;
-    return Number(b) - Number(a);
-  });
-
-  const gridCols = `display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:clamp(8px,1.5vw,16px);`;
-  const artistColors     = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
-  const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
-  const _showCatBadge = (_trendsTab === 'all');
-
-  function buildCard(w) {
-    const cat = (typeof CATEGORY_CONFIG !== 'undefined' && CATEGORY_CONFIG[_catToKey(w.category)]) || { label: w.category||'', icon:'', color:'#475569', bg:'#f1f5f9', border:'#cbd5e1' };
-    const artistArr = w.artists ? w.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
-    const mainColor = artistArr.length ? (artistColors[artistArr[0]] || '#64748b') : '#64748b';
-    const grad = ({'#f97316':'linear-gradient(135deg,#fff7ed,#ffedd5)','#6b7280':'linear-gradient(135deg,#f9fafb,#f3f4f6)','#22c55e':'linear-gradient(135deg,#f0fdf4,#dcfce7)'})[mainColor] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
-    const artistLine = artistArr.map((a, i) => {
-      const dot = artistColors[a] || '#64748b';
-      const txt = artistTextColors[a] || '#64748b';
-      const divider = i > 0 ? `<span style="width:1px;height:10px;background:#e5e7eb;display:inline-block;flex-shrink:0;"></span>` : '';
-      return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
-    }).join('');
-    const isExpired = !!(w.contract_end && w.contract_end !== '' && w.contract_end !== 'false');
-    const expiredBadge = isExpired
-      ? `<div style="position:absolute;top:0;left:0;z-index:4;pointer-events:none;overflow:hidden;width:88px;height:88px;border-radius:10px 0 0 0;"><div style="position:absolute;top:20px;left:-22px;width:100px;background:linear-gradient(135deg,#475569,#334155);color:#fff;font-size:0.52rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;text-align:center;padding:5px 0;transform:rotate(-45deg);transform-origin:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);">EXPIRED</div></div>` : '';
-    const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:2/3;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)"></div>`
-      : `<div style="width:100%;aspect-ratio:2/3;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
-    const card = document.createElement('div');
-    card.style.cssText = `background:${isExpired?'#f9fafb':'#fff'};border-radius:16px;border:1px solid ${isExpired?'#e5e7eb':'#efefef'};box-shadow:0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'});overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:box-shadow 0.18s,transform 0.18s;${isExpired?'opacity:0.6;':''}`;
-    card.addEventListener('mouseenter', () => { card.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)'; card.style.transform='translateY(-4px)'; });
-    card.addEventListener('mouseleave', () => { card.style.boxShadow=`0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'})`; card.style.transform=''; });
-    if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
-    card.innerHTML = `${thumb}
-      <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;flex:1;">
-        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
-        <div style="font-size:0.78rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-          ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span>` : ''}
-          ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:3px 9px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
-        </div>
-      </div>`;
-    return card;
-  }
-
-  const _tFrag = document.createDocumentFragment();
-
-  // Single year selected + no other filters → flat grid, no year dividers
-  const _currentYear = String(new Date().getFullYear());
-  const _effectiveYear = (!_trendsYear || _trendsYear === 'all' || Number(_trendsYear) < Number(_currentYear)) ? _currentYear : _trendsYear;
-
-  if (_effectiveYear !== 'all' && _trendsTab === 'all' && _trendsArtist === 'all') {
-    const cardGrid = document.createElement('div');
-    cardGrid.style.cssText = gridCols;
-    cardGrid.className = 'trends-year-grid';
-    filtered.forEach(w => cardGrid.appendChild(buildCard(w)));
-    _tFrag.appendChild(cardGrid);
-    accordion.style.display = 'block';
-    accordion.innerHTML = '';
-    accordion.appendChild(_tFrag);
-    debounceLucide();
-    return;
-  }
-
-  // With filters → flat grid, add year badge on each card
-  const flatGrid = document.createElement('div');
-  flatGrid.style.cssText = gridCols;
-  flatGrid.className = 'trends-year-grid';
-  years.forEach(year => {
-    yearMap[year].forEach(w => {
-      const card = buildCard(w);
-      const thumb = card.querySelector('div[style*="aspect-ratio"]');
-      if (thumb) {
-        thumb.style.position = 'relative';
-        const badge = document.createElement('span');
-        badge.textContent = w.year || year;
-        badge.style.cssText = 'position:absolute;top:6px;right:6px;font-size:0.6rem;font-weight:800;background:#111;color:#fff;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;z-index:2;pointer-events:none;';
-        thumb.appendChild(badge);
-      }
-      flatGrid.appendChild(card);
-    });
-  });
-  _tFrag.appendChild(flatGrid);
-
-  accordion.style.display = 'block';
-  accordion.innerHTML = '';
-  accordion.appendChild(_tFrag);
-  debounceLucide();
-}
-
-function setTrendsTab(tab) {
-  _trendsTab = tab;
-  _trendsLastFP = '';
-  document.querySelectorAll('.trends-tab').forEach(b => {
-    const isActive = b.id === 'tt-' + tab;
-    b.style.background   = isActive ? '#111' : '#fff';
-    b.style.color        = isActive ? '#fff' : '#6b7280';
-    b.style.border       = isActive ? '1px solid #111' : '1px solid #e5e7eb';
-    b.style.fontWeight   = isActive ? '600' : '500';
-  });
-  renderTrends();
-}
-
-function setTrendsArtist(artist) {
-  _trendsArtist = artist;
-  _trendsLastFP = '';
-  const artistBtnColors = {
-    'Pond':     { bg:'#fff7ed', color:'#c2410c', border:'#fed7aa' },
-    'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
-    'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
-  };
-  document.querySelectorAll('#trends-artist-bar button').forEach(b => {
-    const a = b.id.replace('twa-', '');
-    const isActive = a === artist;
-    if (isActive) {
-      b.style.background = '#111'; b.style.color = '#fff'; b.style.borderColor = '#111';
-    } else if (a === 'all') {
-      b.style.background = '#f9fafb'; b.style.color = '#6b7280'; b.style.borderColor = '#e5e7eb';
-    } else {
-      const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
-      b.style.background = c.bg; b.style.color = c.color; b.style.borderColor = c.border;
-    }
-  });
-  renderTrends();
-}
-
-function setTrendsYear(year) {
-  _trendsYear = year;
-  _trendsLastFP = '';
-  const page = document.getElementById('page-trends');
-  if (page) page.scrollTo({ top: 0, behavior: 'smooth' });
-  renderTrends();
-}
-
-function _buildTrendsYearButtons() {
-  const bar = document.getElementById('trends-year-bar');
-  if (!bar || !allWorks.length) return;
-  const currentYear = new Date().getFullYear();
-  const allYears = [...new Set(allWorks.map(w => w.year||'').filter(Boolean))].sort((a,b) => b-a);
-  const years = allYears.filter(y => Number(y) >= currentYear);
-  const newList = 'all,' + years.join(',');
-  if (bar.dataset.years === newList && bar.children.length) return;
-  bar.dataset.years = newList;
-  bar.innerHTML = '';
-  const allBtn = document.createElement('button');
-  allBtn.textContent = 'All Years';
-  allBtn.onclick = () => setTrendsYear('all');
-  allBtn.dataset.year = 'all';
-  _styleTrendsYearBtn(allBtn, _trendsYear === 'all');
-  bar.appendChild(allBtn);
-  years.forEach(y => {
-    const btn = document.createElement('button');
-    btn.textContent = y;
-    btn.onclick = () => setTrendsYear(y);
-    btn.dataset.year = y;
-    _styleTrendsYearBtn(btn, _trendsYear === y);
-    bar.appendChild(btn);
-  });
-}
-
-function _styleTrendsYearBtn(btn, active) {
-  btn.style.cssText = `padding:5px 14px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;border:1px solid ${active?'#a855f7':'#f0f0f0'};background:${active?'#f5f3ff':'#fff'};color:${active?'#7e22ce':'#6b7280'};`;
-}
-
-function _refreshTrendsYearButtons() {
-  const bar = document.getElementById('trends-year-bar');
-  if (!bar) return;
-  bar.querySelectorAll('button').forEach(btn => _styleTrendsYearBtn(btn, btn.dataset.year === _trendsYear));
-}
-
 // PERFORMANCE MONITOR (shows stats in ?debug mode only)
 // ═══════════════════════════════════════════════════════════════════
 (function() {
@@ -7726,5 +7654,51 @@ function _refreshTrendsYearButtons() {
   window.addEventListener('pagehide', () => clearInterval(_debugTimer));
 })();
   </script>
- </body>
+ 
+   <!-- TREND FORM MODAL -->
+   <div id="trend-form-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:#fff;border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:1.5rem;box-sizing:border-box;">
+     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+      <h3 id="trend-modal-title" style="font-size:1.1rem;font-weight:700;color:#111;margin:0;">Add Trend</h3>
+      <button onclick="closeTrendModal()" style="background:none;border:none;cursor:pointer;padding:4px;color:#6b7280;">
+       <i data-lucide="x" style="width:20px;height:20px;"></i>
+      </button>
+     </div>
+     <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+       <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">รูปภาพ URL *</label>
+       <input id="tf-image" type="url" placeholder="https://..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;">
+      </div>
+      <div>
+       <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Caption *</label>
+       <textarea id="tf-caption" rows="3" placeholder="เขียน caption..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+      <div>
+       <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">ศิลปิน</label>
+       <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:5px;font-size:0.85rem;cursor:pointer;"><input type="checkbox" class="trend-artist-check" value="Pond"> Pond</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:0.85rem;cursor:pointer;"><input type="checkbox" class="trend-artist-check" value="Phuwin"> Phuwin</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:0.85rem;cursor:pointer;"><input type="checkbox" class="trend-artist-check" value="Permpoon"> Permpoon</label>
+       </div>
+      </div>
+      <div>
+       <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">วันที่</label>
+       <input id="tf-date" type="date" style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;">
+      </div>
+      <div>
+       <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">ลิ้งก์ต้นทาง (Twitter/X, IG, ...)</label>
+       <input id="tf-link" type="url" placeholder="https://x.com/..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+       <button onclick="closeTrendModal()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+       <button id="trend-submit-btn" onclick="handleTrendFormSubmit()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#111;color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;">
+        <span id="trend-submit-text">Save</span>
+        <span id="trend-submit-spin" style="display:none;">...</span>
+       </button>
+      </div>
+     </div>
+    </div>
+   </div>
+
+</body>
 </html>
