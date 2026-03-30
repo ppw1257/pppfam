@@ -2977,16 +2977,11 @@ function _applyAllData(res, force, dataChangedRef) {
   const evData = res.events || [];
   if (Array.isArray(evData) && evData.length) {
     const processed = processEvents(evData);
+    // block เมื่อ optimistic pending — ให้ _fetchFreshFromAppsScript จัดการแทน
     if (_optimisticPending) {
-      // ขณะที่มี optimistic pending: เก็บ optimistic event ไว้ก่อน
-      // แต่ต้องลบ optimistic ที่มี id ตรงกับ server data ออก (ป้องกันซ้ำ)
-      const serverIds = new Set(processed.map(x => String(x.__backendId||x.id||'')).filter(Boolean));
-      const kept = allEvents.filter(e => e.__isOptimistic && !serverIds.has(String(e.__rawId||e.__backendId||'')));
-      allEvents = [...processed, ...kept];
-      _memCache.set('events', allEvents);
       apiLoaded = true;
     } else {
-      // ไม่มี optimistic pending: ล้าง optimistic ทิ้งก่อนเสมอ แล้ว apply server data สะอาด
+      // เปรียบเทียบกับ events ที่ไม่ใช่ optimistic เท่านั้น
       const stableEvents = allEvents.filter(e => !e.__isOptimistic);
       const _fpDeep = arr => arr.map(x => (x.__backendId||x.id||'') + ':' + (x.title||'') + ':' + (x.dateStart||'') + ':' + (x.startTime||'')).join('|');
       if (_fpDeep(processed) !== _fpDeep(stableEvents)) dataChangedRef.v = true;
@@ -3000,13 +2995,18 @@ function _applyAllData(res, force, dataChangedRef) {
   // Works
   const wkData = res.works || [];
   if (Array.isArray(wkData) && wkData.length) {
-    const wk = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
-    if (_fp(wk) !== _fp(allWorks)) dataChangedRef.v = true;
-    allWorks = wk;
-    worksLoaded = true;
-    _memCache.set('works', allWorks);
-    Cache.set(LC.WORKS, allWorks);
-    Cache.setTS(LC.TS_WK);
+    if (_optimisticPending) {
+      // block เมื่อ optimistic pending — รอ _fetchFreshFromAppsScript จัดการ
+    } else {
+      const wk = _ensureWorksBackendId ? _ensureWorksBackendId(wkData) : wkData;
+      const stableWorks = allWorks.filter(function(w){ return !w.__isOptimistic; });
+      if (_fp(wk) !== _fp(stableWorks)) dataChangedRef.v = true;
+      allWorks = wk;
+      worksLoaded = true;
+      _memCache.set('works', allWorks);
+      Cache.set(LC.WORKS, allWorks);
+      Cache.setTS(LC.TS_WK);
+    }
   }
   // Birthdays
   const bdData = res.birthdays || [];
@@ -3276,10 +3276,11 @@ function scheduleAutoRefresh() {
     window._pppStorageListenerAdded = true;
     window.addEventListener('storage', function(e) {
       if (e.key === 'ppp_data_updated' && e.newValue && !isAdmin) {
-        if (!_fetchingAll) {
-          // ดึงตรงจาก Apps Script ทันที — ไม่รอ GitHub Pages sync (ช้า 1-5 นาที)
+        // visitor ดึงจาก GitHub Pages (all.json) — ไม่ยิง Apps Script เพื่อป้องกัน quota หมด
+        // GitHub Pages จะอัพเดทภายใน ~5 นาที หลัง admin save
+        if (!_fetchingAll && !_optimisticPending) {
           Cache.clearAll();
-          _fetchFreshFromAppsScript().catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
+          _fetchAllData(true).catch(function(){});
         }
       }
     });
@@ -3443,20 +3444,26 @@ function _refreshAllPages() {
 // - re-render เฉพาะเมื่อ server data ต่างจาก optimistic ที่แสดงอยู่ (fingerprint check)
 // - ถ้า optimistic ถูกต้องแล้ว: ไม่ render ซ้ำ → ไม่กระตุกเลย
 async function _fetchFreshFromAppsScript() {
-  // ── 1 request เดียว: getAll จาก Apps Script (admin path เท่านั้น) ──
-  // visitor ใช้ all.json จาก GitHub Pages แทน (ไม่กิน quota)
+  // เรียกได้เฉพาะ admin เท่านั้น — visitor ใช้ _fetchAllData (GitHub Pages) แทน
+  if (!isAdmin) {
+    // visitor หลุดมาเรียกฟังก์ชันนี้ → redirect ไป GitHub Pages แทน
+    _optimisticPending = false;
+    return _fetchAllData(true);
+  }
   try {
     // ใช้ action=getAll&fresh=1 เพื่อบอก Apps Script ให้ bypass PropertiesService cache
     // ป้องกันกรณี server ส่ง cache เก่ากลับมา ทำให้การ์ดขึ้นสองอัน
     const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&fresh=1&t=${Date.now()}`, 12000);
     const dataChangedRef = { v: false };
 
-    // ลบ optimistic events ออกก่อน apply server data — ป้องกันปนกัน
+    // ลบ optimistic events + works ออกก่อน apply server data — ป้องกันปนกัน
     _optimisticPending = false;
     allEvents = allEvents.filter(e => !e.__isOptimistic);
+    allWorks  = allWorks.filter(function(w){ return !w.__isOptimistic; });
     _memCache.set('events', allEvents);
+    _memCache.set('works', allWorks);
 
-    // apply server data ทับ (overwrite allEvents ด้วยข้อมูลจาก Sheets จริงๆ)
+    // apply server data ทับ (overwrite ด้วยข้อมูลจาก Sheets จริงๆ)
     _applyAllData(res, false, dataChangedRef);
     _fmtDateCache.clear();
     if (isAdmin) _broadcastDataUpdate();
@@ -6191,16 +6198,6 @@ async function handleEventFormSubmit() {
     _fetchFreshFromAppsScript().catch(function(e) {
       clearTimeout(_optSafetyTimer);
       _optimisticPending = false;
-      // ลบ optimistic events ออกเมื่อ sync ล้มเหลว ป้องกันการ์ดซ้ำ
-      allEvents = allEvents.filter(function(ev) { return !ev.__isOptimistic; });
-      _memCache.set('events', allEvents);
-      Cache.set(LC.EVENTS, allEvents);
-      _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
-      requestAnimationFrame(function() {
-        renderHome(); renderCalendar();
-        if (isAdmin) renderAdminList();
-        debounceLucide();
-      });
       console.warn('[PPP] background sync failed:', e && e.message);
     });
   }
@@ -6541,26 +6538,44 @@ async function handleWorksFormSubmit() {
 
     // ── OPTIMISTIC UPDATE works ──
     const _wSavedId = _editingWorkId;
-    const optimisticWork = Object.assign({ __backendId: _wSavedId || ('tmp_w_' + Date.now()), id: _wSavedId || '' }, data);
+    const optimisticWork = Object.assign({
+      __backendId: _wSavedId || ('opt_w_' + Date.now()),
+      __isOptimistic: true,
+      id: _wSavedId || ''
+    }, data);
+
     if (_wSavedId) {
       var _wi = allWorks.findIndex(function(w){ return String(w.__backendId||w.id) === String(_wSavedId); });
       if (_wi !== -1) allWorks[_wi] = Object.assign({}, allWorks[_wi], optimisticWork);
+      else allWorks.unshift(optimisticWork);
     } else {
+      // ลบ optimistic เก่าออกก่อน
+      allWorks = allWorks.filter(function(w){ return !w.__isOptimistic; });
       allWorks.unshift(optimisticWork);
     }
     worksLoaded = true;
     _memCache.set('works', allWorks);
     Cache.set(LC.WORKS, allWorks);
     _worksLastFP = ''; _adminWorksListFP = '';
+
+    // render ทันที
+    _optimisticPending = true;
     requestAnimationFrame(function(){
       renderWorks();
       if (isAdmin) renderAdminWorksList();
       debounceLucide();
     });
 
-    // Sync background
+    // Sync background — ล้างแค่ timestamp ไม่ล้าง optimistic
     _fetchingAll = false;
-    _fetchFreshFromAppsScript().catch(function(){});
+    Cache.del(LC.TS_EV); Cache.del(LC.TS_WK);
+    _rateLimit.reset('works');
+    const _wOptTimer = setTimeout(function(){ _optimisticPending = false; }, 30000);
+    _fetchFreshFromAppsScript().catch(function(e){
+      clearTimeout(_wOptTimer);
+      _optimisticPending = false;
+      console.warn('[PPP] works sync failed:', e && e.message);
+    });
     _currentAdminTab = '';
     switchAdminTab('works');
   } catch(err) {
