@@ -417,7 +417,7 @@
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(clamp(160px, 15vw, 240px), 1fr)) !important;
     gap: clamp(8px, 1.2vw, 14px) !important;
-    align-items: stretch !important;
+    align-items: start !important;
     width: 100% !important;
     min-width: 0 !important;
   }
@@ -1257,7 +1257,7 @@
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)) !important;
     gap: 14px !important;
-    align-items: stretch !important;
+    align-items: start !important;
   }
   @media (max-width: 480px) {
     #trend-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
@@ -1592,7 +1592,7 @@
       <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;color:#111;margin:0;">Trend</h2>
       <div id="trend-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
      </div>
-     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:stretch;"></div>
+     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:start;"></div>
      <div id="trend-empty" style="display:none;text-align:center;padding:4rem 1rem;color:#9ca3af;">
       <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 1rem;display:block;opacity:0.4;"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
       <p style="font-weight:600;color:#6b7280;">ยังไม่มีข้อมูล Trend</p>
@@ -3324,31 +3324,56 @@ async function deleteAnniversaryInSheets(id) {
 // ═══════════════════════════════════════════════════════════════════
 function scheduleAutoRefresh() {
   clearInterval(_refreshTimer);
-  const jitter = Math.random() * 2000;
-  _refreshTimer = setInterval(() => {
-    if (document.hidden) return;
-    if (_optimisticPending) return; // block ถ้ามี optimistic event รอ server confirm
-    if (!_fetchingAll) {
-      _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
-    }
-  }, 15 * 1000); // ทุก 15 วินาที — real-time mode
 
-  // ── Cross-tab broadcast: รับ signal จาก admin tab ทันที ──
-  // เมื่อ admin save/edit/delete → broadcast 'ppp_data_updated'
-  // visitor tab รับแล้ว force fetch ทันที ไม่รอ 1 นาที
+  // ── ฟังก์ชัน: ดึง Apps Script โดยตรง แล้ว render ทันที (bypass CDN) ──
+  function _fetchDirectAndRender() {
+    if (_optimisticPending || _fetchingAll) return;
+    Cache.clearAll();
+    const url = APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now();
+    fetchWithTimeout(url, 12000).then(function(res) {
+      var ref = { v: false };
+      _applyAllData(res, true, ref);
+      _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
+      _adminListFP = ''; _adminWorksListFP = '';
+      _refreshAllPages();
+      renderBirthdayBanners();
+    }).catch(function() {
+      _fetchAllData(true).catch(function(){});
+    });
+  }
+
+  // ── BroadcastChannel: same-origin instant signal ไม่ผ่าน CDN เลย ──
+  // ทำงานเหมือน YouTube — admin save → ทุก tab รู้ทันที ใน milliseconds
+  if (!window._pppBroadcast) {
+    try {
+      window._pppBroadcast = new BroadcastChannel('ppp_realtime');
+      window._pppBroadcast.onmessage = function(e) {
+        if (e.data && e.data.type === 'data_updated') {
+          _fetchDirectAndRender();
+        }
+      };
+    } catch(e) { window._pppBroadcast = null; }
+  }
+
+  // ── localStorage fallback: Safari / cross-browser cross-tab ──
   if (!window._pppStorageListenerAdded) {
     window._pppStorageListenerAdded = true;
     window.addEventListener('storage', function(e) {
-      if (e.key === 'ppp_data_updated' && e.newValue && !isAdmin) {
-        // visitor ดึงจาก GitHub Pages (all.json) — ไม่ยิง Apps Script เพื่อป้องกัน quota หมด
-        // GitHub Pages จะอัพเดทภายใน ~5 นาที หลัง admin save
-        if (!_fetchingAll && !_optimisticPending) {
-          Cache.clearAll();
-          _fetchAllData(true).catch(function(){});
-        }
+      if (e.key === 'ppp_data_updated' && e.newValue) {
+        _fetchDirectAndRender();
       }
     });
   }
+
+  // ── Background polling: ทุก 10 วินาที ──
+  // safety net ถ้าไม่มี signal มา (เช่น เปิด tab ใหม่, หลัง network outage)
+  _refreshTimer = setInterval(function() {
+    if (document.hidden) return;
+    if (_optimisticPending) return;
+    if (!_fetchingAll) {
+      _fetchAllData(true).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e); });
+    }
+  }, 10 * 1000);
 
   // ── Precise midnight timer: fires exactly at 00:00:00 BKK ──
   _scheduleMidnightTimer();
@@ -3357,12 +3382,17 @@ function scheduleAutoRefresh() {
   _scheduleEventStartTimers();
 }
 
-// ── broadcast ให้ visitor tab รู้ว่า admin เพิ่ง save ──
+// ── broadcast ให้ทุก tab รู้ทันที: BroadcastChannel (ms) + localStorage fallback ──
 function _broadcastDataUpdate() {
+  // 1. BroadcastChannel — instant, same-origin, ไม่ผ่าน server เลย
+  try {
+    if (!window._pppBroadcast) window._pppBroadcast = new BroadcastChannel('ppp_realtime');
+    window._pppBroadcast.postMessage({ type: 'data_updated', ts: Date.now() });
+  } catch(_) {}
+  // 2. localStorage fallback — สำหรับ Safari และ browser ที่ไม่รองรับ BroadcastChannel
   try {
     localStorage.setItem('ppp_data_updated', Date.now().toString());
-    // ลบออกหลัง 100ms — แค่ trigger event ไม่ต้องเก็บค่าไว้
-    setTimeout(() => { try { localStorage.removeItem('ppp_data_updated'); } catch(_) {} }, 100);
+    setTimeout(function() { try { localStorage.removeItem('ppp_data_updated'); } catch(_) {} }, 200);
   } catch(_) {}
 }
 
@@ -3506,39 +3536,41 @@ function _refreshAllPages() {
   });
 }
 
-// ── _fetchFreshFromAppsScript: silent background sync หลัง admin save/edit/delete
-// - ดึงข้อมูลจาก Apps Script โดยตรง (bypass GitHub CDN cache)
-// - อัปเดต memory + localStorage เงียบๆ
-// - re-render เฉพาะเมื่อ server data ต่างจาก optimistic ที่แสดงอยู่ (fingerprint check)
-// - ถ้า optimistic ถูกต้องแล้ว: ไม่ render ซ้ำ → ไม่กระตุกเลย
+// ── _fetchFreshFromAppsScript: sync กับ server หลัง admin save/edit/delete ──
+// Netflix/YouTube pattern:
+//   1. Optimistic update แสดงทันที (ทำก่อนเรียกฟังก์ชันนี้)
+//   2. ดึง server data จริงใน background
+//   3. ถ้า server ตรงกับ optimistic → ไม่ render ซ้ำ (fingerprint check)
+//   4. broadcast ให้ทุก tab update ทันที
 async function _fetchFreshFromAppsScript() {
-  // เรียกได้เฉพาะ admin เท่านั้น — visitor ใช้ _fetchAllData (GitHub Pages) แทน
   if (!isAdmin) {
-    // visitor หลุดมาเรียกฟังก์ชันนี้ → redirect ไป GitHub Pages แทน
     _optimisticPending = false;
     return _fetchAllData(true);
   }
   try {
-    // ใช้ action=getAll&fresh=1 เพื่อบอก Apps Script ให้ bypass PropertiesService cache
-    // ป้องกันกรณี server ส่ง cache เก่ากลับมา ทำให้การ์ดขึ้นสองอัน
-    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&fresh=1&t=${Date.now()}`, 12000);
+    const res = await fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now(), 12000);
     const dataChangedRef = { v: false };
 
-    // ลบ optimistic events + works ออกก่อน apply server data — ป้องกันปนกัน
+    // ลบ optimistic ออกก่อน apply server data จริง
     _optimisticPending = false;
     allEvents = allEvents.filter(e => !e.__isOptimistic);
+    allTrends = allTrends.filter(t => !t.__isOptimistic);
     allWorks  = allWorks.filter(function(w){ return !w.__isOptimistic; });
     _memCache.set('events', allEvents);
     _memCache.set('works', allWorks);
 
-    // apply server data ทับ (overwrite ด้วยข้อมูลจาก Sheets จริงๆ)
     _applyAllData(res, false, dataChangedRef);
     _fmtDateCache.clear();
-    if (isAdmin) _broadcastDataUpdate();
-    // render เสมอหลัง fetch จาก server
+
+    // Broadcast ทันที — ทุก tab (visitor, admin อื่น) จะรู้และดึงข้อมูลใหม่เลย
+    _broadcastDataUpdate();
+
+    // render เสมอหลัง confirm server data
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
     _refreshAllPages();
+    renderBirthdayBanners();
   } catch(e) {
+    _optimisticPending = false;
     console.warn('_fetchFreshFromAppsScript failed:', e.message);
   }
 }
@@ -3590,7 +3622,7 @@ function renderTrend() {
   if (empty) empty.style.display = 'none';
 
   // ── Responsive card grid ──
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:stretch;';
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:start;';
 
   grid.innerHTML = filtered.map(t => {
     const artistColor = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
@@ -3619,11 +3651,11 @@ function renderTrend() {
     // Main color for accent
     const mainColor = artists.length ? (artistColor[artists[0]]||'#e5e7eb') : '#e5e7eb';
 
-    return `<div class="trend-card" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:${isLink?'pointer':'default'};transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;height:100%;" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')" onmouseenter="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';this.style.transform=''"`:''}>
+    return `<div class="trend-card" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:${isLink?'pointer':'default'};transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')" onmouseenter="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';this.style.transform=''"`:''}>
       ${t.image ? `<div style="width:100%;aspect-ratio:1/1;background:#f3f4f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;">
         <img src="${escHtml(t.image)}" style="width:100%;height:100%;object-fit:contain;display:block;" loading="lazy" onerror="_onImgError(this)">
       </div>` : `<div style="width:100%;aspect-ratio:1/1;background:#f3f4f6;flex-shrink:0;"></div>`}
-      <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;min-height:80px;">
+      <div style="padding:12px 14px;display:flex;flex-direction:column;">
         ${badgesHtml}
         ${t.caption ? `<p style="font-size:0.83rem;line-height:1.55;color:#374151;margin:0;word-break:break-word;">${escHtml(t.caption)}</p>` : ''}
       </div>
@@ -6209,9 +6241,17 @@ function navigate(page) {
 
   // Trend
   if (page === 'trend') {
-    loadTrendsFromSheets();
     renderTrend();
     debounceLucide();
+    // refresh ข้างหลังทันที ไม่ block UI
+    if (!_fetchingAll && !_optimisticPending) {
+      fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now(), 12000)
+        .then(function(res) {
+          var ref = { v: false };
+          _applyAllData(res, true, ref);
+          if (ref.v) { renderTrend(); renderAdminTrendList(); debounceLucide(); }
+        }).catch(function() { _fetchAllData(true).catch(function(){}); });
+    }
     return;
   }
 
@@ -7511,14 +7551,28 @@ window.addEventListener('resize', () => {
 document.addEventListener('touchstart', () => {}, { passive: true });
 document.addEventListener('touchmove',  () => {}, { passive: true });
 
-// Pause/resume background refresh when tab visibility changes
+// เมื่อ user กลับมาที่ tab → ดึง Apps Script โดยตรงทันที (bypass CDN delay)
+// เหมือน YouTube/Netflix ที่ refresh feed ทันทีเมื่อ focus กลับ
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    if (_optimisticPending) return; // block ถ้ามี optimistic pending
-    if (!_fetchingAll) {
-      Cache.clearAll();
-      _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
-    }
+    if (_optimisticPending) return;
+    if (_fetchingAll) return;
+    Cache.clearAll();
+    // ดึง Apps Script โดยตรง ไม่รอ GitHub Pages CDN
+    fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now(), 12000)
+      .then(function(res) {
+        var ref = { v: false };
+        _applyAllData(res, true, ref);
+        if (ref.v) {
+          _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
+          _adminListFP = ''; _adminWorksListFP = '';
+          _refreshAllPages();
+          renderBirthdayBanners();
+        }
+      })
+      .catch(function() {
+        _fetchAllData(true).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e); });
+      });
   }
 });
 
