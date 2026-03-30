@@ -3365,7 +3365,7 @@ function scheduleAutoRefresh() {
     });
   }
 
-  // ── Background polling: ทุก 10 วินาที ──
+  // ── Background polling: ทุก 30 วินาที ──
   // safety net ถ้าไม่มี signal มา (เช่น เปิด tab ใหม่, หลัง network outage)
   _refreshTimer = setInterval(function() {
     if (document.hidden) return;
@@ -3373,7 +3373,7 @@ function scheduleAutoRefresh() {
     if (!_fetchingAll) {
       _fetchAllData(true).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e); });
     }
-  }, 10 * 1000);
+  }, 30 * 1000);
 
   // ── Precise midnight timer: fires exactly at 00:00:00 BKK ──
   _scheduleMidnightTimer();
@@ -3582,6 +3582,7 @@ let allTrends = [];
 let trendsLoaded = false;
 let _editingTrendId = null;
 let _trendFilter = 'all';
+let _trendLastFP = '';
 const TREND_ARTISTS = ['Pond', 'Phuwin', 'Permpoon'];
 
 // ── render Trend page ─────────────────────────────────────────────
@@ -3590,6 +3591,11 @@ function renderTrend() {
   const empty = document.getElementById('trend-empty');
   const filterBar = document.getElementById('trend-filter-bar');
   if (!grid) return;
+
+  // ── fingerprint guard: ถ้าข้อมูลไม่เปลี่ยน ไม่ rebuild DOM เพื่อกันกระตุก ──
+  const fp = _trendFilter + '|' + allTrends.map(t => (t.__backendId||'') + (t.caption||'') + (t.image||'') + (t.link||'') + (t.date||'')).join(',');
+  if (fp === _trendLastFP && grid.children.length > 0) return;
+  _trendLastFP = fp;
 
   // Filter bar
   if (filterBar) {
@@ -3621,8 +3627,11 @@ function renderTrend() {
   }
   if (empty) empty.style.display = 'none';
 
-  // ── Responsive card grid ──
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;';
+  // ── Responsive card grid — set once, ไม่ override CSS ซ้ำ ──
+  if (!grid.dataset.styled) {
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;';
+    grid.dataset.styled = '1';
+  }
 
   grid.innerHTML = filtered.map(t => {
     const artistColor = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
@@ -3652,7 +3661,10 @@ function renderTrend() {
     const mainColor = artists.length ? (artistColor[artists[0]]||'#e5e7eb') : '#e5e7eb';
 
     // Trend card — style เหมือนหน้าแรก รูปโชว์เต็มขนาดจริง ไม่ crop
-    return `<div class="event-card" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')"`:''}>
+    const cardClick = isLink
+      ? `onclick="window.open('${escHtml(t.link)}','_blank')" style="cursor:pointer;"`
+      : `style="cursor:default;"`;
+    return `<div class="event-card" ${cardClick}>
       ${t.image
         ? `<div style="width:100%;flex-shrink:0;overflow:hidden;background:#f8f9fa;border-radius:var(--radius-card) var(--radius-card) 0 0;">
              <img src="${escHtml(t.image)}" style="width:100%;height:auto;display:block;object-fit:contain;" loading="lazy" onerror="_onImgError(this)">
