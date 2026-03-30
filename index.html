@@ -1257,7 +1257,7 @@
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)) !important;
     gap: 14px !important;
-    align-items: start !important;
+    align-items: stretch !important;
   }
   @media (max-width: 480px) {
     #trend-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
@@ -1592,7 +1592,7 @@
       <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;color:#111;margin:0;">Trend</h2>
       <div id="trend-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
      </div>
-     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:start;"></div>
+     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:stretch;"></div>
      <div id="trend-empty" style="display:none;text-align:center;padding:4rem 1rem;color:#9ca3af;">
       <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 1rem;display:block;opacity:0.4;"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
       <p style="font-weight:600;color:#6b7280;">ยังไม่มีข้อมูล Trend</p>
@@ -3065,7 +3065,10 @@ function _applyAllData(res, force, dataChangedRef) {
   const trData = res.trends || [];
   if (Array.isArray(trData)) {
     if (!_optimisticPending) {
-      allTrends = trData.map(t => Object.assign({ __backendId: t.id||'' }, t));
+      const newTrends = trData.map(t => Object.assign({ __backendId: t.id||'' }, t));
+      const _fpTr = arr => arr.length + '|' + arr.map(t => (t.__backendId||t.id||'') + ':' + (t.caption||'')).join(',');
+      if (_fpTr(newTrends) !== _fpTr(allTrends)) dataChangedRef.v = true;
+      allTrends = newTrends;
       trendsLoaded = true;
     }
   }
@@ -3471,6 +3474,9 @@ function renderCurrentPage() {
     if (allWorks.length) renderWorks();
     else if (!worksLoaded) loadWorksFromSheets();
   }
+  else if (currentPage === 'trend') {
+    renderTrend();
+  }
 }
 
 // ── _refreshAllPages: render หน้าปัจจุบันก่อน แล้วหน้าอื่นใน frame ถัดไป — ไม่กระตุก
@@ -3491,6 +3497,7 @@ function _refreshAllPages() {
       if (currentPage !== 'home') renderHome();
       if (currentPage !== 'calendar') renderCalendar();
       if (currentPage !== 'works' && allWorks.length) renderWorks();
+      if (currentPage !== 'trend') renderTrend();
       if (isAdmin && currentPage !== 'admin') {
         renderAdminList();
         if (worksLoaded) renderAdminWorksList();
@@ -3583,7 +3590,7 @@ function renderTrend() {
   if (empty) empty.style.display = 'none';
 
   // ── Responsive card grid ──
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:start;';
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:stretch;';
 
   grid.innerHTML = filtered.map(t => {
     const artistColor = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
@@ -3612,13 +3619,13 @@ function renderTrend() {
     // Main color for accent
     const mainColor = artists.length ? (artistColor[artists[0]]||'#e5e7eb') : '#e5e7eb';
 
-    return `<div class="trend-card" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:${isLink?'pointer':'default'};transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')" onmouseenter="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';this.style.transform=''"`:''}>
+    return `<div class="trend-card" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:${isLink?'pointer':'default'};transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;height:100%;" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')" onmouseenter="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';this.style.transform=''"`:''}>
       ${t.image ? `<div style="width:100%;aspect-ratio:1/1;background:#f3f4f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;">
         <img src="${escHtml(t.image)}" style="width:100%;height:100%;object-fit:contain;display:block;" loading="lazy" onerror="_onImgError(this)">
       </div>` : `<div style="width:100%;aspect-ratio:1/1;background:#f3f4f6;flex-shrink:0;"></div>`}
-      <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">
+      <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;min-height:80px;">
         ${badgesHtml}
-        ${t.caption ? `<p style="font-size:0.83rem;line-height:1.55;color:#374151;margin:0;word-break:break-word;flex:1;">${escHtml(t.caption)}</p>` : ''}
+        ${t.caption ? `<p style="font-size:0.83rem;line-height:1.55;color:#374151;margin:0;word-break:break-word;">${escHtml(t.caption)}</p>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -3702,41 +3709,63 @@ async function handleTrendFormSubmit() {
   const spin = document.getElementById('trend-submit-spin');
   btn.disabled = true; txt.style.display = 'none'; spin.style.display = 'inline';
 
+  // ── OPTIMISTIC UPDATE: แสดงทันทีก่อน server ตอบ ──
+  const _savedEditId = _editingTrendId;
+  const _optId = _savedEditId || ('opt_t_' + Date.now());
+  const optimisticTrend = Object.assign({ __backendId: _optId, id: _optId, __isOptimistic: true }, data);
+
+  if (_savedEditId) {
+    const idx = allTrends.findIndex(t => String(t.__backendId||t.id||'') === String(_savedEditId));
+    if (idx !== -1) allTrends[idx] = optimisticTrend; else allTrends.unshift(optimisticTrend);
+  } else {
+    allTrends = allTrends.filter(t => !t.__isOptimistic);
+    allTrends.unshift(optimisticTrend);
+  }
+  closeTrendModal();
+  showToast(_savedEditId ? 'Trend updated ✓' : 'Trend added ✓');
+  renderTrend();
+  renderAdminTrendList();
+  debounceLucide();
+
   try {
     let res;
-    if (_editingTrendId) {
-      res = await apiPost({ action: 'updateTrend', id: _editingTrendId, trend: data });
+    if (_savedEditId) {
+      res = await apiPost({ action: 'updateTrend', id: _savedEditId, trend: data });
     } else {
       res = await apiPost({ action: 'createTrend', trend: data });
     }
     if (res.status !== 'ok') throw new Error(res.message || 'Failed');
 
-    // อัปเดต allTrends ด้วย id จริงจาก server ทันที ไม่มีการ์ดซ้ำ
-    const realId = res.id || _editingTrendId || ('t_' + Date.now());
-    const saved = Object.assign({ __backendId: realId, id: realId }, data);
-    if (_editingTrendId) {
-      const idx = allTrends.findIndex(t => String(t.__backendId||t.id||'') === String(_editingTrendId));
-      if (idx !== -1) allTrends[idx] = saved; else allTrends.unshift(saved);
-    } else {
-      allTrends = allTrends.filter(t => !t.__isOptimistic);
-      allTrends.unshift(saved);
+    // แทนที่ optimistic ด้วย id จริงจาก server — ไม่มีการ์ดซ้ำ
+    const realId = res.id || _savedEditId || _optId;
+    const confirmedTrend = Object.assign({ __backendId: realId, id: realId }, data);
+    const oidx = allTrends.findIndex(t => String(t.__backendId||t.id||'') === String(_optId));
+    if (oidx !== -1) allTrends[oidx] = confirmedTrend; else {
+      allTrends = allTrends.filter(t => String(t.__backendId||t.id||'') !== String(_optId));
+      allTrends.unshift(confirmedTrend);
     }
-    closeTrendModal();
-    showToast(_editingTrendId ? 'Trend updated ✓' : 'Trend added ✓');
     renderTrend();
     renderAdminTrendList();
     debounceLucide();
 
-    // sync เงียบๆ ข้างหลัง ดึงข้อมูลจริงจาก server แต่ไม่ render ซ้ำถ้าไม่มีการเปลี่ยนแปลง
+    // sync server ข้างหลัง — replace ด้วยข้อมูลจริงเงียบๆ ถ้าต่างกัน
     try {
       const fresh = await fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getTrends&t=' + Date.now(), 15000);
       if (fresh && fresh.status === 'ok' && Array.isArray(fresh.trends)) {
-        allTrends = fresh.trends.map(t => Object.assign({ __backendId: t.id||''  }, t));
-        renderTrend();
-        renderAdminTrendList();
+        const newTrends = fresh.trends.map(t => Object.assign({ __backendId: t.id||'' }, t));
+        const _fpTr = arr => arr.length + '|' + arr.map(t => (t.__backendId||t.id||'') + ':' + (t.caption||'')).join(',');
+        if (_fpTr(newTrends) !== _fpTr(allTrends.filter(t => !t.__isOptimistic))) {
+          allTrends = newTrends;
+          renderTrend();
+          renderAdminTrendList();
+        }
       }
-    } catch(e) { /* silent background sync */ }
+    } catch(e) { /* silent */ }
   } catch(err) {
+    // Rollback optimistic ถ้า server error
+    allTrends = allTrends.filter(t => String(t.__backendId||t.id||'') !== String(_optId));
+    renderTrend();
+    renderAdminTrendList();
     showToast('❌ ' + (err.message || 'Error'));
     console.error('[trend]', err);
   } finally {
@@ -5986,7 +6015,8 @@ async function confirmDelete(key) {
   Cache.set(LC.EVENTS, allEvents);
   _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
   requestAnimationFrame(function() {
-    renderHome(); renderCalendar();
+    renderHome(); renderCalendar(); renderTrend();
+    if (allWorks.length) renderWorks();
     if (isAdmin) renderAdminList();
     debounceLucide();
   });
@@ -6000,7 +6030,7 @@ async function confirmDelete(key) {
     // Rollback: คืน event กลับ ถ้า delete ล้มเหลว
     if (_removed) { allEvents.splice(_delIdx, 0, _removed); _memCache.set('events', allEvents); Cache.set(LC.EVENTS, allEvents); }
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
-    requestAnimationFrame(function(){ renderHome(); renderCalendar(); if (isAdmin) renderAdminList(); debounceLucide(); });
+    requestAnimationFrame(function(){ renderHome(); renderCalendar(); renderTrend(); if (allWorks.length) renderWorks(); if (isAdmin) renderAdminList(); debounceLucide(); });
     if (rowEl) rowEl.style.opacity = '1';
     showToast('An error occurred' + ': ' + (err.message || ''));
   }
@@ -6482,11 +6512,12 @@ async function handleEventFormSubmit() {
     _memCache.set('events', allEvents);
     Cache.set(LC.EVENTS, allEvents);
 
-    // render ทันที
+    // render ทันที — ทุกหน้า
     _optimisticPending = true;
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
     requestAnimationFrame(function() {
-      renderHome(); renderCalendar();
+      renderHome(); renderCalendar(); renderTrend();
+      if (allWorks.length) renderWorks();
       if (isAdmin) renderAdminList();
       renderBirthdayBanners(); debounceLucide();
     });
@@ -6866,10 +6897,10 @@ async function handleWorksFormSubmit() {
     Cache.set(LC.WORKS, allWorks);
     _worksLastFP = ''; _adminWorksListFP = '';
 
-    // render ทันที
+    // render ทันที — ทุกหน้า
     _optimisticPending = true;
     requestAnimationFrame(function(){
-      renderWorks();
+      renderHome(); renderCalendar(); renderTrend(); renderWorks();
       if (isAdmin) renderAdminWorksList();
       debounceLucide();
     });
@@ -6956,7 +6987,7 @@ function deleteWork(backendId, title) {
       _memCache.set('works', allWorks);
       Cache.set(LC.WORKS, allWorks);
       _worksLastFP = ''; _adminWorksListFP = '';
-      requestAnimationFrame(function(){ renderWorks(); if (isAdmin) renderAdminWorksList(); debounceLucide(); });
+      requestAnimationFrame(function(){ renderHome(); renderCalendar(); renderTrend(); renderWorks(); if (isAdmin) renderAdminWorksList(); debounceLucide(); });
       _fetchingAll = false;
       _fetchFreshFromAppsScript().catch(function(){});
     } catch(err) {
