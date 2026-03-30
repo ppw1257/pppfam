@@ -3113,8 +3113,10 @@ async function loadEventsFromSheets(force = false) {
     if (data && data.status === 'ok') {
       const raw = data.events || [];
       const processed = processEvents(raw);
-      const prevFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '');
-      const newFP  = processed.length + '|' + (processed[0]?.__backendId || '');
+      // fingerprint ครอบคลุม startTime + hashtags ด้วย — ตรวจจับการเปลี่ยนแปลงที่ length/id ไม่เปลี่ยน
+      const _fpDeepEv = arr => arr.map(e => (e.__backendId||'') + ':' + (e.startTime||'') + ':' + (e.hashtags||'')).join('|');
+      const prevFP = _fpDeepEv(allEvents);
+      const newFP  = _fpDeepEv(processed);
       allEvents = processed;
       _memCache.set('events', processed);   // L1 write
       Cache.set(LC.EVENTS, processed);      // L2 write
@@ -3471,6 +3473,12 @@ async function _fetchFreshFromAppsScript() {
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
     _refreshAllPages();
   } catch(e) {
+    // ล้าง optimistic events เสมอแม้จะ error — ป้องกันการ์ดขึ้นสองอัน
+    _optimisticPending = false;
+    allEvents = allEvents.filter(e => !e.__isOptimistic);
+    allWorks  = allWorks.filter(function(w){ return !w.__isOptimistic; });
+    _memCache.set('events', allEvents);
+    _memCache.set('works', allWorks);
     console.warn('_fetchFreshFromAppsScript failed:', e.message);
   }
 }
@@ -6155,12 +6163,13 @@ async function handleEventFormSubmit() {
     }, payload);
 
     if (_savedId) {
-      // edit: replace event เดิมด้วย optimistic version
+      // edit: ลบ optimistic เก่าออกก่อนเสมอ ป้องกัน duplicate กรณี findIndex พลาด
+      allEvents = allEvents.filter(e => !e.__isOptimistic);
       const idx = allEvents.findIndex(e =>
         String(e.__backendId||e.__rawId||e.id||'') === String(_savedId)
       );
       if (idx !== -1) allEvents[idx] = optimisticEvent;
-      else allEvents.push(optimisticEvent);
+      // ถ้าหา index ไม่เจอ ไม่ push — รอ server data แทน ป้องกันการ์ดขึ้นสองอัน
     } else {
       // add ใหม่: ลบ optimistic เก่าออกก่อน แล้ว push
       allEvents = allEvents.filter(e => !e.__isOptimistic);
