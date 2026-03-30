@@ -462,29 +462,29 @@
     }
   }
   /* works-tabs: scroll บน desktop, wrap บนมือถือ */
-  #works-tabs {
+  #works-tabs, #trends-tabs {
     flex-wrap: wrap !important;
     overflow-x: visible !important;
     gap: 6px !important;
     row-gap: 6px !important;
   }
   @media (min-width: 768px) {
-    #works-tabs {
+    #works-tabs, #trends-tabs {
       flex-wrap: nowrap !important;
       overflow-x: auto !important;
       overflow-y: hidden !important;
       scrollbar-width: none !important;
     }
-    #works-tabs::-webkit-scrollbar { display: none !important; }
+    #works-tabs::-webkit-scrollbar, #trends-tabs::-webkit-scrollbar { display: none !important; }
   }
   @media (max-width: 767px) {
-    #works-tabs {
+    #works-tabs, #trends-tabs {
       flex-wrap: wrap !important;
       overflow: visible !important;
       gap: 5px !important;
       row-gap: 5px !important;
     }
-    #works-tabs button {
+    #works-tabs button, #trends-tabs button {
       font-size: 0.72rem !important;
       padding: 5px 11px !important;
       flex-shrink: 0 !important;
@@ -1201,15 +1201,24 @@
   * { box-sizing: border-box; }
   img { max-width: 100%; height: auto; }
 
-  /* ══ Works grid: 6 col desktop, responsive ══ */
-  #works-grid, #works-loading, .works-year-grid {
+  /* ══ Works + Trends grid: 6 col desktop, responsive ══ */
+  #works-grid, #works-loading, .works-year-grid,
+  #trends-grid, #trends-loading, .trends-year-grid {
     grid-template-columns: repeat(6, 1fr) !important;
     gap: clamp(6px, 1vw, 10px) !important;
   }
-  @media (max-width: 1100px) { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(5, 1fr) !important; } }
-  @media (max-width: 900px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(4, 1fr) !important; } }
-  @media (max-width: 600px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; } }
-  @media (max-width: 400px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; } }
+  @media (max-width: 1100px) { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(5, 1fr) !important; } }
+  @media (max-width: 900px)  { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+  @media (max-width: 600px)  { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; } }
+  @media (max-width: 400px)  { #works-grid, #works-loading, .works-year-grid, #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; } }
+
+  /* Trends: portrait cards — wider columns */
+  #trends-grid, #trends-loading, .trends-year-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: clamp(8px, 1.5vw, 16px) !important;
+  }
+  @media (max-width: 900px)  { #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+  @media (max-width: 500px)  { #trends-grid, #trends-loading, .trends-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; } }
 
   /* ══ Works filter tabs: wrap บนมือถือ ══ */
   #works-tabs {
@@ -1270,6 +1279,7 @@
       <span class="nav-link active" data-page="home" onclick="navigate('home')"><i data-lucide="home" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label" >Home</span></span>
       <span class="nav-link" data-page="calendar" onclick="navigate('calendar')"><i data-lucide="calendar" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Calendar</span></span>
       <span class="nav-link" data-page="works" onclick="navigate('works')"><i data-lucide="star" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Works</span></span>
+      <span class="nav-link" data-page="trends" onclick="navigate('trends')"><i data-lucide="trending-up" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Trends</span></span>
       <span class="nav-link" data-page="admin" id="nav-admin-link" style="display:none;" onclick="navigate('admin')"><i data-lucide="settings" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Admin</span></span>
 
      </div>
@@ -1560,6 +1570,60 @@
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:80%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
       <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;flex-shrink:0;"></div><div style="flex:1;"><div style="height:13px;width:85%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:45%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
      </div>
+    </div>
+    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
+   </div>
+
+   <!-- TRENDS PAGE — mirrors Works page layout exactly -->
+   <div class="page" id="page-trends">
+    <div style="width:100%;padding:2rem 1rem;box-sizing:border-box;overflow-x:hidden;">
+
+     <!-- Header -->
+     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.25rem;">
+      <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#111;margin:0;">Trends</h2>
+     </div>
+
+     <!-- Filter bars — identical structure to Works page -->
+     <div style="margin-bottom:0.75rem;">
+      <!-- Artist filter -->
+      <div class="filter-bar" style="margin-bottom:6px;" id="trends-artist-bar">
+       <button onclick="setTrendsArtist('all')" id="twa-all"
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;">✦ All</button>
+       <button onclick="setTrendsArtist('Pond')" id="twa-Pond"
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;"><span style="width:6px;height:6px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>Pond</button>
+       <button onclick="setTrendsArtist('Phuwin')" id="twa-Phuwin"
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;"><span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;flex-shrink:0;"></span>Phuwin</button>
+       <button onclick="setTrendsArtist('Permpoon')" id="twa-Permpoon"
+         style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
+      </div>
+      <!-- Year filter bar — built dynamically -->
+      <div class="filter-bar" id="trends-year-bar" style="margin-bottom:6px;"></div>
+      <!-- Category tabs — hidden -->
+      <div id="trends-tabs" style="display:none;"></div>
+     </div>
+
+     <!-- Content — same IDs pattern as works but prefixed trends- -->
+     <div id="trends-accordion" style="display:none;"></div>
+     <div id="trends-grid" style="display:none;align-items:stretch;"></div>
+     <div id="trends-empty" style="display:none;padding:3rem 1rem;">
+      <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
+       <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+        <i data-lucide="trending-up" style="width:24px;height:24px;color:#a855f7;stroke-width:1.8;"></i>
+       </div>
+       <p style="font-size:1rem;font-weight:700;color:#111;margin-bottom:6px;">No data yet</p>
+       <div style="display:flex;justify-content:center;gap:6px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div>
+        <div style="width:7px;height:7px;border-radius:50%;background:#6b7280;"></div>
+        <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
+       </div>
+      </div>
+     </div>
+     <div id="trends-loading" style="display:grid;gap:0 8px;">
+      <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="flex:1;"><div style="height:13px;width:90%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:55%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
+      <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="flex:1;"><div style="height:13px;width:80%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:50%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
+      <div style="padding-bottom:20px;"><div style="border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><div style="flex:1;"><div style="height:13px;width:85%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;margin-bottom:7px;"></div><div style="height:11px;width:45%;background:linear-gradient(90deg,#f5f5f5 0%,#ececec 40%,#f5f5f5 80%);background-size:300% 100%;border-radius:6px;"></div></div></div></div>
+     </div>
+
     </div>
     <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
    </div>
@@ -2405,9 +2469,33 @@
 
       <!-- Description -->
       <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;">
-      <div style="margin-bottom:1.25rem;">
+      <div style="margin-bottom:1rem;">
        <label class="form-label">Description <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
        <textarea class="form-input" id="wf-description" name="description" rows="3" placeholder="Details..."></textarea>
+      </div>
+
+      <!-- Trends fields -->
+      <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;">
+      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#a855f7;margin-bottom:0.75rem;">
+       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:4px;"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+       Trends <span style="font-weight:400;text-transform:none;color:#9ca3af;">(used in Trends page)</span>
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+       <div style="grid-column:1/-1;">
+        <label class="form-label">Tags <span style="font-weight:400;color:#9ca3af;">(optional — คั่นด้วย comma)</span></label>
+        <input class="form-input" id="wf-tags" name="tags" placeholder="e.g. brand deal, cover, collab">
+        <div style="font-size:0.65rem;color:#9ca3af;margin-top:4px;">ใช้สำหรับ filter และ breakdown ในหน้า Trends</div>
+       </div>
+       <div style="grid-column:1/-1;">
+        <label class="form-label" style="margin-bottom:0.5rem;">Featured Work</label>
+        <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:8px 14px;border-radius:10px;border:1px solid #e9d5ff;background:#faf5ff;width:100%;box-sizing:border-box;transition:background 0.15s;" id="wf-featured-label">
+         <input type="checkbox" id="wf-featured" name="featured" value="true" style="width:16px;height:16px;accent-color:#a855f7;cursor:pointer;flex-shrink:0;" onchange="const _l=document.getElementById('wf-featured-label');_l.style.background=this.checked?'#f3e8ff':'#faf5ff';_l.style.borderColor=this.checked?'#a855f7':'#e9d5ff';">
+         <div>
+          <div style="font-size:0.85rem;font-weight:600;color:#7e22ce;">⭐ Featured</div>
+          <div style="font-size:0.68rem;color:#9ca3af;margin-top:1px;">ปักหมุดเป็นงานเด่น — แสดงในหน้า Trends</div>
+         </div>
+        </label>
+       </div>
       </div>
 
       <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center;">
@@ -3432,6 +3520,7 @@ function _refreshAllPages() {
       if (currentPage !== 'home') renderHome();
       if (currentPage !== 'calendar') renderCalendar();
       if (currentPage !== 'works' && allWorks.length) renderWorks();
+      if (currentPage !== 'trends' && allWorks.length) { _trendsLastFP = ''; renderTrends(); }
       if (isAdmin && currentPage !== 'admin') {
         renderAdminList();
         if (worksLoaded) renderAdminWorksList();
@@ -5900,6 +5989,14 @@ function navigate(page) {
     return;
   }
 
+  // Trends: render works grid (same data as Works page)
+  if (page === 'trends') {
+    if (allWorks.length) { renderTrends(); }
+    loadWorksFromSheets(); // always refresh in background
+    debounceLucide();
+    return;
+  }
+
   // Home/Admin: ใช้ scheduleRender ปกติ
   scheduleRender();
   debounceLucide();
@@ -6479,13 +6576,14 @@ function closeWorksFormModal() {
 }
 
 function _clearWorksForm() {
-  ['wf-title','wf-year','wf-brand','wf-magazine','wf-role','wf-project','wf-image','wf-releaseDate','wf-contractEnd','wf-link','wf-description'].forEach(id => {
+  ['wf-title','wf-year','wf-brand','wf-magazine','wf-role','wf-project','wf-image','wf-releaseDate','wf-contractEnd','wf-link','wf-description','wf-tags'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   ['wf-category','wf-type'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.querySelectorAll('.artist-check-w').forEach(c => c.checked = false);
+  const _wff = document.getElementById('wf-featured'); if (_wff) { _wff.checked = false; const _lbl=document.getElementById('wf-featured-label'); if(_lbl){_lbl.style.background='#faf5ff';_lbl.style.borderColor='#e9d5ff';} }
 }
 
 function _fillWorksForm(w) {
@@ -6507,6 +6605,8 @@ function _fillWorksForm(w) {
     if (_txt) { _txt.style.color = _isEnded ? '#334155' : '#6b7280'; _txt.textContent = (_isEnded && _hiddenDate.value) ? 'Contract Ended · ' + _hiddenDate.value : 'Contract Ended'; }
   }
   set('wf-description', w.description); set('wf-category', w.category); set('wf-type', w.type);
+  set('wf-tags', w.tags);
+  const _wff2 = document.getElementById('wf-featured'); if (_wff2) { const _fv = !!(w.featured && w.featured !== 'false' && w.featured !== '0'); _wff2.checked = _fv; const _lbl2=document.getElementById('wf-featured-label'); if(_lbl2){_lbl2.style.background=_fv?'#f3e8ff':'#faf5ff';_lbl2.style.borderColor=_fv?'#a855f7':'#e9d5ff';} }
   const artistArr = (w.artists||'').split(',').map(a=>a.trim());
   document.querySelectorAll('.artist-check-w').forEach(c => { c.checked = artistArr.includes(c.value); });
 }
@@ -6519,7 +6619,9 @@ function _readWorksForm() {
     artists, brand: gv('wf-brand'), magazine: gv('wf-magazine'),
     type: gv('wf-type'), role: gv('wf-role'), project: gv('wf-project'),
     image: gv('wf-image'), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');if(!_cb||!_cb.checked)return '';const _ex=document.getElementById('wf-contractEndDate');if(_ex&&_ex.value)return _ex.value;const _d=new Date();return _d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');})(), link: gv('wf-link'),
-    description: gv('wf-description')
+    description: gv('wf-description'),
+    tags: gv('wf-tags'),
+    featured: (()=>{ const _f=document.getElementById('wf-featured'); return (_f && _f.checked) ? 'true' : ''; })()
   };
 }
 
@@ -6544,7 +6646,6 @@ async function handleWorksFormSubmit() {
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
     if (data.year) { _worksYear = data.year; }
-
     // ── OPTIMISTIC UPDATE works ──
     const _wSavedId = _editingWorkId;
     const optimisticWork = Object.assign({
@@ -7333,6 +7434,267 @@ function _fastHydrateFromCache() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// TRENDS PAGE — mirrors Works page exactly, newest first
+// ═══════════════════════════════════════════════════════════════════
+let _trendsTab    = 'all';
+let _trendsArtist = 'all';
+let _trendsYear   = 'all';
+let _trendsLastFP = '';
+
+function renderTrends() {
+  const accordion = document.getElementById('trends-accordion');
+  const grid      = document.getElementById('trends-grid');
+  const empty     = document.getElementById('trends-empty');
+  const loading   = document.getElementById('trends-loading');
+  if (!accordion) return;
+
+  const tFP = `${_trendsYear}|${_trendsTab}|${_trendsArtist}|${allWorks.length}`;
+  if (tFP === _trendsLastFP && accordion.innerHTML.trim() !== '') return;
+  _trendsLastFP = tFP;
+
+  if (loading) loading.style.display = 'none';
+
+  if (!worksLoaded && !allWorks.length) {
+    if (loading) loading.style.display = 'grid';
+    accordion.style.display = 'none';
+    if (grid) grid.style.display = 'none';
+    if (empty) empty.style.display = 'none';
+    return;
+  }
+
+  _buildTrendsYearButtons();
+  _refreshTrendsYearButtons();
+  if (grid) grid.style.display = 'none';
+
+  function _catToKey(cat) {
+    const c = (cat||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    if (c.includes('littlebig')) return 'littlebigworld';
+    if (c.includes('series'))    return 'series';
+    if (c.includes('music')||c.includes('mv')) return 'music';
+    if (c.includes('magazine'))  return 'magazine';
+    if (c.includes('presenter')||c.includes('brand')) return 'presenter';
+    if (c.includes('variety'))   return 'variety';
+    if (c.includes('interview')) return 'interview';
+    if (c.includes('behind')||c.includes('bts')) return 'bts';
+    if (c.includes('otherwork')||c.includes('other')) return 'otherworks';
+    return c;
+  }
+
+  let filtered = allWorks;
+  if (_trendsYear && _trendsYear !== 'all') {
+    filtered = filtered.filter(w => (w.year||'') === _trendsYear);
+  }
+  if (_trendsTab !== 'all') {
+    if (_trendsTab === 'bts') {
+      filtered = filtered.filter(w => _catToKey(w.category) === 'bts' || (w.type||'').toLowerCase().includes('behind'));
+    } else {
+      filtered = filtered.filter(w => _catToKey(w.category) === _trendsTab);
+    }
+  }
+  if (_trendsArtist !== 'all') {
+    filtered = filtered.filter(w => {
+      if (!w.artists) return false;
+      return w.artists.split(',').map(a=>a.trim()).includes(_trendsArtist);
+    });
+  }
+
+  // Sort: newest year first, then newest release_date first, then reverse original order
+  const _origOrder = new Map(filtered.map((w, i) => [w.__backendId || w.rowNumber || i, i]));
+  filtered = [...filtered].sort((a, b) => {
+    const ya = Number(a.year) || 0, yb = Number(b.year) || 0;
+    if (yb !== ya) return yb - ya;
+    const da = a.release_date || '', db = b.release_date || '';
+    if (da && db) return db.localeCompare(da);
+    if (da) return -1; if (db) return 1;
+    const ia = _origOrder.get(a.__backendId || a.rowNumber) ?? 0;
+    const ib = _origOrder.get(b.__backendId || b.rowNumber) ?? 0;
+    return ib - ia;
+  });
+
+  if (filtered.length === 0) {
+    accordion.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  // Group by year desc
+  const yearMap = {};
+  filtered.forEach(w => {
+    const y = w.year || 'Unknown';
+    if (!yearMap[y]) yearMap[y] = [];
+    yearMap[y].push(w);
+  });
+  const years = Object.keys(yearMap).sort((a, b) => {
+    if (a === 'Unknown') return 1;
+    if (b === 'Unknown') return -1;
+    return Number(b) - Number(a);
+  });
+
+  const gridCols = `display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:clamp(8px,1.5vw,16px);`;
+  const artistColors     = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
+  const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
+  const _showCatBadge = (_trendsTab === 'all');
+
+  function buildCard(w) {
+    const cat = (typeof CATEGORY_CONFIG !== 'undefined' && CATEGORY_CONFIG[_catToKey(w.category)]) || { label: w.category||'', icon:'', color:'#475569', bg:'#f1f5f9', border:'#cbd5e1' };
+    const artistArr = w.artists ? w.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
+    const mainColor = artistArr.length ? (artistColors[artistArr[0]] || '#64748b') : '#64748b';
+    const grad = ({'#f97316':'linear-gradient(135deg,#fff7ed,#ffedd5)','#6b7280':'linear-gradient(135deg,#f9fafb,#f3f4f6)','#22c55e':'linear-gradient(135deg,#f0fdf4,#dcfce7)'})[mainColor] || 'linear-gradient(135deg,#f3f4f6,#e5e7eb)';
+    const artistLine = artistArr.map((a, i) => {
+      const dot = artistColors[a] || '#64748b';
+      const txt = artistTextColors[a] || '#64748b';
+      const divider = i > 0 ? `<span style="width:1px;height:10px;background:#e5e7eb;display:inline-block;flex-shrink:0;"></span>` : '';
+      return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
+    }).join('');
+    const isExpired = !!(w.contract_end && w.contract_end !== '' && w.contract_end !== 'false');
+    const expiredBadge = isExpired
+      ? `<div style="position:absolute;top:0;left:0;z-index:4;pointer-events:none;overflow:hidden;width:88px;height:88px;border-radius:10px 0 0 0;"><div style="position:absolute;top:20px;left:-22px;width:100px;background:linear-gradient(135deg,#475569,#334155);color:#fff;font-size:0.52rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;text-align:center;padding:5px 0;transform:rotate(-45deg);transform-origin:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);">EXPIRED</div></div>` : '';
+    const thumb = w.image
+      ? `<div style="width:100%;aspect-ratio:2/3;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)"></div>`
+      : `<div style="width:100%;aspect-ratio:2/3;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
+    const card = document.createElement('div');
+    card.style.cssText = `background:${isExpired?'#f9fafb':'#fff'};border-radius:16px;border:1px solid ${isExpired?'#e5e7eb':'#efefef'};box-shadow:0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'});overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:box-shadow 0.18s,transform 0.18s;${isExpired?'opacity:0.6;':''}`;
+    card.addEventListener('mouseenter', () => { card.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)'; card.style.transform='translateY(-4px)'; });
+    card.addEventListener('mouseleave', () => { card.style.boxShadow=`0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'})`; card.style.transform=''; });
+    if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
+    card.innerHTML = `${thumb}
+      <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;flex:1;">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
+        <div style="font-size:0.78rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
+          ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span>` : ''}
+          ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:3px 9px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
+        </div>
+      </div>`;
+    return card;
+  }
+
+  const _tFrag = document.createDocumentFragment();
+
+  // Single year selected + no other filters → flat grid, no year dividers
+  const _currentYear = String(new Date().getFullYear());
+  const _effectiveYear = (!_trendsYear || _trendsYear === 'all' || Number(_trendsYear) < Number(_currentYear)) ? _currentYear : _trendsYear;
+
+  if (_effectiveYear !== 'all' && _trendsTab === 'all' && _trendsArtist === 'all') {
+    const cardGrid = document.createElement('div');
+    cardGrid.style.cssText = gridCols;
+    cardGrid.className = 'trends-year-grid';
+    filtered.forEach(w => cardGrid.appendChild(buildCard(w)));
+    _tFrag.appendChild(cardGrid);
+    accordion.style.display = 'block';
+    accordion.innerHTML = '';
+    accordion.appendChild(_tFrag);
+    debounceLucide();
+    return;
+  }
+
+  // With filters → flat grid, add year badge on each card
+  const flatGrid = document.createElement('div');
+  flatGrid.style.cssText = gridCols;
+  flatGrid.className = 'trends-year-grid';
+  years.forEach(year => {
+    yearMap[year].forEach(w => {
+      const card = buildCard(w);
+      const thumb = card.querySelector('div[style*="aspect-ratio"]');
+      if (thumb) {
+        thumb.style.position = 'relative';
+        const badge = document.createElement('span');
+        badge.textContent = w.year || year;
+        badge.style.cssText = 'position:absolute;top:6px;right:6px;font-size:0.6rem;font-weight:800;background:#111;color:#fff;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;z-index:2;pointer-events:none;';
+        thumb.appendChild(badge);
+      }
+      flatGrid.appendChild(card);
+    });
+  });
+  _tFrag.appendChild(flatGrid);
+
+  accordion.style.display = 'block';
+  accordion.innerHTML = '';
+  accordion.appendChild(_tFrag);
+  debounceLucide();
+}
+
+function setTrendsTab(tab) {
+  _trendsTab = tab;
+  _trendsLastFP = '';
+  document.querySelectorAll('.trends-tab').forEach(b => {
+    const isActive = b.id === 'tt-' + tab;
+    b.style.background   = isActive ? '#111' : '#fff';
+    b.style.color        = isActive ? '#fff' : '#6b7280';
+    b.style.border       = isActive ? '1px solid #111' : '1px solid #e5e7eb';
+    b.style.fontWeight   = isActive ? '600' : '500';
+  });
+  renderTrends();
+}
+
+function setTrendsArtist(artist) {
+  _trendsArtist = artist;
+  _trendsLastFP = '';
+  const artistBtnColors = {
+    'Pond':     { bg:'#fff7ed', color:'#c2410c', border:'#fed7aa' },
+    'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
+    'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
+  };
+  document.querySelectorAll('#trends-artist-bar button').forEach(b => {
+    const a = b.id.replace('twa-', '');
+    const isActive = a === artist;
+    if (isActive) {
+      b.style.background = '#111'; b.style.color = '#fff'; b.style.borderColor = '#111';
+    } else if (a === 'all') {
+      b.style.background = '#f9fafb'; b.style.color = '#6b7280'; b.style.borderColor = '#e5e7eb';
+    } else {
+      const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
+      b.style.background = c.bg; b.style.color = c.color; b.style.borderColor = c.border;
+    }
+  });
+  renderTrends();
+}
+
+function setTrendsYear(year) {
+  _trendsYear = year;
+  _trendsLastFP = '';
+  const page = document.getElementById('page-trends');
+  if (page) page.scrollTo({ top: 0, behavior: 'smooth' });
+  renderTrends();
+}
+
+function _buildTrendsYearButtons() {
+  const bar = document.getElementById('trends-year-bar');
+  if (!bar || !allWorks.length) return;
+  const currentYear = new Date().getFullYear();
+  const allYears = [...new Set(allWorks.map(w => w.year||'').filter(Boolean))].sort((a,b) => b-a);
+  const years = allYears.filter(y => Number(y) >= currentYear);
+  const newList = 'all,' + years.join(',');
+  if (bar.dataset.years === newList && bar.children.length) return;
+  bar.dataset.years = newList;
+  bar.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'All Years';
+  allBtn.onclick = () => setTrendsYear('all');
+  allBtn.dataset.year = 'all';
+  _styleTrendsYearBtn(allBtn, _trendsYear === 'all');
+  bar.appendChild(allBtn);
+  years.forEach(y => {
+    const btn = document.createElement('button');
+    btn.textContent = y;
+    btn.onclick = () => setTrendsYear(y);
+    btn.dataset.year = y;
+    _styleTrendsYearBtn(btn, _trendsYear === y);
+    bar.appendChild(btn);
+  });
+}
+
+function _styleTrendsYearBtn(btn, active) {
+  btn.style.cssText = `padding:5px 14px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;border:1px solid ${active?'#a855f7':'#f0f0f0'};background:${active?'#f5f3ff':'#fff'};color:${active?'#7e22ce':'#6b7280'};`;
+}
+
+function _refreshTrendsYearButtons() {
+  const bar = document.getElementById('trends-year-bar');
+  if (!bar) return;
+  bar.querySelectorAll('button').forEach(btn => _styleTrendsYearBtn(btn, btn.dataset.year === _trendsYear));
+}
+
 // PERFORMANCE MONITOR (shows stats in ?debug mode only)
 // ═══════════════════════════════════════════════════════════════════
 (function() {
