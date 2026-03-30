@@ -2903,6 +2903,8 @@ function apiWriteJSONP(action, payload) {
     if (payload.event)       url += '&data=' + encodeURIComponent(JSON.stringify(payload.event));
     if (payload.birthday)    url += '&data=' + encodeURIComponent(JSON.stringify(payload.birthday));
     if (payload.anniversary) url += '&data=' + encodeURIComponent(JSON.stringify(payload.anniversary));
+    if (payload.trend)       url += '&data=' + encodeURIComponent(JSON.stringify(payload.trend));
+    if (payload.work)        url += '&data=' + encodeURIComponent(JSON.stringify(payload.work));
     let el;
     const cleanup = () => { delete window[cb]; if (el && el.parentNode) el.parentNode.removeChild(el); };
     const tid = setTimeout(() => { cleanup(); reject(new Error('JSONP write timeout')); }, 20000);
@@ -2925,6 +2927,8 @@ async function apiPost(body) {
     if (body.event)       payload.event       = body.event;
     if (body.birthday)    payload.birthday    = body.birthday;
     if (body.anniversary) payload.anniversary = body.anniversary;
+    if (body.trend)       payload.trend       = body.trend;
+    if (body.work)        payload.work        = body.work;
     return await apiWriteJSONP(body.action, payload);
   }
 }
