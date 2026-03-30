@@ -3591,7 +3591,7 @@ function renderTrend() {
     const artistBg = { Pond:'#fff7ed', Phuwin:'#f1f5f9', Permpoon:'#f0fdf4' };
     const artistBorder = { Pond:'#fed7aa', Phuwin:'#cbd5e1', Permpoon:'#bbf7d0' };
     const artists = (t.artists||'').split(',').map(a=>a.trim()).filter(Boolean);
-    const dateStr = t.date ? new Date(t.date+'T00:00:00').toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}) : '';
+    const dateStr = t.date ? new Date(t.date+'T00:00:00').toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'}) : '';
     const isLink = !!t.link;
     const isX = t.link && (t.link.includes('x.com')||t.link.includes('twitter.com'));
     const isIG = t.link && t.link.includes('instagram.com');
@@ -3613,14 +3613,12 @@ function renderTrend() {
     const mainColor = artists.length ? (artistColor[artists[0]]||'#e5e7eb') : '#e5e7eb';
 
     return `<div class="trend-card" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:${isLink?'pointer':'default'};transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')" onmouseenter="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';this.style.transform=''"`:''}>
-      ${t.image ? `<div style="width:100%;aspect-ratio:1/1;overflow:hidden;background:#f3f4f6;position:relative;flex-shrink:0;">
-        <img src="${escHtml(t.image)}" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform 0.3s;" loading="lazy" onerror="_onImgError(this)" ${isLink?`onmouseenter="this.style.transform='scale(1.04)'" onmouseleave="this.style.transform=''"`:''}">
-        ${artists.length ? `<div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(to top,rgba(0,0,0,0.35),transparent);"></div>` : ''}
+      ${t.image ? `<div style="width:100%;background:#f3f4f6;flex-shrink:0;">
+        <img src="${escHtml(t.image)}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
       </div>` : `<div style="width:100%;height:6px;flex-shrink:0;background:${mainColor};opacity:0.7;"></div>`}
       <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">
         ${badgesHtml}
         ${t.caption ? `<p style="font-size:0.83rem;line-height:1.55;color:#374151;margin:0;word-break:break-word;flex:1;">${escHtml(t.caption)}</p>` : ''}
-        ${sourceBadge}
       </div>
     </div>`;
   }).join('');
