@@ -3613,9 +3613,9 @@ function renderTrend() {
     const mainColor = artists.length ? (artistColor[artists[0]]||'#e5e7eb') : '#e5e7eb';
 
     return `<div class="trend-card" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:${isLink?'pointer':'default'};transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;" ${isLink?`onclick="window.open('${escHtml(t.link)}','_blank')" onmouseenter="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.12)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';this.style.transform=''"`:''}>
-      ${t.image ? `<div style="width:100%;background:#f3f4f6;flex-shrink:0;">
-        <img src="${escHtml(t.image)}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
-      </div>` : `<div style="width:100%;height:6px;flex-shrink:0;background:${mainColor};opacity:0.7;"></div>`}
+      ${t.image ? `<div style="width:100%;aspect-ratio:1/1;background:#f3f4f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <img src="${escHtml(t.image)}" style="width:100%;height:100%;object-fit:contain;display:block;" loading="lazy" onerror="_onImgError(this)">
+      </div>` : `<div style="width:100%;aspect-ratio:1/1;background:#f3f4f6;flex-shrink:0;"></div>`}
       <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">
         ${badgesHtml}
         ${t.caption ? `<p style="font-size:0.83rem;line-height:1.55;color:#374151;margin:0;word-break:break-word;flex:1;">${escHtml(t.caption)}</p>` : ''}
@@ -3710,25 +3710,32 @@ async function handleTrendFormSubmit() {
       res = await apiPost({ action: 'createTrend', trend: data });
     }
     if (res.status !== 'ok') throw new Error(res.message || 'Failed');
-    closeTrendModal();
-    showToast(_editingTrendId ? 'Trend updated ✓' : 'Trend added ✓');
 
-    // optimistic update
-    const _optId = _editingTrendId || ('opt_t_' + Date.now());
-    const optimistic = Object.assign({ __backendId: _optId, __isOptimistic: true, id: _optId }, data);
+    // อัปเดต allTrends ด้วย id จริงจาก server ทันที ไม่มีการ์ดซ้ำ
+    const realId = res.id || _editingTrendId || ('t_' + Date.now());
+    const saved = Object.assign({ __backendId: realId, id: realId }, data);
     if (_editingTrendId) {
       const idx = allTrends.findIndex(t => String(t.__backendId||t.id||'') === String(_editingTrendId));
-      if (idx !== -1) allTrends[idx] = optimistic; else allTrends.unshift(optimistic);
+      if (idx !== -1) allTrends[idx] = saved; else allTrends.unshift(saved);
     } else {
       allTrends = allTrends.filter(t => !t.__isOptimistic);
-      allTrends.unshift(optimistic);
+      allTrends.unshift(saved);
     }
+    closeTrendModal();
+    showToast(_editingTrendId ? 'Trend updated ✓' : 'Trend added ✓');
     renderTrend();
     renderAdminTrendList();
     debounceLucide();
 
-    // background sync
-    _fetchFreshFromAppsScript().catch(function(){});
+    // sync เงียบๆ ข้างหลัง ดึงข้อมูลจริงจาก server แต่ไม่ render ซ้ำถ้าไม่มีการเปลี่ยนแปลง
+    try {
+      const fresh = await fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getTrends&t=' + Date.now(), 15000);
+      if (fresh && fresh.status === 'ok' && Array.isArray(fresh.trends)) {
+        allTrends = fresh.trends.map(t => Object.assign({ __backendId: t.id||''  }, t));
+        renderTrend();
+        renderAdminTrendList();
+      }
+    } catch(e) { /* silent background sync */ }
   } catch(err) {
     showToast('❌ ' + (err.message || 'Error'));
     console.error('[trend]', err);
