@@ -2694,9 +2694,34 @@ let _lucideTimer    = null;
 const APPS_SCRIPT_ADMIN_URL = 'https://script.google.com/macros/s/AKfycbxJ8wQWFvlNpWZwDlmt4E_H6lrnmOaocVDS8aTqQOe17gGgEagVJ_PeGgyfRx7msbLu/exec';
 
 // Base URL where your JSON files are served (used for READ operations)
-// If using Apps Script doGet as fallback: set same as APPS_SCRIPT_ADMIN_URL
-// If using Drive/CDN: set to the folder/base path URL
-const JSON_BASE_URL = 'https://ppw1257.github.io/pppfam/data'; // GitHub Pages static JSON
+const JSON_BASE_URL = 'https://ppw1257.github.io/pppfam/data'; // GitHub Pages static JSON (fallback)
+
+// ── POCKETBASE CONFIG ─────────────────────────────────────────────
+const PB_URL = 'https://pocketbase-production-510d.up.railway.app';
+
+async function fetchFromPocketBase(collection, perPage = 500) {
+  let allItems = [];
+  let page = 1;
+  while (true) {
+    const res = await fetchWithTimeout(`${PB_URL}/api/collections/${collection}/records?perPage=${perPage}&page=${page}`);
+    const items = res.items || [];
+    allItems = allItems.concat(items);
+    if (allItems.length >= (res.totalItems || 0) || items.length < perPage) break;
+    page++;
+  }
+  return allItems;
+}
+
+async function fetchAllFromPocketBase() {
+  const [events, works, trends, birthdays, anniversaries] = await Promise.all([
+    fetchFromPocketBase('events'),
+    fetchFromPocketBase('works'),
+    fetchFromPocketBase('trends'),
+    fetchFromPocketBase('birthdays'),
+    fetchFromPocketBase('anniversaries'),
+  ]);
+  return { events, works, trends, birthdays, anniversaries };
+}
 
 // ── STATIC JSON FETCH HELPERS ─────────────────────────────────────
 
@@ -3107,7 +3132,6 @@ function _applyAllData(res, force, dataChangedRef) {
 async function _fetchAllData(force = false) {
   if (_fetchingAll) return;
   if (!force && Cache.isFresh(LC.TS_EV) && Cache.isFresh(LC.TS_WK) && allEvents.length > 0 && allWorks.length > 0) return;
-  // ล้าง rate limiter เมื่อ force=true เพื่อไม่ให้ถูก block
   if (force) {
     _rateLimit.reset('events');
     _rateLimit.reset('works');
@@ -3116,13 +3140,11 @@ async function _fetchAllData(force = false) {
   }
   _fetchingAll = true;
   try {
-    // ── 1 request เดียว: all.json จาก GitHub Pages (ไม่กิน Apps Script quota เลย) ──
-    const t = Date.now();
-    const res = await fetchWithTimeout(`${JSON_BASE_URL}/all.json?t=${t}`);
+    // ── PRIMARY: PocketBase (real-time) ──
+    const res = await fetchAllFromPocketBase();
     const dataChangedRef = { v: false };
     _applyAllData(res, force, dataChangedRef);
     hideConnectionError();
-    // render เฉพาะเมื่อ data เปลี่ยนจริง — ป้องกันกระตุกจาก background auto-refresh
     if (dataChangedRef.v) {
       _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
       _adminListFP = ''; _adminWorksListFP = '';
@@ -3131,9 +3153,10 @@ async function _fetchAllData(force = false) {
     }
     _scheduleEventStartTimers();
   } catch(e) {
-    // Fallback: ถ้า all.json ไม่มี ลอง Apps Script getAll (1 request เดียว)
+    // Fallback: GitHub Pages static JSON
     try {
-      const res2 = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getAll&t=${Date.now()}`);
+      const t = Date.now();
+      const res2 = await fetchWithTimeout(`${JSON_BASE_URL}/all.json?t=${t}`);
       const dataChangedRef = { v: false };
       _applyAllData(res2, force, dataChangedRef);
       hideConnectionError();
