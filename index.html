@@ -1334,6 +1334,28 @@
       </div>
      </div>
 
+     <!-- ARTIST STAT PILLS -->
+     <div id="home-artist-pills" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;margin-top:0.5rem;">
+      <!-- Pond pill -->
+      <div style="display:inline-flex;align-items:center;gap:6px;background:#f97316;color:#fff;border-radius:99px;padding:5px 14px;font-size:0.78rem;font-weight:700;letter-spacing:0.02em;">
+       <span>Pond</span>
+       <span style="opacity:0.75;">·</span>
+       <span id="home-pill-pond-total">-</span>
+      </div>
+      <!-- Phuwin pill -->
+      <div style="display:inline-flex;align-items:center;gap:6px;background:#4b5563;color:#fff;border-radius:99px;padding:5px 14px;font-size:0.78rem;font-weight:700;letter-spacing:0.02em;">
+       <span>Phuwin</span>
+       <span style="opacity:0.75;">·</span>
+       <span id="home-pill-phuwin-total">-</span>
+      </div>
+      <!-- Permpoon pill -->
+      <div style="display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:#fff;border-radius:99px;padding:5px 14px;font-size:0.78rem;font-weight:700;letter-spacing:0.02em;">
+       <span>Permpoon</span>
+       <span style="opacity:0.75;">·</span>
+       <span id="home-pill-permpoon-total">-</span>
+      </div>
+     </div>
+
      <!-- FILTER BAR REMOVED -->
      <div id="events-grid"></div>
      <div id="no-events" style="display:none;padding:3rem 1rem;">
@@ -1403,9 +1425,10 @@
          <span style="font-size:0.6rem;font-weight:700;color:#7c2d12;letter-spacing:0.08em;">POND</span>
         </div>
         <div id="cs-pond-total" style="font-size:1.4rem;font-weight:800;color:#c2410c;line-height:1;">-</div>
-        <div class="artist-stat-donerow" style="margin-left:auto;text-align:right;">
-         <div style="font-size:0.62rem;color:#9a3412;font-weight:600;" id="cs-pond-done-label">Done <strong id="cs-pond-past" style="color:#7c2d12;">-</strong></div>
+        <div class="artist-stat-donerow" style="margin-left:auto;display:flex;align-items:center;gap:8px;">
          <div style="font-size:0.62rem;color:#9a3412;font-weight:600;" id="cs-pond-left-label">Left <strong id="cs-pond-up" style="color:#c2410c;">-</strong></div>
+         <div style="width:1px;height:12px;background:#fed7aa;"></div>
+         <div style="font-size:0.62rem;color:#9a3412;font-weight:600;" id="cs-pond-done-label">Done <strong id="cs-pond-past" style="color:#7c2d12;">-</strong></div>
         </div>
        </div>
        <div style="background:#f9fafb;border:0.5px solid #e5e7eb;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
@@ -1414,9 +1437,10 @@
          <span style="font-size:0.6rem;font-weight:700;color:#374151;letter-spacing:0.08em;">PHUWIN</span>
         </div>
         <div id="cs-phuwin-total" style="font-size:1.4rem;font-weight:800;color:#1f2937;line-height:1;">-</div>
-        <div class="artist-stat-donerow" style="margin-left:auto;text-align:right;">
-         <div style="font-size:0.62rem;color:#374151;font-weight:600;" id="cs-phuwin-done-label">Done <strong id="cs-phuwin-past" style="color:#111827;">-</strong></div>
+        <div class="artist-stat-donerow" style="margin-left:auto;display:flex;align-items:center;gap:8px;">
          <div style="font-size:0.62rem;color:#374151;font-weight:600;" id="cs-phuwin-left-label">Left <strong id="cs-phuwin-up" style="color:#1f2937;">-</strong></div>
+         <div style="width:1px;height:12px;background:#d1d5db;"></div>
+         <div style="font-size:0.62rem;color:#374151;font-weight:600;" id="cs-phuwin-done-label">Done <strong id="cs-phuwin-past" style="color:#111827;">-</strong></div>
         </div>
        </div>
        <div class="artist-stat-permpoon" style="background:#f0fdf4;border:0.5px solid #bbf7d0;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
@@ -1425,9 +1449,10 @@
          <span style="font-size:0.6rem;font-weight:700;color:#14532d;letter-spacing:0.08em;">PERMPOON</span>
         </div>
         <div id="cs-permpoon-total" style="font-size:1.4rem;font-weight:800;color:#15803d;line-height:1;">-</div>
-        <div class="artist-stat-donerow" style="margin-left:auto;text-align:right;">
-         <div style="font-size:0.62rem;color:#166534;font-weight:600;" id="cs-permpoon-done-label">Done <strong id="cs-permpoon-past" style="color:#14532d;">-</strong></div>
+        <div class="artist-stat-donerow" style="margin-left:auto;display:flex;align-items:center;gap:8px;">
          <div style="font-size:0.62rem;color:#166534;font-weight:600;" id="cs-permpoon-left-label">Left <strong id="cs-permpoon-up" style="color:#15803d;">-</strong></div>
+         <div style="width:1px;height:12px;background:#bbf7d0;"></div>
+         <div style="font-size:0.62rem;color:#166534;font-weight:600;" id="cs-permpoon-done-label">Done <strong id="cs-permpoon-past" style="color:#14532d;">-</strong></div>
         </div>
        </div>
       </div>
@@ -4098,6 +4123,13 @@ function renderHome() {
   if (el('bento-count-phuwin'))   el('bento-count-phuwin').textContent   = cPhuwin;
   if (el('bento-count-permpoon')) el('bento-count-permpoon').textContent = cPermpoon;
   if (el('bento-count-total'))    el('bento-count-total').textContent    = upAll.length;
+  // ── Home pills: นับเฉพาะ events ที่แสดงในหน้าแรก ──
+  const pillPond     = events.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Pond')).length;
+  const pillPhuwin   = events.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Phuwin')).length;
+  const pillPermpoon = events.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Permpoon')).length;
+  if (el('home-pill-pond-total'))     el('home-pill-pond-total').textContent     = pillPond;
+  if (el('home-pill-phuwin-total'))   el('home-pill-phuwin-total').textContent   = pillPhuwin;
+  if (el('home-pill-permpoon-total')) el('home-pill-permpoon-total').textContent = pillPermpoon;
   const next  = upAll[0];
   const next2 = upAll[1] || null;
   if (next && el('bento-next-title')) {
