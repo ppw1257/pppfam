@@ -2724,8 +2724,8 @@ async function fetchAllFromPocketBase() {
   // Map PocketBase records to match expected format
   return {
     events: events.map(r => Object.assign({ __backendId: r.id }, r)),
-    works: works.map(r => Object.assign({ __backendId: r.id }, r)),
-    trends: trends.map(r => Object.assign({ __backendId: r.id }, r)),
+    works: works.map(r => Object.assign({ __backendId: r.id }, r, { image: _pbFileUrl(r, r.image || '') })),
+    trends: trends.map(r => Object.assign({ __backendId: r.id }, r, { image: _pbFileUrl(r, r.image || '') })),
     birthdays: birthdays.map(r => Object.assign({ __backendId: r.id }, r)),
     anniversaries: anniversaries.map(r => Object.assign({ __backendId: r.id }, r)),
   };
@@ -2989,8 +2989,8 @@ function processEvents(raw) {
     endTime:     rawStr(r.endTime   || r.end_time   || ''),
     timezone:    safeText(r.timezone || ''),
     title:       safeText(r.title       || r.event_name    || ''),
-    image:       rawStr(r.image         || r.image_url     || ''),
-    heroImage:   rawStr(r.heroImage     || r.hero_image    || ''),
+    image:       _pbFileUrl(r, r.image || r.image_url || ''),
+    heroImage:   _pbFileUrl(r, r.heroImage || r.hero_image || ''),
     artists:     safeText(r.artists     || ''),
     country:     safeText(r.country     || ''),
     city:        safeText(r.city        || ''),
@@ -3979,7 +3979,7 @@ async function handleTrendFormSubmit() {
     try {
       const fresh = await fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getTrends&t=' + Date.now(), 15000);
       if (fresh && fresh.status === 'ok' && Array.isArray(fresh.trends)) {
-        const newTrends = fresh.trends.map(t => Object.assign({ __backendId: t.id||'' }, t));
+        const newTrends = fresh.trends.map(t => Object.assign({ __backendId: t.id||'' }, t, { image: _pbFileUrl(t, t.image||'') }));
         const _fpTr = arr => arr.length + '|' + arr.map(t => (t.__backendId||t.id||'') + ':' + (t.caption||'')).join(',');
         if (_fpTr(newTrends) !== _fpTr(allTrends.filter(t => !t.__isOptimistic))) {
           allTrends = newTrends;
@@ -4025,7 +4025,7 @@ async function loadTrendsFromSheets(force = false) {
   try {
     const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getTrends&t=${Date.now()}`, 12000);
     if (res && res.status === 'ok' && Array.isArray(res.trends)) {
-      allTrends = res.trends.map(t => Object.assign({ __backendId: t.id||'' }, t));
+      allTrends = res.trends.map(t => Object.assign({ __backendId: t.id||'' }, t, { image: _pbFileUrl(t, t.image||'') }));
       trendsLoaded = true;
       renderTrend();
       renderAdminTrendList();
@@ -4198,6 +4198,16 @@ function _extractDriveId(url) {
   if (m2) return m2[1];
   return null;
 }
+function _pbFileUrl(record, filename) {
+  if (!filename) return '';
+  // Already a full URL (http/https) — return as-is
+  if (/^https?:\/\//.test(filename)) return filename;
+  const colId = record.collectionId || record.collectionName || '';
+  const recId = record.id || record.__backendId || '';
+  if (!colId || !recId) return filename;
+  return `${PB_URL}/api/files/${colId}/${recId}/${filename}`;
+}
+
 function _fixImgSrc(url) {
   if (!url) return '';
   url = url.trim().replace(/&amp;/g, '&');
