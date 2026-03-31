@@ -3161,10 +3161,13 @@ async function _fetchAllData(force = false) {
     _scheduleEventStartTimers();
   } catch(e) {
     console.warn('PocketBase fetch failed, trying fallback:', e.message);
-    // Fallback: GitHub Pages static JSON
+    // Fallback: GitHub Pages static JSON — ใช้แค่ events/birthdays/anniversaries
+    // ไม่นำ works จาก fallback มาเพราะอาจเป็นข้อมูลเก่าและทำให้การ์ดซ้ำ
     try {
       const t = Date.now();
       const res2 = await fetchWithTimeout(`${JSON_BASE_URL}/all.json?t=${t}`);
+      // ลบ works ออกจาก fallback response เพื่อป้องกันการ์ดซ้ำ
+      if (res2 && res2.works) res2.works = [];
       const dataChangedRef = { v: false };
       _applyAllData(res2, force, dataChangedRef);
       hideConnectionError();
@@ -3607,9 +3610,9 @@ function _refreshAllPages() {
 // ── _fetchFreshFromAppsScript: sync กับ server หลัง admin save/edit/delete ──
 // ดึงจาก PocketBase แทน Apps Script
 async function _fetchFreshFromAppsScript() {
-  _optimisticPending = false;
   try {
     const res = await fetchAllFromPocketBase();
+    _optimisticPending = false; // ปลด flag หลัง fetch สำเร็จ
     const dataChangedRef = { v: false };
 
     // ลบ optimistic ออกก่อน apply server data จริง
@@ -6859,7 +6862,7 @@ async function loadWorksFromSheets(force = false) {
   if (_fetchingWorks) return;
   _fetchingWorks = true;
   try {
-    // ดึงจาก PocketBase โดยตรง
+    // ดึงจาก PocketBase เท่านั้น — ไม่มี fallback อื่น
     const _pbWorks = await fetchFromPocketBase('works');
     if (Array.isArray(_pbWorks) && _pbWorks.length) {
       const prevWkFP = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
@@ -6868,44 +6871,9 @@ async function loadWorksFromSheets(force = false) {
       allWorks = newWorks; worksLoaded = true;
       _memCache.set('works', allWorks); Cache.set(LC.WORKS, allWorks); Cache.setTS(LC.TS_WK);
       if (newWkFP !== prevWkFP) { _worksLastFP = ''; if (currentPage === 'works' || currentPage === 'admin') scheduleRender(); }
-      return;
-    }
-    const t = Date.now();
-    const res = await fetchWithTimeout(`${JSON_BASE_URL}/works.json?t=${t}`);
-    const raw = res.works || res;
-    if (Array.isArray(raw) && raw.length) {
-      const prevWkFP = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
-      const newWorks = _ensureWorksBackendId(raw.filter(w => w.title));
-      const newWkFP  = newWorks.length + '|' + (newWorks[0]?.__backendId || '');
-      allWorks = newWorks;
-      worksLoaded = true;
-      _memCache.set('works', allWorks);
-      Cache.set(LC.WORKS, allWorks);
-      Cache.setTS(LC.TS_WK);
-      if (newWkFP !== prevWkFP) {
-        _worksLastFP = '';
-        if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
-      }
     }
   } catch(e) {
-    // Fallback to Apps Script if GitHub fails
-    try {
-      const res = await fetchWithTimeout(API_URL + '?action=getWorks&t=' + Date.now());
-      if (res && res.works) {
-        const prevWkFP2 = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
-        const newWorks2 = _ensureWorksBackendId(res.works.filter(w => w.title));
-        const newWkFP2  = newWorks2.length + '|' + (newWorks2[0]?.__backendId || '');
-        allWorks = newWorks2;
-        worksLoaded = true;
-        _memCache.set('works', allWorks);
-        Cache.set(LC.WORKS, allWorks);
-        Cache.setTS(LC.TS_WK);
-        if (newWkFP2 !== prevWkFP2) {
-          _worksLastFP = '';
-          if (currentPage === 'works' || currentPage === 'admin') scheduleRender();
-        }
-      }
-    } catch(e2) { console.warn('Works load failed:', e2.message); }
+    console.warn('Works load (PocketBase) failed:', e.message);
   } finally { _fetchingWorks = false; }
 }
 
@@ -7412,8 +7380,8 @@ function _buildWorksYearDropdown() {
   if (!allWorks.length) return;
   const currentYear = new Date().getFullYear();
   const allYears = [...new Set(allWorks.map(w => w.year||'').filter(Boolean))].sort((a,b) => b-a);
-  // แสดงเฉพาะปีปัจจุบันและอนาคต (ไม่เอาปีเก่า)
-  const years = allYears.filter(y => Number(y) >= currentYear);
+  // แสดงทุกปีที่มีข้อมูล (ไม่กรองปีเก่าออก)
+  const years = allYears;
   if (sel) {
     const current = sel.value;
     sel.innerHTML = years.map(y => `<option value="${y}" ${y===current?'selected':''}>${y}</option>`).join('');
@@ -7604,7 +7572,11 @@ function renderWorks() {
     card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 8px 28px rgba(0,0,0,0.12)'; card.style.transform = 'translateY(-4px)'; });
     card.addEventListener('mouseleave', () => { card.style.boxShadow = `0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'})`; card.style.transform = ''; });
 
-    if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
+    if (w.link) {
+      card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
+    } else {
+      card.style.cursor = 'default';
+    }
     card.innerHTML = `${thumb}
       <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;flex:1;">
         <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
