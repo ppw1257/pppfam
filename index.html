@@ -7380,18 +7380,18 @@ function _buildWorksYearDropdown() {
   if (!allWorks.length) return;
   const currentYear = new Date().getFullYear();
   const allYears = [...new Set(allWorks.map(w => w.year||'').filter(Boolean))].sort((a,b) => b-a);
-  // แสดงทุกปีที่มีข้อมูล (ไม่กรองปีเก่าออก)
-  const years = allYears;
+  // ปุ่ม filter แสดงเฉพาะปี 2026 ขึ้นไป — All Years ยังแสดงข้อมูลทุกปี
+  const years = allYears.filter(y => Number(y) >= 2026);
   if (sel) {
     const current = sel.value;
-    sel.innerHTML = years.map(y => `<option value="${y}" ${y===current?'selected':''}>${y}</option>`).join('');
-    if (!years.includes(current)) { sel.value = years[0] || ''; _worksYear = sel.value; }
+    sel.innerHTML = allYears.map(y => `<option value="${y}" ${y===current?'selected':''}>${y}</option>`).join('');
+    if (!allYears.includes(current)) { sel.value = allYears[0] || ''; _worksYear = sel.value; }
   }
   // ถ้า _worksYear ไม่อยู่ใน list และไม่ใช่ 'all' ให้ reset เป็นปีล่าสุด
-  if (_worksYear !== 'all' && _worksYear && !years.includes(_worksYear)) {
-    _worksYear = years[0] || String(currentYear);
+  if (_worksYear !== 'all' && _worksYear && !allYears.includes(_worksYear)) {
+    _worksYear = allYears[0] || String(currentYear);
   }
-  // Build pill buttons — All Years + ปีปัจจุบันและอนาคต
+  // Build pill buttons — All Years + ปี 2026 ขึ้นไปเท่านั้น
   const bar = document.getElementById('works-year-bar');
   if (!bar) return;
   // Only rebuild if year list changed
