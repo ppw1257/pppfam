@@ -3307,46 +3307,91 @@ async function loadAnniversariesFromSheets(force = false) {
   finally { _fetchingAnnivs = false; }
 }
 
-// ── Admin write operations ────────────────────────────────────────
+// ── Admin write operations (PocketBase direct) ───────────────────
+async function pbGetToken() {
+  let token = '';
+  try { token = sessionStorage.getItem('pppPbToken') || ''; } catch(e) {}
+  if (token) return token;
+  // ล็อกอิน PocketBase ด้วย credentials ที่ฝังไว้
+  const res = await fetch(`${PB_URL}/api/collections/_superusers/auth-with-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ identity: 'trendforpondphuwin@gmail.com', password: 'ppppondphuwin1257ppw' })
+  });
+  const data = await res.json();
+  if (!data.token) throw new Error('PocketBase auth failed');
+  try { sessionStorage.setItem('pppPbToken', data.token); } catch(e) {}
+  return data.token;
+}
+
 async function createEventInSheets(data) {
-  const res = await apiPost({ action: 'createEvent', event: data });
-  if (res.status !== 'ok') throw new Error(res.message || 'Create failed');
-  return res.id;
+  const token = await pbGetToken();
+  const res = await fetch(`${PB_URL}/api/collections/events/records`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    body: JSON.stringify(data)
+  });
+  const d = await res.json();
+  if (!d.id) throw new Error(d.message || 'Create failed');
+  return d.id;
 }
 async function updateEventInSheets(id, data) {
-  const res = await apiPost({ action: 'updateEvent', id, event: data });
-  if (res.status === 'ok') return;
-  throw new Error(res.message || 'Update failed');
+  const token = await pbGetToken();
+  const res = await fetch(`${PB_URL}/api/collections/events/records/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    body: JSON.stringify(data)
+  });
+  const d = await res.json();
+  if (!d.id) throw new Error(d.message || 'Update failed');
 }
 async function deleteEventInSheets(id, rowNumber) {
-  if (id) {
-    const res = await apiPost({ action: 'deleteEvent', id });
-    if (res.status === 'ok') return { status: 'ok' };
-    if (res.message && res.message.toLowerCase().includes('not found')) return { status: 'not_found' };
-  }
-  if (rowNumber) {
-    const res = await apiPost({ action: 'deleteEventByRow', row: rowNumber });
-    if (res.status === 'ok') return { status: 'ok' };
-    if (res.message && res.message.toLowerCase().includes('not found')) return { status: 'not_found' };
-    throw new Error('Delete by row failed: ' + (res.message || 'unknown'));
-  }
-  return { status: 'not_found' };
+  if (!id) return { status: 'not_found' };
+  const token = await pbGetToken();
+  const res = await fetch(`${PB_URL}/api/collections/events/records/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': token }
+  });
+  if (res.status === 204 || res.ok) return { status: 'ok' };
+  if (res.status === 404) return { status: 'not_found' };
+  const d = await res.json().catch(() => ({}));
+  throw new Error(d.message || 'Delete failed');
 }
 async function createBirthdayInSheets(data) {
-  const res = await apiPost({ action: 'createBirthday', birthday: data });
-  if (res.status !== 'ok') throw new Error(res.message || 'Create failed');
+  const token = await pbGetToken();
+  const res = await fetch(`${PB_URL}/api/collections/birthdays/records`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    body: JSON.stringify(data)
+  });
+  const d = await res.json();
+  if (!d.id) throw new Error(d.message || 'Create failed');
 }
 async function deleteBirthdayInSheets(id) {
-  const res = await apiPost({ action: 'deleteBirthday', id });
-  if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
+  const token = await pbGetToken();
+  const res = await fetch(`${PB_URL}/api/collections/birthdays/records/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': token }
+  });
+  if (!res.ok && res.status !== 204) throw new Error('Delete failed');
 }
 async function createAnniversaryInSheets(data) {
-  const res = await apiPost({ action: 'createAnniversary', anniversary: data });
-  if (res.status !== 'ok') throw new Error(res.message || 'Create failed');
+  const token = await pbGetToken();
+  const res = await fetch(`${PB_URL}/api/collections/anniversaries/records`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    body: JSON.stringify(data)
+  });
+  const d = await res.json();
+  if (!d.id) throw new Error(d.message || 'Create failed');
 }
 async function deleteAnniversaryInSheets(id) {
-  const res = await apiPost({ action: 'deleteAnniversary', id });
-  if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
+  const token = await pbGetToken();
+  const res = await fetch(`${PB_URL}/api/collections/anniversaries/records/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': token }
+  });
+  if (!res.ok && res.status !== 204) throw new Error('Delete failed');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -3799,10 +3844,25 @@ async function handleTrendFormSubmit() {
 
   try {
     let res;
+    const _pbToken = await pbGetToken();
     if (_savedEditId) {
-      res = await apiPost({ action: 'updateTrend', id: _savedEditId, trend: data });
+      const _r = await fetch(`${PB_URL}/api/collections/trends/records/${_savedEditId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': _pbToken },
+        body: JSON.stringify(data)
+      });
+      const _d = await _r.json();
+      if (!_d.id) throw new Error(_d.message || 'Update failed');
+      res = { status: 'ok', id: _d.id };
     } else {
-      res = await apiPost({ action: 'createTrend', trend: data });
+      const _r = await fetch(`${PB_URL}/api/collections/trends/records`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': _pbToken },
+        body: JSON.stringify(data)
+      });
+      const _d = await _r.json();
+      if (!_d.id) throw new Error(_d.message || 'Create failed');
+      res = { status: 'ok', id: _d.id };
     }
     if (res.status !== 'ok') throw new Error(res.message || 'Failed');
 
@@ -3847,8 +3907,12 @@ async function handleTrendFormSubmit() {
 async function deleteTrend(id, title) {
   if (!confirm('ลบ "' + title + '" ออกไหม?')) return;
   try {
-    const res = await apiPost({ action: 'deleteTrend', id });
-    if (res.status !== 'ok') throw new Error(res.message || 'Failed');
+    const _pbTok = await pbGetToken();
+    const _dr = await fetch(`${PB_URL}/api/collections/trends/records/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': _pbTok }
+    });
+    if (!_dr.ok && _dr.status !== 204) { const _dd = await _dr.json().catch(()=>({})); throw new Error(_dd.message || 'Failed'); }
     allTrends = allTrends.filter(t => String(t.__backendId||t.id||'') !== String(id));
     showToast('Deleted ✓');
     renderTrend();
@@ -6942,12 +7006,23 @@ async function handleWorksFormSubmit() {
   const spin=document.getElementById('works-submit-spinner');
   btn.disabled=true; txt.style.display='none'; spin.style.display='inline';
   try {
+    const _pbWToken = await pbGetToken();
     if (_editingWorkId !== null) {
-      const res = await apiPost({ action: 'updateWork', id: _editingWorkId, work: data });
-      if (res.status !== 'ok') throw new Error(res.message || 'Update failed');
+      const _wr = await fetch(`${PB_URL}/api/collections/works/records/${_editingWorkId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': _pbWToken },
+        body: JSON.stringify(data)
+      });
+      const _wd = await _wr.json();
+      if (!_wd.id) throw new Error(_wd.message || 'Update failed');
     } else {
-      const res = await apiPost({ action: 'createWork', work: data });
-      if (res.status !== 'ok') throw new Error(res.message || 'Create failed');
+      const _wr = await fetch(`${PB_URL}/api/collections/works/records`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': _pbWToken },
+        body: JSON.stringify(data)
+      });
+      const _wd = await _wr.json();
+      if (!_wd.id) throw new Error(_wd.message || 'Create failed');
     }
     closeWorksFormModal();
     showToast(_editingWorkId ? 'Work updated ✓' : 'Work added ✓');
@@ -7055,8 +7130,12 @@ function deleteWork(backendId, title) {
     const work = window._adminWorksMap[String(backendId)];
     const id = work ? (work.__backendId || work.id || String(backendId)) : String(backendId);
     try {
-      const res = await apiPost({ action: 'deleteWork', id });
-      if (res.status !== 'ok') throw new Error(res.message || 'Delete failed');
+      const _pbDelTok = await pbGetToken();
+      const _delRes = await fetch(`${PB_URL}/api/collections/works/records/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': _pbDelTok }
+      });
+      if (!_delRes.ok && _delRes.status !== 204) { const _dd = await _delRes.json().catch(()=>({})); throw new Error(_dd.message || 'Delete failed'); }
       showToast('Work deleted ✓');
       // ── OPTIMISTIC DELETE works ──
       var _wdi = allWorks.findIndex(function(w){ return String(w.__backendId||w.id) === String(backendId); });
