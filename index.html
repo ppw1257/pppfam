@@ -3312,7 +3312,6 @@ async function pbGetToken() {
   let token = '';
   try { token = sessionStorage.getItem('pppPbToken') || ''; } catch(e) {}
   if (token) return token;
-  // ล็อกอิน PocketBase ด้วย credentials ที่ฝังไว้
   const res = await fetch(`${PB_URL}/api/collections/_superusers/auth-with-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -3323,12 +3322,10 @@ async function pbGetToken() {
   try { sessionStorage.setItem('pppPbToken', data.token); } catch(e) {}
   return data.token;
 }
-
 async function createEventInSheets(data) {
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/events/records`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': token },
     body: JSON.stringify(data)
   });
   const d = await res.json();
@@ -3338,8 +3335,7 @@ async function createEventInSheets(data) {
 async function updateEventInSheets(id, data) {
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/events/records/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': token },
     body: JSON.stringify(data)
   });
   const d = await res.json();
@@ -3349,8 +3345,7 @@ async function deleteEventInSheets(id, rowNumber) {
   if (!id) return { status: 'not_found' };
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/events/records/${id}`, {
-    method: 'DELETE',
-    headers: { 'Authorization': token }
+    method: 'DELETE', headers: { 'Authorization': token }
   });
   if (res.status === 204 || res.ok) return { status: 'ok' };
   if (res.status === 404) return { status: 'not_found' };
@@ -3360,8 +3355,7 @@ async function deleteEventInSheets(id, rowNumber) {
 async function createBirthdayInSheets(data) {
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/birthdays/records`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': token },
     body: JSON.stringify(data)
   });
   const d = await res.json();
@@ -3370,16 +3364,14 @@ async function createBirthdayInSheets(data) {
 async function deleteBirthdayInSheets(id) {
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/birthdays/records/${id}`, {
-    method: 'DELETE',
-    headers: { 'Authorization': token }
+    method: 'DELETE', headers: { 'Authorization': token }
   });
   if (!res.ok && res.status !== 204) throw new Error('Delete failed');
 }
 async function createAnniversaryInSheets(data) {
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/anniversaries/records`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': token },
     body: JSON.stringify(data)
   });
   const d = await res.json();
@@ -3388,8 +3380,7 @@ async function createAnniversaryInSheets(data) {
 async function deleteAnniversaryInSheets(id) {
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/anniversaries/records/${id}`, {
-    method: 'DELETE',
-    headers: { 'Authorization': token }
+    method: 'DELETE', headers: { 'Authorization': token }
   });
   if (!res.ok && res.status !== 204) throw new Error('Delete failed');
 }
@@ -3847,8 +3838,7 @@ async function handleTrendFormSubmit() {
     const _pbToken = await pbGetToken();
     if (_savedEditId) {
       const _r = await fetch(`${PB_URL}/api/collections/trends/records/${_savedEditId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': _pbToken },
+        method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': _pbToken },
         body: JSON.stringify(data)
       });
       const _d = await _r.json();
@@ -3856,8 +3846,7 @@ async function handleTrendFormSubmit() {
       res = { status: 'ok', id: _d.id };
     } else {
       const _r = await fetch(`${PB_URL}/api/collections/trends/records`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': _pbToken },
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': _pbToken },
         body: JSON.stringify(data)
       });
       const _d = await _r.json();
@@ -3909,8 +3898,7 @@ async function deleteTrend(id, title) {
   try {
     const _pbTok = await pbGetToken();
     const _dr = await fetch(`${PB_URL}/api/collections/trends/records/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': _pbTok }
+      method: 'DELETE', headers: { 'Authorization': _pbTok }
     });
     if (!_dr.ok && _dr.status !== 204) { const _dd = await _dr.json().catch(()=>({})); throw new Error(_dd.message || 'Failed'); }
     allTrends = allTrends.filter(t => String(t.__backendId||t.id||'') !== String(id));
@@ -6861,6 +6849,17 @@ async function loadWorksFromSheets(force = false) {
   if (_fetchingWorks) return;
   _fetchingWorks = true;
   try {
+    // ดึงจาก PocketBase โดยตรง
+    const _pbWorks = await fetchFromPocketBase('works');
+    if (Array.isArray(_pbWorks) && _pbWorks.length) {
+      const prevWkFP = allWorks.length + '|' + (allWorks[0]?.__backendId || '');
+      const newWorks = _ensureWorksBackendId(_pbWorks.filter(w => w.title));
+      const newWkFP  = newWorks.length + '|' + (newWorks[0]?.__backendId || '');
+      allWorks = newWorks; worksLoaded = true;
+      _memCache.set('works', allWorks); Cache.set(LC.WORKS, allWorks); Cache.setTS(LC.TS_WK);
+      if (newWkFP !== prevWkFP) { _worksLastFP = ''; if (currentPage === 'works' || currentPage === 'admin') scheduleRender(); }
+      return;
+    }
     const t = Date.now();
     const res = await fetchWithTimeout(`${JSON_BASE_URL}/works.json?t=${t}`);
     const raw = res.works || res;
@@ -7009,16 +7008,14 @@ async function handleWorksFormSubmit() {
     const _pbWToken = await pbGetToken();
     if (_editingWorkId !== null) {
       const _wr = await fetch(`${PB_URL}/api/collections/works/records/${_editingWorkId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': _pbWToken },
+        method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': _pbWToken },
         body: JSON.stringify(data)
       });
       const _wd = await _wr.json();
       if (!_wd.id) throw new Error(_wd.message || 'Update failed');
     } else {
       const _wr = await fetch(`${PB_URL}/api/collections/works/records`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': _pbWToken },
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': _pbWToken },
         body: JSON.stringify(data)
       });
       const _wd = await _wr.json();
@@ -7132,8 +7129,7 @@ function deleteWork(backendId, title) {
     try {
       const _pbDelTok = await pbGetToken();
       const _delRes = await fetch(`${PB_URL}/api/collections/works/records/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': _pbDelTok }
+        method: 'DELETE', headers: { 'Authorization': _pbDelTok }
       });
       if (!_delRes.ok && _delRes.status !== 204) { const _dd = await _delRes.json().catch(()=>({})); throw new Error(_dd.message || 'Delete failed'); }
       showToast('Work deleted ✓');
