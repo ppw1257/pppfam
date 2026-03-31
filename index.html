@@ -2694,7 +2694,7 @@ let _lucideTimer    = null;
 const APPS_SCRIPT_ADMIN_URL = 'https://script.google.com/macros/s/AKfycbxJ8wQWFvlNpWZwDlmt4E_H6lrnmOaocVDS8aTqQOe17gGgEagVJ_PeGgyfRx7msbLu/exec';
 
 // Base URL where your JSON files are served (used for READ operations)
-const JSON_BASE_URL = 'https://ppw1257.github.io/pppfam/data'; // GitHub Pages static JSON (fallback)
+const JSON_BASE_URL = 'https://ppw1257.github.io/pppfam/data'; // GitHub Pages static JSON (fallback only)
 
 // ── POCKETBASE CONFIG ─────────────────────────────────────────────
 const PB_URL = 'https://pocketbase-production-510d.up.railway.app';
@@ -2720,7 +2720,14 @@ async function fetchAllFromPocketBase() {
     fetchFromPocketBase('birthdays'),
     fetchFromPocketBase('anniversaries'),
   ]);
-  return { events, works, trends, birthdays, anniversaries };
+  // Map PocketBase records to match expected format
+  return {
+    events: events.map(r => Object.assign({ __backendId: r.id }, r)),
+    works: works.map(r => Object.assign({ __backendId: r.id }, r)),
+    trends: trends.map(r => Object.assign({ __backendId: r.id }, r)),
+    birthdays: birthdays.map(r => Object.assign({ __backendId: r.id }, r)),
+    anniversaries: anniversaries.map(r => Object.assign({ __backendId: r.id }, r)),
+  };
 }
 
 // ── STATIC JSON FETCH HELPERS ─────────────────────────────────────
@@ -3153,6 +3160,7 @@ async function _fetchAllData(force = false) {
     }
     _scheduleEventStartTimers();
   } catch(e) {
+    console.warn('PocketBase fetch failed, trying fallback:', e.message);
     // Fallback: GitHub Pages static JSON
     try {
       const t = Date.now();
@@ -3560,22 +3568,14 @@ function _refreshAllPages() {
 }
 
 // ── _fetchFreshFromAppsScript: sync กับ server หลัง admin save/edit/delete ──
-// Netflix/YouTube pattern:
-//   1. Optimistic update แสดงทันที (ทำก่อนเรียกฟังก์ชันนี้)
-//   2. ดึง server data จริงใน background
-//   3. ถ้า server ตรงกับ optimistic → ไม่ render ซ้ำ (fingerprint check)
-//   4. broadcast ให้ทุก tab update ทันที
+// ดึงจาก PocketBase แทน Apps Script
 async function _fetchFreshFromAppsScript() {
-  if (!isAdmin) {
-    _optimisticPending = false;
-    return _fetchAllData(true);
-  }
+  _optimisticPending = false;
   try {
-    const res = await fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now(), 12000);
+    const res = await fetchAllFromPocketBase();
     const dataChangedRef = { v: false };
 
     // ลบ optimistic ออกก่อน apply server data จริง
-    _optimisticPending = false;
     allEvents = allEvents.filter(e => !e.__isOptimistic);
     allTrends = allTrends.filter(t => !t.__isOptimistic);
     allWorks  = allWorks.filter(function(w){ return !w.__isOptimistic; });
@@ -3585,7 +3585,7 @@ async function _fetchFreshFromAppsScript() {
     _applyAllData(res, false, dataChangedRef);
     _fmtDateCache.clear();
 
-    // Broadcast ทันที — ทุก tab (visitor, admin อื่น) จะรู้และดึงข้อมูลใหม่เลย
+    // Broadcast ทันที — ทุก tab จะรู้และดึงข้อมูลใหม่เลย
     _broadcastDataUpdate();
 
     // render เสมอหลัง confirm server data
@@ -3594,7 +3594,7 @@ async function _fetchFreshFromAppsScript() {
     renderBirthdayBanners();
   } catch(e) {
     _optimisticPending = false;
-    console.warn('_fetchFreshFromAppsScript failed:', e.message);
+    console.warn('_fetchFreshFromAppsScript (PocketBase) failed:', e.message);
   }
 }
 
