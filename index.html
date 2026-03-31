@@ -3154,7 +3154,7 @@ async function _fetchAllData(force = false) {
     hideConnectionError();
     if (dataChangedRef.v) {
       _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
-      _adminListFP = ''; _adminWorksListFP = '';
+      _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
       scheduleRender();
       renderBirthdayBanners();
     }
@@ -3170,7 +3170,7 @@ async function _fetchAllData(force = false) {
       hideConnectionError();
       if (dataChangedRef.v) {
         _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
-        _adminListFP = ''; _adminWorksListFP = '';
+        _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
         scheduleRender();
         renderBirthdayBanners();
       }
@@ -3401,7 +3401,7 @@ function scheduleAutoRefresh() {
       var ref = { v: false };
       _applyAllData(res, true, ref);
       _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
-      _adminListFP = ''; _adminWorksListFP = '';
+      _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
       _refreshAllPages();
       renderBirthdayBanners();
     }).catch(function() {
@@ -3583,6 +3583,7 @@ function _refreshAllPages() {
   _worksLastFP      = '';
   _adminListFP      = '';
   _adminWorksListFP = '';
+  _trendLastFP      = ''; // ← เพิ่ม: ให้ Trend page re-render ด้วยเสมอ
   _refreshIsPast();
   // Frame 1: render หน้าที่ user กำลังดูอยู่ทันที
   requestAnimationFrame(() => {
@@ -3624,8 +3625,9 @@ async function _fetchFreshFromAppsScript() {
     // Broadcast ทันที — ทุก tab จะรู้และดึงข้อมูลใหม่เลย
     _broadcastDataUpdate();
 
-    // render เสมอหลัง confirm server data
+    // render เสมอหลัง confirm server data — reset ทุก fingerprint
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+    _worksLastFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
     _refreshAllPages();
     renderBirthdayBanners();
   } catch(e) {
@@ -5230,7 +5232,9 @@ let _calLastFP = '';
 
 function renderCalendar() {
   // ── Fingerprint check — skip if same month/year/filter/selected/data ──
-  const calFP = `${calYear}|${calMonth}|${calFilter}|${calSelectedDate||''}|${allEvents.length}`;
+  // ใช้ title+dateStart ของทุก event เพื่อตรวจจับการแก้ไขข้อมูล ไม่ใช่แค่จำนวน
+  const _calEvHash = allEvents.slice(0, 20).map(e => (e.__backendId||'') + (e.dateStart||'') + (e.title||'')).join(',');
+  const calFP = `${calYear}|${calMonth}|${calFilter}|${calSelectedDate||''}|${allEvents.length}|${_calEvHash}`;
   const dateStripEl0 = document.getElementById('cal-date-strip');
   const gridEmpty = !dateStripEl0 || dateStripEl0.children.length === 0;
   if (calFP === _calLastFP && !gridEmpty) {
@@ -5893,7 +5897,9 @@ function renderAdminList() {
   if (limitWarn) limitWarn.style.display = allEvents.length >= 999 ? 'block' : 'none';
 
   // Fingerprint check — skip re-render if data & filter unchanged
-  const fp = _adminYearFilter + '|' + allEvents.length + '|' + (allEvents[0]?.__backendId || '');
+  // ใช้ข้อมูล title+dateStart ของทุก event เพื่อจับการแก้ไขที่ไม่เปลี่ยนจำนวน
+  const _adminEvHash = allEvents.slice(0, 30).map(e => (e.__backendId||'') + (e.dateStart||'') + (e.title||'')).join(',');
+  const fp = _adminYearFilter + '|' + allEvents.length + '|' + _adminEvHash;
   if (fp === _adminListFP && list.children.length > 0) {
     renderAdminYearTabs();
     return;
@@ -6136,6 +6142,7 @@ async function confirmDelete(key) {
   _memCache.set('events', allEvents);
   Cache.set(LC.EVENTS, allEvents);
   _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+  _worksLastFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
   requestAnimationFrame(function() {
     renderHome(); renderCalendar(); renderTrend();
     if (allWorks.length) renderWorks();
@@ -6152,6 +6159,7 @@ async function confirmDelete(key) {
     // Rollback: คืน event กลับ ถ้า delete ล้มเหลว
     if (_removed) { allEvents.splice(_delIdx, 0, _removed); _memCache.set('events', allEvents); Cache.set(LC.EVENTS, allEvents); }
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+    _worksLastFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
     requestAnimationFrame(function(){ renderHome(); renderCalendar(); renderTrend(); if (allWorks.length) renderWorks(); if (isAdmin) renderAdminList(); debounceLucide(); });
     if (rowEl) rowEl.style.opacity = '1';
     showToast('An error occurred' + ': ' + (err.message || ''));
@@ -6644,7 +6652,9 @@ async function handleEventFormSubmit() {
 
     // render ทันที — ทุกหน้า
     _optimisticPending = true;
+    // Reset fingerprint ทุกหน้าเพื่อบังคับ re-render แม้ข้อมูลจะดูเหมือนเดิม
     _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
+    _worksLastFP = ''; _trendLastFP = ''; _adminWorksListFP = '';
     requestAnimationFrame(function() {
       renderHome(); renderCalendar(); renderTrend();
       if (allWorks.length) renderWorks();
@@ -7227,7 +7237,9 @@ function renderAdminWorksList() {
   if (!list) return;
 
   // ── Fingerprint guard — skip re-render ถ้าข้อมูลไม่เปลี่ยน ──
-  const _awFP = allWorks.length + '|' + (yearSel ? yearSel.value : 'all') + '|' + (document.getElementById('admin-works-search')?.value||'') + '|' + (document.getElementById('admin-works-cat-filter')?.value||'all') + '|' + (document.getElementById('admin-works-expired-filter')?.value||'all') + '|' + (allWorks[0]?.__backendId || '') + '|' + (allWorks[allWorks.length-1]?.__backendId || '');
+  // ใช้ title ของ works เพื่อจับการแก้ไขข้อมูล ไม่ใช่แค่จำนวนหรือ id ตัวแรก/ท้าย
+  const _wkAdminHash = allWorks.slice(0, 20).map(w => (w.__backendId||'') + (w.title||'')).join(',');
+  const _awFP = allWorks.length + '|' + (yearSel ? yearSel.value : 'all') + '|' + (document.getElementById('admin-works-search')?.value||'') + '|' + (document.getElementById('admin-works-cat-filter')?.value||'all') + '|' + (document.getElementById('admin-works-expired-filter')?.value||'all') + '|' + _wkAdminHash;
   if (_awFP === _adminWorksListFP && list.children.length > 0) return;
   _adminWorksListFP = _awFP;
 
@@ -7456,7 +7468,9 @@ function renderWorks() {
   if (!accordion) return;
 
   // Fingerprint check — skip re-render if nothing changed
-  const wFP = `${_worksYear}|${_worksTab}|${_worksArtist}|${allWorks.length}`;
+  // ใช้ title+id ของ works เพื่อจับการแก้ไข ไม่ใช่แค่จำนวน
+  const _wkHash = allWorks.slice(0, 20).map(w => (w.__backendId||'') + (w.title||'')).join(',');
+  const wFP = `${_worksYear}|${_worksTab}|${_worksArtist}|${allWorks.length}|${_wkHash}`;
   if (wFP === _worksLastFP && accordion.innerHTML.trim() !== '') {
     return;
   }
@@ -7678,7 +7692,7 @@ document.addEventListener('visibilitychange', () => {
         _applyAllData(res, true, ref);
         if (ref.v) {
           _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
-          _adminListFP = ''; _adminWorksListFP = '';
+          _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
           _refreshAllPages();
           renderBirthdayBanners();
         }
