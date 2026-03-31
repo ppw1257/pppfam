@@ -115,7 +115,7 @@
     --text-2xl:  clamp(18px, 2vw,   28px);
     --text-3xl:  clamp(22px, 2.5vw, 36px);
   }
-  * { font-family: 'Inter', 'K2D', sans-serif; -webkit-tap-highlight-color: transparent; }
+  * { font-family: 'K2D', sans-serif; -webkit-tap-highlight-color: transparent; }
   html { height: 100%; overflow: hidden; font-size: 105%; }
   body { height: 100%; background: #ffffff; background-attachment: fixed; color: #2d2d2d; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
   #app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
@@ -136,15 +136,6 @@
   .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #f0f0f0; box-shadow: 0 1px 8px rgba(0,0,0,0.05); height: 100%; position: relative; transition: box-shadow 0.18s, transform 0.18s; }
   .month-group { }
   .event-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #e8e8e8; }
-  /* ── Next event highlight ── */
-  .event-card--next {
-    border: 2px solid var(--next-color, #f97316) !important;
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--next-color, #f97316) 12%, transparent), 0 4px 20px rgba(0,0,0,0.08) !important;
-  }
-  .event-card--next:hover {
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--next-color, #f97316) 18%, transparent), 0 8px 28px rgba(0,0,0,0.13) !important;
-    transform: translateY(-3px);
-  }
   .next-card-label {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
@@ -153,10 +144,7 @@
     background: var(--next-color, #f97316);
     pointer-events: none;
   }
-  .event-card--next .card-img-wrap .next-card-label { top: 10px; left: 10px; }
-  @supports not (color: color-mix(in srgb, red 50%, blue)) {
-    .event-card--next { box-shadow: 0 0 0 4px rgba(249,115,22,0.15), 0 4px 20px rgba(0,0,0,0.08) !important; }
-  }
+
   .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.55);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;z-index:5; }
   .event-card:hover .card-hover-overlay { opacity:1; }
   .card-hover-overlay .oh-title { font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4; }
@@ -228,7 +216,7 @@
   .cal-list-date { flex-shrink:0;width:48px;text-align:center; }
   .cal-list-dow { font-size:0.68rem;font-weight:700;color:#9ca3af;letter-spacing:0.07em;text-transform:uppercase; }
   .cal-list-num { font-size:1.3rem;font-weight:700;color:#111;line-height:1.1; }
-  .cal-list-bar { width:3px;border-radius:99px;align-self:stretch;flex-shrink:0; }
+  .cal-list-bar { width:4px;border-radius:99px;align-self:stretch;flex-shrink:0; }
   .cal-list-body { flex:1;min-width:0; }
   .cal-list-title { font-size:0.88rem;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
   .cal-list-meta { font-size:0.75rem;color:#9ca3af;margin-top:2px;display:flex;align-items:center;gap:8px; }
@@ -309,17 +297,29 @@
     color: #fff !important;
     box-shadow: none !important;
   }
+  .artist-filter-btn[data-artist="Pond"].active {
+    background: #f97316 !important;
+    border-color: #ea6a0a !important;
+  }
+  .artist-filter-btn[data-artist="Phuwin"].active {
+    background: #475569 !important;
+    border-color: #334155 !important;
+  }
+  .artist-filter-btn[data-artist="Permpoon"].active {
+    background: #16a34a !important;
+    border-color: #15803d !important;
+  }
   .filter-bar .flex-spacer { display: none !important; }
   .filter-bar > div:last-child { flex-shrink: 0; }
   .cal-month-strip { display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none; }
   .cal-month-strip::-webkit-scrollbar { display:none; }
-  .cal-month-pill { padding:5px 14px;border-radius:99px;font-size:0.78rem;font-weight:500;color:#6b7280;background:transparent;cursor:pointer;white-space:nowrap;border:1px solid #e5e7eb;font-family:inherit;transition:all 0.15s; }
+  .cal-month-pill { padding:5px 14px;border-radius:99px;font-size:0.78rem;font-weight:500;color:#6b7280;background:transparent;cursor:pointer;white-space:nowrap;border:1px solid #e5e7eb;transition:all 0.15s; }
   .cal-month-pill:hover { background:#f3f4f6;color:#111; border-color:#d1d5db; }
   .cal-month-pill.active { background:#111;color:#fff;font-weight:600;box-shadow:none;border-color:#111; }
   /* date strip */
   /* cal-date-strip: controlled by inline style per context */
   .cal-date-strip::-webkit-scrollbar { display:none; }
-  .cal-date-chip { width:100%;display:flex;flex-direction:row;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;border:none;background:transparent;font-family:inherit;position:relative;box-sizing:border-box;flex-shrink:0; }
+  .cal-date-chip { width:100%;display:flex;flex-direction:row;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;cursor:pointer;border:none;background:transparent;position:relative;box-sizing:border-box;flex-shrink:0; }
   .cal-date-chip:hover { background:#f3f4f6; }
   .cal-date-chip.today { background:#111; }
   .cal-date-chip.today .cal-date-chip-dow { color:rgba(255,255,255,0.5); }
@@ -375,10 +375,10 @@
   label.artist-check-label[for="ac-pond"] { border-color: #fed7aa; color: #f97316; }
   label.artist-check-label[for="ac-pond"]:hover { border-color: #f97316; background: #fff7ed; }
   #ac-pond:checked + label.artist-check-label {
-    background: #111 !important;
-    border-color: #111 !important;
+    background: #f97316 !important;
+    border-color: #ea6a0a !important;
     color: #ffffff !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(249,115,22,0.35);
     font-weight: 700;
   }
   /* Phuwin — slate */
@@ -510,13 +510,14 @@
   .bday-countdown { font-size:0.7rem;font-weight:800;padding:3px 8px;border-radius:99px;margin-left:auto;flex-shrink:0;letter-spacing:0.05em; }
   .month-group { margin-bottom: 2.5rem; padding-top: 1.5rem; }
   .month-group:first-child { padding-top: 0; }
-  .month-group-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; margin-top: 1.25rem; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
-  .month-group-header-box { display: inline-flex; align-items: baseline; gap: 6px; }
+  .month-group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; margin-top: 1.25rem; padding-bottom: 8px; }
+  .month-group-header-box { display: inline-flex; align-items: center; gap: 6px; }
   .month-group-header-dots { display: none; }
   .month-group-header-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .month-group-header-label { font-size: 1.05rem; font-weight: 700; color: #111; letter-spacing: -0.01em; line-height: 1; }
-  .month-group-header-line { display: none; }
-  .month-group-header-count { font-size: 0.65rem; font-weight: 700; color: #fff; background: #6366f1; border-radius: 99px; padding: 2px 9px; border: none; letter-spacing: 0.02em; }
+  .month-group-header-label { font-size: 1.35rem; font-weight: 800; color: #111; letter-spacing: -0.02em; line-height: 1; }
+  .month-group-header-line { display: block; flex: 1; height: 1px; background: #f0f0f0; }
+  .month-group-header-count { font-size: 0.65rem; font-weight: 700; color: #fff; background: #111; border-radius: 99px; padding: 2px 9px; border: none; letter-spacing: 0.02em; }
+  .month-group-header-upcoming { font-size: 0.72rem; font-weight: 700; color: #111; flex-shrink: 0; }
   /* Map embed */
   .map-embed-wrap { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
   .map-embed-wrap iframe { width: 100%; height: 300px; border: 0; display: block; }
@@ -1315,7 +1316,7 @@
         </div>
        </div>
        <div style="position:relative;">
-        <div id="bento-next-label" style="font-size:0.6rem;font-weight:800;letter-spacing:0.08em;margin-bottom:6px;color:#f97316;">NEXT EVENT</div>
+        <div id="bento-next-label" style="margin-bottom:6px;"><span style="background:#f97316;color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">NEXT EVENT</span></div>
         <div id="bento-next-title" style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:5px;">Loading...</div>
         <div id="bento-next-meta" style="font-size:0.62rem;color:rgba(255,255,255,0.4);margin-bottom:4px;"></div>
 
@@ -1347,7 +1348,7 @@
          style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-       <span id="events-count" style="font-size:0.68rem;font-weight:700;color:#fff;background:#111;border:none;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;"></span>
+       <div id="events-count" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;"></div>
 
       </div>
      </div>
@@ -1396,13 +1397,13 @@
        </div>
        <div style="display:flex;gap:24px;align-items:center;">
         <div style="text-align:center;">
-         <div id="cal-stat-past" style="font-size:1.2rem;font-weight:600;color:#9ca3af;line-height:1;">-</div>
-         <div style="font-size:0.55rem;color:#d1d5db;margin-top:3px;font-weight:600;letter-spacing:0.06em;">Past</div>
+         <div id="cal-stat-upcoming" style="font-size:1.2rem;font-weight:600;color:#f97316;line-height:1;">-</div>
+         <div style="font-size:0.55rem;color:#d1d5db;margin-top:3px;font-weight:600;letter-spacing:0.06em;">Remaining</div>
         </div>
         <div style="width:1px;height:24px;background:#f0f0f0;"></div>
         <div style="text-align:center;">
-         <div id="cal-stat-upcoming" style="font-size:1.2rem;font-weight:600;color:#f97316;line-height:1;">-</div>
-         <div style="font-size:0.55rem;color:#d1d5db;margin-top:3px;font-weight:600;letter-spacing:0.06em;">Remaining</div>
+         <div id="cal-stat-past" style="font-size:1.2rem;font-weight:600;color:#9ca3af;line-height:1;">-</div>
+         <div style="font-size:0.55rem;color:#d1d5db;margin-top:3px;font-weight:600;letter-spacing:0.06em;">Past</div>
         </div>
         <div style="width:1px;height:24px;background:#f0f0f0;"></div>
         <div style="text-align:center;">
@@ -1501,7 +1502,7 @@
       <!-- ขวา: event cards -->
       <div style="min-width:0;">
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-size:0.72rem;color:#9ca3af;"><span id="cal-month-event-count">—</span> <span>events</span></div>
+        <div id="cal-month-event-count" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;"></div>
        </div>
        <div id="cal-card-grid" style="display:flex;flex-direction:column;gap:10px;">
         <div style="text-align:center;padding:3rem;color:#9ca3af;font-size:0.85rem;">Loading...</div>
@@ -1526,7 +1527,7 @@
      <!-- Header — same structure as home page -->
      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.25rem;">
       <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#111;margin:0;">Works</h2>
-      <div style="display:none;"><select id="works-year-select" style="display:none;" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;font-family:inherit;"></select></div>
+      <div style="display:none;"><select id="works-year-select" style="display:none;" onchange="setWorksYear(this.value)" style="padding:6px 28px 6px 12px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.85rem;font-weight:700;color:#111;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;"></select></div>
      </div>
 
      <!-- Filter bars — same structure as home page -->
@@ -1588,9 +1589,9 @@
    <!-- TREND PAGE -->
    <div class="page" id="page-trend">
     <div style="width:100%;padding:2rem 1rem;box-sizing:border-box;overflow-x:hidden;">
-     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.5rem;">
-      <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;color:#111;margin:0;">Trend</h2>
-      <div id="trend-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+     <div style="margin-bottom:1.25rem;">
+      <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;color:#111;margin:0 0 0.75rem;">Trend</h2>
+      <div id="trend-filter-bar" class="filter-bar" style="margin-bottom:6px;"></div>
      </div>
      <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;"></div>
      <div id="trend-empty" style="display:none;text-align:center;padding:4rem 1rem;color:#9ca3af;">
@@ -1635,19 +1636,19 @@
 
       <!-- Tab bar -->
       <div style="display:flex;gap:3px;background:#f0efeb;border-radius:10px;padding:3px;width:fit-content;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;" id="admin-tab-bar">
-       <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;background:#111;color:#fff;font-family:inherit;">
+       <button class="admin-tab-btn active-atb" id="atb-events" onclick="switchAdminTab('events')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;background:#111;color:#fff;">
         <i data-lucide="calendar" style="width:13px;height:13px;"></i>Events
        </button>
-       <button class="admin-tab-btn" id="atb-works" onclick="switchAdminTab('works')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+       <button class="admin-tab-btn" id="atb-works" onclick="switchAdminTab('works')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;">
         <i data-lucide="star" style="width:13px;height:13px;"></i>Works
        </button>
-       <button class="admin-tab-btn" id="atb-bdays" onclick="switchAdminTab('bdays')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+       <button class="admin-tab-btn" id="atb-bdays" onclick="switchAdminTab('bdays')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;">
         <i data-lucide="cake" style="width:13px;height:13px;"></i>Birthdays
        </button>
-       <button class="admin-tab-btn" id="atb-trend" onclick="switchAdminTab('trend')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+       <button class="admin-tab-btn" id="atb-trend" onclick="switchAdminTab('trend')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;">
         <i data-lucide="trending-up" style="width:14px;height:14px;"></i>Trend
        </button>
-       <button class="admin-tab-btn" id="atb-anniv" onclick="switchAdminTab('anniv')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;font-family:inherit;">
+       <button class="admin-tab-btn" id="atb-anniv" onclick="switchAdminTab('anniv')" style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:0.82rem;font-weight:500;cursor:pointer;white-space:nowrap;background:transparent;color:#6b7280;">
         <i data-lucide="heart" style="width:13px;height:13px;"></i>Anniversary
        </button>
       </div>
@@ -1660,7 +1661,7 @@
         <div style="flex:1;"></div>
         <div style="display:flex;align-items:center;gap:6px;">
          <span style="font-size:0.78rem;font-weight:600;color:#6b7280;">Year:</span>
-         <select id="admin-year-select" onchange="setAdminYear(this.value)" style="padding:4px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;"></select>
+         <select id="admin-year-select" onchange="setAdminYear(this.value)" style="padding:4px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;outline:none;"></select>
         </div>
        </div>
        <div id="admin-events-list" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -1683,7 +1684,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
          <span style="font-size:0.78rem;font-weight:600;color:#6b7280;">Year:</span>
-         <select id="admin-works-year-filter" onchange="renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;outline:none;">
+         <select id="admin-works-year-filter" onchange="renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:700;cursor:pointer;outline:none;">
           <option value="all">All Years</option>
          </select>
         </div>
@@ -1692,9 +1693,9 @@
        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;">
         <div style="position:relative;flex:1;min-width:200px;">
          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-         <input id="admin-works-search" type="text" placeholder="Search name, brand, artist..." oninput="_adminWorksListFP='';renderAdminWorksList()" style="width:100%;padding:7px 10px 7px 32px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.82rem;font-family:inherit;outline:none;box-sizing:border-box;background:#fff;">
+         <input id="admin-works-search" type="text" placeholder="Search name, brand, artist..." oninput="_adminWorksListFP='';renderAdminWorksList()" style="width:100%;padding:7px 10px 7px 32px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.82rem;outline:none;box-sizing:border-box;background:#fff;">
         </div>
-        <select id="admin-works-cat-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;outline:none;">
+        <select id="admin-works-cat-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;outline:none;">
          <option value="all">All Categories</option>
          <option value="littlebigworld">Little Big World</option>
          <option value="series">Series</option>
@@ -1705,7 +1706,7 @@
          <option value="interview">Interviews</option>
          <option value="otherworks">Other Works</option>
         </select>
-        <select id="admin-works-expired-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;outline:none;">
+        <select id="admin-works-expired-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;outline:none;">
          <option value="all">All Status</option>
          <option value="active">Active</option>
          <option value="expired">Expired</option>
@@ -1723,7 +1724,7 @@
       <div id="admin-tab-trend" class="admin-tab-panel" style="display:none;">
        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <span style="font-size:0.9rem;font-weight:600;color:#111;">Trend Posts</span>
-        <button onclick="openAddTrendModal()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;background:#111;color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;">
+        <button onclick="openAddTrendModal()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;background:#111;color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;">
          <i data-lucide="plus" style="width:14px;height:14px;"></i> Add Trend
         </button>
        </div>
@@ -1916,7 +1917,7 @@
         <label class="form-label" for="ev-startTime" style="font-weight:700;">Start Time <span style="color:#ec4899;">*</span></label>
         <div style="display:flex;align-items:center;gap:8px;">
           <input class="form-input" id="ev-startTime" name="startTime" type="time" style="border:1px solid #111;background:#f9f9f9;font-weight:600;flex:1;">
-          <select id="ev-startTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;font-family:inherit;">
+          <select id="ev-startTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;">
             <option value="GMT+7" selected>— Thailand (GMT+7)</option>
             <option value="GMT-12">GMT-12</option>
             <option value="GMT-11">GMT-11</option>
@@ -1963,7 +1964,7 @@
         <label class="form-label" for="ev-endTime"><span>End Time</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <div style="display:flex;align-items:center;gap:8px;">
           <input class="form-input" id="ev-endTime" name="endTime" type="time" style="flex:1;">
-          <select id="ev-endTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;font-family:inherit;">
+          <select id="ev-endTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;">
             <option value="GMT+7" selected>— Thailand (GMT+7)</option>
             <option value="GMT-12">GMT-12</option>
             <option value="GMT-11">GMT-11</option>
@@ -3770,11 +3771,15 @@ function renderTrend() {
       const isActive = _trendFilter === f.v;
       const isArtist = f.v !== 'all';
       let bg, border, color, fontW;
-      if (isActive) { bg='#111'; border='#111'; color='#fff'; fontW='700'; }
-      else if (isArtist) { bg=artistBg[f.v]||'#fff'; border=artistBorder[f.v]||'#e5e7eb'; color=artistText[f.v]||'#6b7280'; fontW='600'; }
-      else { bg='#fff'; border='#e5e7eb'; color='#6b7280'; fontW='500'; }
+      if (f.v === 'all') {
+        bg = isActive ? '#111' : '#fff'; border = isActive ? '#111' : '#e5e7eb'; color = isActive ? '#fff' : '#6b7280'; fontW = '700';
+      } else if (isActive) {
+        bg = artistColors[f.v]||'#111'; border = artistColors[f.v]||'#111'; color = '#fff'; fontW = '700';
+      } else {
+        bg = artistBg[f.v]||'#fff'; border = artistBorder[f.v]||'#e5e7eb'; color = artistText[f.v]||'#6b7280'; fontW = '700';
+      }
       const dot = isArtist && !isActive ? `<span style="width:6px;height:6px;border-radius:50%;background:${artistColors[f.v]||'#6b7280'};display:inline-block;flex-shrink:0;"></span>` : '';
-      return `<button onclick="setTrendFilter('${f.v}')" style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid ${border};background:${bg};color:${color};font-size:0.78rem;font-weight:${fontW};cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s;">${dot}${f.label}</button>`;
+      return `<button onclick="setTrendFilter('${f.v}')" style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid ${border};background:${bg};color:${color};font-size:0.75rem;font-weight:${fontW};cursor:pointer;white-space:nowrap;flex-shrink:0;">${dot}${f.label}</button>`;
     }).join('');
   }
 
@@ -3862,8 +3867,8 @@ function renderAdminTrendList() {
        <div style="font-size:0.72rem;color:#9ca3af;">${escHtml(artistLabel)} ${t.date?'· '+t.date:''}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-       <button onclick="openEditTrendModal('${escHtml(t.__backendId||t.id||'')}')" style="padding:5px 10px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;color:#374151;font-family:inherit;">Edit</button>
-       <button onclick="deleteTrend('${escHtml(t.__backendId||t.id||'')}','${escHtml(t.caption||'').slice(0,20)}')" style="padding:5px 10px;border-radius:6px;border:none;background:#fee2e2;font-size:0.75rem;font-weight:600;cursor:pointer;color:#dc2626;font-family:inherit;">Delete</button>
+       <button onclick="openEditTrendModal('${escHtml(t.__backendId||t.id||'')}')" style="padding:5px 10px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;color:#374151;">Edit</button>
+       <button onclick="deleteTrend('${escHtml(t.__backendId||t.id||'')}','${escHtml(t.caption||'').slice(0,20)}')" style="padding:5px 10px;border-radius:6px;border:none;background:#fee2e2;font-size:0.75rem;font-weight:600;cursor:pointer;color:#dc2626;">Delete</button>
       </div>
      </div>`;
   }).join('');
@@ -4280,7 +4285,25 @@ function renderHome() {
   const count = document.getElementById('events-count');
   if (!grid) return;
 
-  if (count) count.textContent = `${events.length} event${events.length !== 1 ? 's' : ''}`;
+  if (count) {
+    if (homeFilter === 'all') {
+      // Show per-artist colored pills
+      const upAll2 = allEvents.filter(ev => ev.title && !isEventPast(ev));
+      const cP  = upAll2.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Pond')).length;
+      const cPh = upAll2.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Phuwin')).length;
+      const cPe = upAll2.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Permpoon')).length;
+      count.innerHTML = [
+        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#f97316;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Pond · ${cP}</span>`,
+        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#64748b;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Phuwin · ${cPh}</span>`,
+        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#22c55e;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Permpoon · ${cPe}</span>`,
+      ].join('');
+    } else {
+      // Single pill with artist color
+      const _pillColor = { Pond: '#f97316', Phuwin: '#64748b', Permpoon: '#22c55e' };
+      const pillColor = _pillColor[homeFilter] || '#111';
+      count.innerHTML = `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:${pillColor};border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">${homeFilter} · ${events.length}</span>`;
+    }
+  }
 
   // ── Bento grid update ──
   const upAll = allEvents.filter(ev => ev.title && !isEventPast(ev));
@@ -4484,7 +4507,7 @@ function _vsInit(groups) {
       const hdr = document.createElement('div');
       hdr.className = 'month-group-header';
       const _lp1 = item.label.split(' '); const _m1 = _lp1[0]||''; const _y1 = _lp1[1]||'';
-      hdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m1}</span><span style="font-size:1.05rem;font-weight:400;color:#111;letter-spacing:-0.01em;line-height:1;">${_y1}</span><span class="month-group-header-count" style="margin-left:4px;">${item.total} event${item.total !== 1 ? 's' : ''}</span></div>`;
+      hdr.innerHTML = `<div class="month-group-header-box"><span class="month-group-header-label">${_m1}</span><span style="font-size:1.1rem;font-weight:400;color:#9ca3af;letter-spacing:-0.01em;line-height:1;">${_y1}</span><span class="month-group-header-count" style="margin-left:4px;">${item.total} event${item.total !== 1 ? 's' : ''}</span></div><div class="month-group-header-line"></div><span class="month-group-header-upcoming">${item.total} upcoming</span>`;
       gw.appendChild(hdr);
       let gridEl;
       if (item.mode === 'list') {
@@ -5312,12 +5335,12 @@ function filterCalendar(artist) {
     'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
     'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
   };
+  const calActiveColors = { 'Pond':{ bg:'#f97316',color:'#fff',border:'#ea6a0a' },'Phuwin':{ bg:'#475569',color:'#fff',border:'#334155' },'Permpoon':{ bg:'#16a34a',color:'#fff',border:'#15803d' } };
   document.querySelectorAll('.cal-filter-btn').forEach(btn => {
     const a = btn.dataset.artist;
     if (a === artist) {
-      btn.style.background = '#111';
-      btn.style.color = '#fff';
-      btn.style.borderColor = '#111';
+      const ac = calActiveColors[a] || { bg:'#111', color:'#fff', border:'#111' };
+      btn.style.background = ac.bg; btn.style.color = ac.color; btn.style.borderColor = ac.border;
     } else {
       const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
       btn.style.background = c.bg;
@@ -5392,7 +5415,36 @@ function renderCalendar() {
     }
   });
   const countEl = document.getElementById('cal-month-event-count');
-  if (countEl) countEl.textContent = totalMonthEvents.size;
+  if (countEl) {
+    if (calFilter === 'all') {
+      const monthStr2 = `${calYear}-${String(month+1).padStart(2,'0')}`;
+      const daysInMonth2 = new Date(calYear, month+1, 0).getDate();
+      const _countArtist = (artist) => {
+        const s = new Set();
+        allEvents.forEach(ev => {
+          if (!ev.dateStart) return;
+          if (!ev.artists || !ev.artists.split(',').map(a=>a.trim()).includes(artist)) return;
+          for (let d = 1; d <= daysInMonth2; d++) {
+            const ds = `${monthStr2}-${String(d).padStart(2,'0')}`;
+            if (ds >= ev.dateStart && ds <= (ev.dateEnd || ev.dateStart)) { s.add(ev.__backendId || ev.title); break; }
+          }
+        });
+        return s.size;
+      };
+      const cP  = _countArtist('Pond');
+      const cPh = _countArtist('Phuwin');
+      const cPe = _countArtist('Permpoon');
+      countEl.innerHTML = [
+        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#f97316;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Pond \u00b7 ${cP}</span>`,
+        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#64748b;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Phuwin \u00b7 ${cPh}</span>`,
+        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#22c55e;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Permpoon \u00b7 ${cPe}</span>`,
+      ].join('');
+    } else {
+      const _pillColor = { Pond: '#f97316', Phuwin: '#64748b', Permpoon: '#22c55e' };
+      const pillColor = _pillColor[calFilter] || '#111';
+      countEl.innerHTML = `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:${pillColor};border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">${calFilter} \u00b7 ${totalMonthEvents.size}</span>`;
+    }
+  }
 
   // ── Month strip (4×3 grid) — อัปเดต in-place ถ้าทำได้ ──
   const stripEl = document.getElementById('cal-month-strip');
@@ -5408,7 +5460,7 @@ function renderCalendar() {
       const isActive = mi === month;
       const count = evCountByMonth[mi];
       const dotHtml = count > 0 ? `<span style="width:5px;height:5px;border-radius:50%;background:${isActive?'rgba(255,255,255,0.55)':'#f97316'};display:inline-block;flex-shrink:0;"></span>` : '';
-      return `<button onclick="calMonth=${mi};calSelectedDate=null;renderCalendar();" style="padding:9px 6px;border-radius:10px;border:none;font-size:0.82rem;font-weight:${isActive?'700':'600'};background:${isActive?'#111':'#f3f4f6'};color:${isActive?'#fff':'#374151'};cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;">${mn}${dotHtml}</button>`;
+      return `<button onclick="calMonth=${mi};calSelectedDate=null;renderCalendar();" style="padding:9px 6px;border-radius:10px;border:none;font-size:0.82rem;font-weight:${isActive?'700':'600'};background:${isActive?'#111':'#f3f4f6'};color:${isActive?'#fff':'#374151'};cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">${mn}${dotHtml}</button>`;
     }).join('');
     // Only update DOM if content actually changed
     if (stripEl.dataset.fp !== calFP.slice(0, 20)) {
@@ -5442,9 +5494,9 @@ function renderCalendar() {
       const numColor = (isSelected||isToday) ? 'color:#fff;font-weight:800;' : hasEv ? `color:${accentColor};font-weight:700;` : 'color:#374151;font-weight:500;';
       const dot = hasEv && !isSelected && !isToday ? `<div style="width:4px;height:4px;border-radius:50%;background:${accentColor};margin-top:1px;"></div>` : '';
       if (hasEv) {
-        cells += `<button onclick="calSelectedDate='${ds}';renderCalendar();" style="width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:none;cursor:pointer;font-family:inherit;${bg}"><span style="font-size:0.78rem;${numColor}">${d}</span>${dot}</button>`;
+        cells += `<button onclick="calSelectedDate='${ds}';renderCalendar();" style="width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:none;cursor:pointer;${bg}"><span style="font-size:0.78rem;${numColor}">${d}</span>${dot}</button>`;
       } else if (isToday) {
-        cells += `<button onclick="calSelectedDate='${ds}';renderCalendar();" style="width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:none;cursor:pointer;font-family:inherit;${bg}"><span style="font-size:0.78rem;${numColor}">${d}</span></button>`;
+        cells += `<button onclick="calSelectedDate='${ds}';renderCalendar();" style="width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:none;cursor:pointer;${bg}"><span style="font-size:0.78rem;${numColor}">${d}</span></button>`;
       } else {
         cells += `<div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:default;"><span style="font-size:0.78rem;color:#d1d5db;font-weight:400;">${d}</span></div>`;
       }
@@ -5701,10 +5753,12 @@ function filterHome(artist) {
     'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
     'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
   };
+  const artistActiveColors = { 'Pond':{ bg:'#f97316',color:'#fff',border:'#ea6a0a' },'Phuwin':{ bg:'#475569',color:'#fff',border:'#334155' },'Permpoon':{ bg:'#16a34a',color:'#fff',border:'#15803d' } };
   document.querySelectorAll('.artist-filter-btn').forEach(btn => {
     const a = btn.dataset.artist;
     if (a === artist) {
-      btn.style.background = '#111'; btn.style.color = '#fff'; btn.style.borderColor = '#111';
+      const ac = artistActiveColors[a] || { bg:'#111', color:'#fff', border:'#111' };
+      btn.style.background = ac.bg; btn.style.color = ac.color; btn.style.borderColor = ac.border;
     } else {
       const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
       btn.style.background = c.bg; btn.style.color = c.color; btn.style.borderColor = c.border;
@@ -7448,13 +7502,13 @@ function setWorksArtist(artist) {
     'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
     'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
   };
+  const worksActiveColors = { 'Pond':{ bg:'#f97316',color:'#fff',border:'#ea6a0a' },'Phuwin':{ bg:'#475569',color:'#fff',border:'#334155' },'Permpoon':{ bg:'#16a34a',color:'#fff',border:'#15803d' } };
   document.querySelectorAll('.works-artist-btn').forEach(b => {
     const a = b.id.replace('wa-', '');
     const isActive = b.id === 'wa-' + artist;
     if (isActive) {
-      b.style.background = '#111';
-      b.style.color = '#fff';
-      b.style.borderColor = '#111';
+      const ac = worksActiveColors[a] || { bg:'#111', color:'#fff', border:'#111' };
+      b.style.background = ac.bg; b.style.color = ac.color; b.style.borderColor = ac.border;
     } else {
       const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
       b.style.background = c.bg;
@@ -7515,7 +7569,7 @@ function _buildWorksYearDropdown() {
   });
 }
 function _styleYearBtn(btn, active) {
-  btn.style.cssText = `padding:5px 14px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;border:1px solid ${active?'#a855f7':'#f0f0f0'};background:${active?'#f5f3ff':'#fff'};color:${active?'#7e22ce':'#6b7280'};`;
+  btn.style.cssText = `padding:5px 14px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;border:1px solid ${active?'#a855f7':'#f0f0f0'};background:${active?'#f5f3ff':'#fff'};color:${active?'#7e22ce':'#6b7280'};`;
 }
 
 function _refreshWorksYearButtons() {
@@ -7958,11 +8012,11 @@ function _fastHydrateFromCache() {
      <div style="display:flex;flex-direction:column;gap:12px;">
       <div>
        <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">รูปภาพ URL *</label>
-       <input id="tf-image" type="url" placeholder="https://..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;">
+       <input id="tf-image" type="url" placeholder="https://..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;">
       </div>
       <div>
        <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Caption *</label>
-       <textarea id="tf-caption" rows="3" placeholder="เขียน caption..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;resize:vertical;"></textarea>
+       <textarea id="tf-caption" rows="3" placeholder="เขียน caption..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;resize:vertical;"></textarea>
       </div>
       <div>
        <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">ศิลปิน</label>
@@ -7974,15 +8028,15 @@ function _fastHydrateFromCache() {
       </div>
       <div>
        <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">วันที่</label>
-       <input id="tf-date" type="date" style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;">
+       <input id="tf-date" type="date" style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;">
       </div>
       <div>
        <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">ลิ้งก์ต้นทาง (Twitter/X, IG, ...)</label>
-       <input id="tf-link" type="url" placeholder="https://x.com/..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:inherit;">
+       <input id="tf-link" type="url" placeholder="https://x.com/..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;box-sizing:border-box;">
       </div>
       <div style="display:flex;gap:8px;margin-top:4px;">
-       <button onclick="closeTrendModal()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
-       <button id="trend-submit-btn" onclick="handleTrendFormSubmit()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#111;color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;">
+       <button onclick="closeTrendModal()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-size:0.9rem;font-weight:600;cursor:pointer;">Cancel</button>
+       <button id="trend-submit-btn" onclick="handleTrendFormSubmit()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#111;color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;">
         <span id="trend-submit-text">Save</span>
         <span id="trend-submit-spin" style="display:none;">...</span>
        </button>
