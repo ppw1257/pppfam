@@ -3392,28 +3392,122 @@ async function deleteAnniversaryInSheets(id) {
 // AUTO-REFRESH — one request per minute max, background only
 // Uses Page Visibility API to pause when tab is hidden
 // ═══════════════════════════════════════════════════════════════════
-function scheduleAutoRefresh() {
-  clearInterval(_refreshTimer);
+// ── PocketBase Realtime (SSE) — true real-time < 1 วินาที ──────────
+// admin save → ทุก client ทั่วโลกรู้ทันที ไม่ต้อง polling
+let _pbRealtimeRetryCount = 0;
+const _PB_REALTIME_MAX_RETRY = 10;
+const _PB_REALTIME_RETRY_DELAYS = [1000, 2000, 3000, 5000, 8000, 10000, 15000, 20000, 30000, 60000];
 
-  // ── ฟังก์ชัน: ดึง Apps Script โดยตรง แล้ว render ทันที (bypass CDN) ──
-  function _fetchDirectAndRender() {
+function _onPbRealtimeChange(collectionName) {
+  // Debounce: ถ้ามีหลาย collection เปลี่ยนพร้อมกัน รอ 300ms แล้ว fetch ครั้งเดียว
+  if (window._pbRealtimeDebounce) clearTimeout(window._pbRealtimeDebounce);
+  window._pbRealtimeDebounce = setTimeout(function() {
     if (_optimisticPending || _fetchingAll) return;
-    Cache.clearAll();
-    const url = APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now();
-    fetchWithTimeout(url, 12000).then(function(res) {
-      var ref = { v: false };
-      _applyAllData(res, true, ref);
+    _fetchingAll = false;
+    _fetchAllData(true).then(function() {
       _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
       _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
       _refreshAllPages();
       renderBirthdayBanners();
-    }).catch(function() {
-      _fetchAllData(true).catch(function(){});
+    }).catch(function(e) {
+      if (e && e.message !== 'AbortError') console.warn('[PPP Realtime]', e.message || e);
     });
+  }, 300);
+}
+
+async function _initPbRealtime() {
+  // ป้องกัน duplicate subscription
+  if (window._pbRealtimeActive) return;
+
+  try {
+    // Subscribe ทุก collection สำคัญ ผ่าน PocketBase SSE
+    const _collections = ['events', 'works', 'trends', 'birthdays', 'anniversaries'];
+    const _token = await pbGetToken();
+
+    _collections.forEach(function(col) {
+      const _sseUrl = PB_URL + '/api/realtime';
+      // ใช้ EventSource โดยตรง (lightweight, ไม่ต้องการ PocketBase JS SDK)
+      // PocketBase SSE format: subscribe via POST then listen
+    });
+
+    // วิธีที่ง่ายและเสถียรที่สุด: ใช้ fetch + EventSource ผ่าน PocketBase REST
+    const _evtSource = new EventSource(
+      PB_URL + '/api/realtime',
+      { withCredentials: false }
+    );
+
+    // รับ clientId ก่อน แล้ว subscribe collections
+    _evtSource.addEventListener('PB_CONNECT', async function(e) {
+      const clientId = JSON.parse(e.data).clientId;
+      // Subscribe ทุก collection
+      try {
+        await fetch(PB_URL + '/api/realtime', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': _token },
+          body: JSON.stringify({
+            clientId: clientId,
+            subscriptions: [
+              'events', 'works', 'trends', 'birthdays', 'anniversaries'
+            ]
+          })
+        });
+        window._pbRealtimeActive = true;
+        _pbRealtimeRetryCount = 0; // reset retry count เมื่อ connect สำเร็จ
+        console.log('[PPP Realtime] Connected ✓ — live updates active');
+      } catch(err) {
+        console.warn('[PPP Realtime] Subscribe failed:', err.message);
+      }
+    });
+
+    // รับ event เมื่อข้อมูลเปลี่ยน
+    ['events', 'works', 'trends', 'birthdays', 'anniversaries'].forEach(function(col) {
+      _evtSource.addEventListener(col, function(e) {
+        _onPbRealtimeChange(col);
+      });
+    });
+
+    // Connection error → reconnect อัตโนมัติ
+    _evtSource.onerror = function() {
+      window._pbRealtimeActive = false;
+      _evtSource.close();
+      window._pbEvtSource = null;
+      const delay = _PB_REALTIME_RETRY_DELAYS[Math.min(_pbRealtimeRetryCount, _PB_REALTIME_RETRY_DELAYS.length - 1)];
+      _pbRealtimeRetryCount++;
+      if (_pbRealtimeRetryCount <= _PB_REALTIME_MAX_RETRY) {
+        console.warn('[PPP Realtime] Disconnected — reconnecting in ' + (delay/1000) + 's...');
+        setTimeout(_initPbRealtime, delay);
+      } else {
+        console.warn('[PPP Realtime] Max retries reached — falling back to polling only');
+      }
+    };
+
+    window._pbEvtSource = _evtSource;
+
+  } catch(err) {
+    window._pbRealtimeActive = false;
+    const delay = _PB_REALTIME_RETRY_DELAYS[Math.min(_pbRealtimeRetryCount, _PB_REALTIME_RETRY_DELAYS.length - 1)];
+    _pbRealtimeRetryCount++;
+    console.warn('[PPP Realtime] Init failed, retry in ' + (delay/1000) + 's:', err.message);
+    setTimeout(_initPbRealtime, delay);
+  }
+}
+
+function scheduleAutoRefresh() {
+  clearInterval(_refreshTimer);
+
+  // ── ฟังก์ชัน: fetch fresh แล้ว render ทันที ──
+  function _fetchDirectAndRender() {
+    if (_optimisticPending || _fetchingAll) return;
+    Cache.clearAll();
+    _fetchAllData(true).then(function() {
+      _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
+      _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
+      _refreshAllPages();
+      renderBirthdayBanners();
+    }).catch(function(){});
   }
 
-  // ── BroadcastChannel: same-origin instant signal ไม่ผ่าน CDN เลย ──
-  // ทำงานเหมือน YouTube — admin save → ทุก tab รู้ทันที ใน milliseconds
+  // ── BroadcastChannel: same-origin instant signal (same device, multi-tab) ──
   if (!window._pppBroadcast) {
     try {
       window._pppBroadcast = new BroadcastChannel('ppp_realtime');
@@ -3435,15 +3529,19 @@ function scheduleAutoRefresh() {
     });
   }
 
-  // ── Background polling: ทุก 30 วินาที ──
-  // safety net ถ้าไม่มี signal มา (เช่น เปิด tab ใหม่, หลัง network outage)
+  // ── PocketBase SSE Realtime: true real-time cross-device < 1s ──
+  // เริ่ม realtime connection (retry อัตโนมัติถ้า fail)
+  _initPbRealtime();
+
+  // ── Background polling: ทุก 5 นาที — safety net เท่านั้น ──
+  // SSE จัดการ real-time แล้ว polling นี้เป็นแค่ fallback ถ้า SSE หลุด
   _refreshTimer = setInterval(function() {
     if (document.hidden) return;
     if (_optimisticPending) return;
     if (!_fetchingAll) {
       _fetchAllData(true).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e); });
     }
-  }, 30 * 1000);
+  }, 5 * 60 * 1000); // 5 นาที (ลดจาก 30 วินาที เพราะ SSE จัดการแล้ว)
 
   // ── Precise midnight timer: fires exactly at 00:00:00 BKK ──
   _scheduleMidnightTimer();
