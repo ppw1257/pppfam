@@ -22,7 +22,6 @@
   <!-- DNS prefetch + preconnect for external assets -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://script.google.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
   <!-- โหลด font แบบ blocking เพื่อป้องกัน FOUT (font flash ที่ทำให้กระตุก) -->
@@ -1335,23 +1334,7 @@
       </div>
      </div>
 
-     <!-- FILTER BAR -->
-     <div style="margin-bottom:0.75rem;">
-      <div id="home-filter-bar" class="filter-bar" style="margin-bottom:6px;">
-       <button class="artist-filter-btn" data-artist="all" onclick="filterHome('all')"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.75rem;font-weight:700;cursor:pointer;">✦ All</button>
-       <button class="artist-filter-btn" data-artist="Pond" onclick="filterHome('Pond')"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>Pond</button>
-       <button class="artist-filter-btn" data-artist="Phuwin" onclick="filterHome('Phuwin')"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;flex-shrink:0;"></span>Phuwin</button>
-       <button class="artist-filter-btn" data-artist="Permpoon" onclick="filterHome('Permpoon')"
-         style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:0.75rem;font-weight:700;cursor:pointer;"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Permpoon</button>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-       <div id="events-count" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;"></div>
-
-      </div>
-     </div>
+     <!-- FILTER BAR REMOVED -->
      <div id="events-grid"></div>
      <div id="no-events" style="display:none;padding:3rem 1rem;">
       <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
@@ -2580,7 +2563,6 @@ let calMonth        = new Date().getMonth();
 let calYear         = new Date().getFullYear();
 let calSelectedDate = null;
 let calFilter       = 'all';
-let homeFilter      = 'all';
 let homeSearch      = '';
 
 
@@ -2692,10 +2674,10 @@ let _lucideTimer    = null;
 // ── CONFIGURE THESE TWO VALUES ────────────────────────────────────
 
 // Your Apps Script Web App URL (used for WRITE operations only)
-const APPS_SCRIPT_ADMIN_URL = 'https://script.google.com/macros/s/AKfycbxJ8wQWFvlNpWZwDlmt4E_H6lrnmOaocVDS8aTqQOe17gGgEagVJ_PeGgyfRx7msbLu/exec';
+const APPS_SCRIPT_ADMIN_URL = ''; // Removed — using PocketBase only
 
 // Base URL where your JSON files are served (used for READ operations)
-const JSON_BASE_URL = 'https://ppw1257.github.io/pppfam/data'; // GitHub Pages static JSON (fallback only)
+const JSON_BASE_URL = ''; // Removed — using PocketBase only
 
 // ── POCKETBASE CONFIG ─────────────────────────────────────────────
 const PB_URL = 'https://pocketbase-production-510d.up.railway.app';
@@ -2738,33 +2720,10 @@ async function fetchAllFromPocketBase() {
  * from the CDN/Drive. Falls back to Apps Script doGet if static URL fails.
  * This is the HIGH-TRAFFIC read path — no Apps Script quota consumed.
  */
-async function fetchStaticJSON(dataType) {
-  // dataType: 'events' | 'works' | 'birthdays' | 'anniversaries' | 'all'
-  const useAppsScriptFallback = (JSON_BASE_URL === APPS_SCRIPT_ADMIN_URL);
-  // Map dataType to action name
-  const actionMap = {
-    'events': 'getEvents', 'works': 'getWorks',
-    'birthdays': 'getBirthdays', 'anniversaries': 'getAnniversaries',
-    'all': 'getAll'
-  };
-  const action = actionMap[dataType] || ('get' + dataType.charAt(0).toUpperCase() + dataType.slice(1));
-
-  if (useAppsScriptFallback) {
-    const url = `${APPS_SCRIPT_ADMIN_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
-    return fetchWithTimeout(url);
-  } else {
-    const url = `${JSON_BASE_URL}/${dataType}.json?t=${Date.now()}`;
-    try {
-      return await fetchWithTimeout(url);
-    } catch(e) {
-      const fallbackUrl = `${APPS_SCRIPT_ADMIN_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
-      return fetchWithTimeout(fallbackUrl);
-    }
-  }
-}
+// fetchStaticJSON removed — using PocketBase only
 
 // Legacy alias — used by write operations (admin panel)
-const API_URL = APPS_SCRIPT_ADMIN_URL;
+// API_URL removed — using PocketBase only
 
 // ═══════════════════════════════════════════════════════════════════
 // CACHE LAYER — L2: localStorage with TTL + version control
@@ -2866,42 +2825,7 @@ const _actionToDataType = {
   'getAll':          'all',
 };
 
-async function apiGetWithRetry(action, retryIndex = 0) {
-  const dataType = _actionToDataType[action];
-  if (dataType) {
-    // ── READ path: fetch static JSON cache — no Apps Script quota consumed ──
-    try {
-      return await fetchStaticJSON(dataType);
-    } catch(e) {
-      try {
-        const url = `${API_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
-        return await fetchJSONP(url);
-      } catch(e2) {
-        if (retryIndex < RETRY_DELAYS.length) {
-          await delay(RETRY_DELAYS[retryIndex]);
-          return apiGetWithRetry(action, retryIndex + 1);
-        }
-        throw new Error(`Fetch failed after retries: ${action}`);
-      }
-    }
-  } else {
-    // Fallback for any action not in the static cache map
-    const url = `${API_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
-    try {
-      return await fetchWithTimeout(url);
-    } catch(e) {
-      try {
-        return await fetchJSONP(url);
-      } catch(e2) {
-        if (retryIndex < RETRY_DELAYS.length) {
-          await delay(RETRY_DELAYS[retryIndex]);
-          return apiGetWithRetry(action, retryIndex + 1);
-        }
-        throw new Error(`API failed after retries: ${action}`);
-      }
-    }
-  }
-}
+// apiGetWithRetry removed — using PocketBase only
 
 async function apiPostFetch(body) {
   const ctrl = new AbortController();
@@ -3161,155 +3085,18 @@ async function _fetchAllData(force = false) {
     }
     _scheduleEventStartTimers();
   } catch(e) {
-    console.warn('PocketBase fetch failed, trying fallback:', e.message);
-    // Fallback: GitHub Pages static JSON — ใช้แค่ events/birthdays/anniversaries
-    // ไม่นำ works จาก fallback มาเพราะอาจเป็นข้อมูลเก่าและทำให้การ์ดซ้ำ
-    try {
-      const t = Date.now();
-      const res2 = await fetchWithTimeout(`${JSON_BASE_URL}/all.json?t=${t}`);
-      // ลบ works ออกจาก fallback response เพื่อป้องกันการ์ดซ้ำ
-      if (res2 && res2.works) res2.works = [];
-      const dataChangedRef = { v: false };
-      _applyAllData(res2, force, dataChangedRef);
-      hideConnectionError();
-      if (dataChangedRef.v) {
-        _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
-        _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
-        scheduleRender();
-        renderBirthdayBanners();
-      }
-      _scheduleEventStartTimers();
-    } catch(e2) {
-      console.warn('Fetch failed:', e2.message);
-      showConnectionError();
-    }
+    console.warn('[PPP] PocketBase fetch failed:', e.message);
+    showConnectionError();
   } finally {
     _fetchingAll = false;
   }
 }
 
-async function loadEventsFromSheets(force = false) {
-  // L1: memory cache hit — only skip network if cache is also fresh
-  if (!force) {
-    const mem = _memCache.get('events');
-    if (mem && mem.length && Cache.isFresh(LC.TS_EV)) {
-      allEvents = mem; return; // truly fresh — no need to fetch
-    }
-    if (mem && mem.length) {
-      allEvents = mem; // serve stale from memory while we fetch below
-    }
-  }
-  // Rate limiter — hard block duplicate calls within TTL window
-  if (!force && !_rateLimit.allow('events')) return;
-  // Dedup guard — never run two fetches in parallel
-  if (_fetchingEvents) return;
-  // Skip if localStorage cache is fresh AND we have data
-  if (!force && Cache.isFresh(LC.TS_EV) && allEvents.length > 0) return;
+// loadEventsFromSheets removed — using _fetchAllData(true) instead
 
-  _fetchingEvents = true;
-  try {
-    const data = await apiGetWithRetry('getEvents');
-    if (data && data.status === 'ok') {
-      const raw = data.events || [];
-      const processed = processEvents(raw);
-      const prevFP = allEvents.length + '|' + (allEvents[0]?.__backendId || '');
-      const newFP  = processed.length + '|' + (processed[0]?.__backendId || '');
-      allEvents = processed;
-      _memCache.set('events', processed);   // L1 write
-      Cache.set(LC.EVENTS, processed);      // L2 write
-      Cache.setTS(LC.TS_EV);
-      apiLoaded = true;
-      // Clear memoize caches so new data renders fresh
-      _fmtDateCache.clear();
-      _escCache.clear();
-      hideConnectionError();
-      // Re-render เฉพาะเมื่อข้อมูลเปลี่ยน
-      if (newFP !== prevFP) {
-        _vsLastFingerprint = '';
-        _calLastFP = '';
-        _adminListFP = '';
-        scheduleRender();
-      }
-      _scheduleEventStartTimers();
-    }
-  } catch(e) {
-    console.warn('Events load failed:', e.message);
-    // If we have stale cache, use it silently
-    if (allEvents.length === 0) {
-      const stale = Cache.get(LC.EVENTS);
-      if (stale && stale.length) {
-        allEvents = stale; apiLoaded = true;
-        scheduleRender();
-        showStaleWarning();
-      } else {
-        showConnectionError();
-      }
-    }
-  } finally {
-    _fetchingEvents = false;
-  }
-}
+// loadBirthdaysFromSheets removed — using _fetchAllData(true) instead
 
-async function loadBirthdaysFromSheets(force = false) {
-  if (!force) {
-    const mem = _memCache.get('bdays');
-    if (mem && mem.length && Cache.isFresh(LC.TS_BD)) { allBirthdays = mem; return; }
-    if (mem && mem.length) { allBirthdays = mem; } // stale-while-revalidate
-    else {
-      const stale = Cache.get(LC.BDAYS);
-      if (stale && stale.length) { allBirthdays = stale; _memCache.set('bdays', stale); }
-    }
-  }
-  if (!force && !_rateLimit.allow('bdays')) return;
-  if (_fetchingBdays) return;
-  if (!force && Cache.isFresh(LC.TS_BD) && allBirthdays.length > 0) return;
-  _fetchingBdays = true;
-  try {
-    const data = await apiGetWithRetry('getBirthdays');
-    if (data && data.status === 'ok') {
-      allBirthdays = (data.birthdays || []).map(r => ({
-        __backendId: r.id || '',
-        artist_name: r.artist_name || '',
-        birthday_month: parseInt(r.birthday_month) || 0,
-        birthday_day:   parseInt(r.birthday_day)   || 0,
-        color: r.color || '#6b7280'
-      }));
-      _memCache.set('bdays', allBirthdays);
-      Cache.set(LC.BDAYS, allBirthdays);
-      Cache.setTS(LC.TS_BD);
-      renderBirthdayBanners();
-      renderAnniversaryAdmin();
-    }
-  } catch(e) { console.warn('Birthday load failed:', e.message); }
-  finally { _fetchingBdays = false; }
-}
-
-async function loadAnniversariesFromSheets(force = false) {
-  if (!force) { const mem = _memCache.get('annivs'); if (mem) { allAnniversaries = mem; return; } }
-  if (!force && !_rateLimit.allow('annivs')) return;
-  if (_fetchingAnnivs) return;
-  if (!force && Cache.isFresh(LC.TS_AN) && allAnniversaries.length > 0) return;
-  _fetchingAnnivs = true;
-  try {
-    const data = await apiGetWithRetry('getAnniversaries');
-    if (data && data.status === 'ok') {
-      allAnniversaries = (data.anniversaries || []).map(r => ({
-        __backendId: r.id || '',
-        anniversary_name:  r.anniversary_name  || '',
-        anniversary_month: parseInt(r.anniversary_month) || 0,
-        anniversary_day:   parseInt(r.anniversary_day)   || 0,
-        anniversary_year:  r.anniversary_year ? parseInt(r.anniversary_year) : null,
-        color: r.color || '#a855f7'
-      }));
-      _memCache.set('annivs', allAnniversaries);
-      Cache.set(LC.ANNIVS, allAnniversaries);
-      Cache.setTS(LC.TS_AN);
-      renderBirthdayBanners();
-      renderAnniversaryAdmin();
-    }
-  } catch(e) { console.warn('Anniversary load failed:', e.message); }
-  finally { _fetchingAnnivs = false; }
-}
+// loadAnniversariesFromSheets removed — using _fetchAllData(true) instead
 
 // ── Admin write operations (PocketBase direct) ───────────────────
 async function pbGetToken() {
@@ -3975,11 +3762,11 @@ async function handleTrendFormSubmit() {
     renderAdminTrendList();
     debounceLucide();
 
-    // sync server ข้างหลัง — replace ด้วยข้อมูลจริงเงียบๆ ถ้าต่างกัน
+    // sync server ข้างหลัง — ดึงจาก PocketBase
     try {
-      const fresh = await fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getTrends&t=' + Date.now(), 15000);
-      if (fresh && fresh.status === 'ok' && Array.isArray(fresh.trends)) {
-        const newTrends = fresh.trends.map(t => Object.assign({ __backendId: t.id||'' }, t, { image: _pbFileUrl(t, t.image||'') }));
+      const freshRes = await fetchAllFromPocketBase();
+      if (freshRes && Array.isArray(freshRes.trends)) {
+        const newTrends = freshRes.trends.map(t => Object.assign({ __backendId: t.id||'' }, t, { image: _pbFileUrl(t, t.image||'') }));
         const _fpTr = arr => arr.length + '|' + arr.map(t => (t.__backendId||t.id||'') + ':' + (t.caption||'')).join(',');
         if (_fpTr(newTrends) !== _fpTr(allTrends.filter(t => !t.__isOptimistic))) {
           allTrends = newTrends;
@@ -4019,12 +3806,12 @@ async function deleteTrend(id, title) {
   }
 }
 
-// ── Load from Apps Script ─────────────────────────────────────────
+// ── Load from PocketBase ─────────────────────────────────────────
 async function loadTrendsFromSheets(force = false) {
   if (trendsLoaded && !force) return;
   try {
-    const res = await fetchWithTimeout(`${APPS_SCRIPT_ADMIN_URL}?action=getTrends&t=${Date.now()}`, 12000);
-    if (res && res.status === 'ok' && Array.isArray(res.trends)) {
+    const res = await fetchAllFromPocketBase();
+    if (res && Array.isArray(res.trends)) {
       allTrends = res.trends.map(t => Object.assign({ __backendId: t.id||'' }, t, { image: _pbFileUrl(t, t.image||'') }));
       trendsLoaded = true;
       renderTrend();
@@ -4261,10 +4048,6 @@ function renderHome() {
   const events = allEvents.filter(ev => {
     if (!ev.title) return false;
     if (isEventPast(ev)) return false;
-    if (homeFilter !== 'all') {
-      if (!ev.artists) return false;
-      if (!ev.artists.split(',').map(a => a.trim()).includes(homeFilter)) return false;
-    }
     if (q) {
       const haystack = (ev.title + ' ' + (ev.location||'') + ' ' + (ev.city||'') + ' ' + (ev.country||'') + ' ' + (ev.artists||'') + ' ' + (ev.type||'') + ' ' + (ev.tv||'')).toLowerCase();
       if (!haystack.includes(q)) return false;
@@ -4295,25 +4078,7 @@ function renderHome() {
   const count = document.getElementById('events-count');
   if (!grid) return;
 
-  if (count) {
-    if (homeFilter === 'all') {
-      // Show per-artist colored pills
-      const upAll2 = allEvents.filter(ev => ev.title && !isEventPast(ev));
-      const cP  = upAll2.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Pond')).length;
-      const cPh = upAll2.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Phuwin')).length;
-      const cPe = upAll2.filter(ev => ev.artists?.split(',').map(a=>a.trim()).includes('Permpoon')).length;
-      count.innerHTML = [
-        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#f97316;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Pond · ${cP}</span>`,
-        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#64748b;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Phuwin · ${cPh}</span>`,
-        `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:#22c55e;border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">Permpoon · ${cPe}</span>`,
-      ].join('');
-    } else {
-      // Single pill with artist color
-      const _pillColor = { Pond: '#f97316', Phuwin: '#64748b', Permpoon: '#22c55e' };
-      const pillColor = _pillColor[homeFilter] || '#111';
-      count.innerHTML = `<span style="font-size:0.68rem;font-weight:700;color:#fff;background:${pillColor};border-radius:99px;padding:3px 11px;letter-spacing:0.02em;white-space:nowrap;">${homeFilter} · ${events.length}</span>`;
-    }
-  }
+  if (count) { count.innerHTML = ''; }
 
   // ── Bento grid update ──
   const upAll = allEvents.filter(ev => ev.title && !isEventPast(ev));
@@ -4488,7 +4253,7 @@ let _vsLastFingerprint = ''; // skip re-render when event list unchanged
 
 function _vsComputeFingerprint(groups) {
   // Include viewMode and filter so switching tab/filter always re-renders
-  return _viewMode + '|' + homeFilter + '|' + homeSearch + '|' +
+  return _viewMode + '|' + homeSearch + '|' +
     groups.filter(g => g.type === 'card').map(g => g.ev.__backendId + ':' + (g.ev._isPast?1:0)).join('|');
 }
 
@@ -4588,15 +4353,10 @@ function _observeLazyImages(root) {
 }
 
 function renderPastEvents(grid) {
-  const pastFilter = homeFilter === 'all' ? null : homeFilter;
   const q = homeSearch.trim().toLowerCase();
   let pastEvs = allEvents.filter(ev => {
     if (!ev.title || !ev.title.trim()) return false;
     if (!isEventPast(ev)) return false;
-    if (pastFilter) {
-      if (!ev.artists) return false;
-      if (!ev.artists.split(',').map(a=>a.trim()).includes(pastFilter)) return false;
-    }
     if (q) {
       const hay = [ev.title, ev.location, ev.city, ev.artists].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
@@ -4939,7 +4699,7 @@ function startCardCountdowns() {
       if (stillUpcoming.length === 0) {
         Cache.del(LC.TS_EV);
         _memCache.del('events');
-        loadEventsFromSheets(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
+        _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
       }
       if (!window._cdRenderPending) {
         window._cdRenderPending = true;
@@ -5755,38 +5515,6 @@ function nextMonth() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} calSel
 // ═══════════════════════════════════════════════════════════════════
 // FILTER HANDLERS — debounced renders
 // ═══════════════════════════════════════════════════════════════════
-function filterHome(artist) {
-  homeFilter = artist;
-  _vsLastFingerprint = '';
-  const artistBtnColors = {
-    'Pond':     { bg:'#fff7ed', color:'#c2410c', border:'#fed7aa' },
-    'Phuwin':   { bg:'#f1f5f9', color:'#334155', border:'#cbd5e1' },
-    'Permpoon': { bg:'#f0fdf4', color:'#15803d', border:'#bbf7d0' },
-  };
-  const artistActiveColors = { 'Pond':{ bg:'#f97316',color:'#fff',border:'#ea6a0a' },'Phuwin':{ bg:'#475569',color:'#fff',border:'#334155' },'Permpoon':{ bg:'#16a34a',color:'#fff',border:'#15803d' } };
-  document.querySelectorAll('.artist-filter-btn').forEach(btn => {
-    const a = btn.dataset.artist;
-    if (a === artist) {
-      const ac = artistActiveColors[a] || { bg:'#111', color:'#fff', border:'#111' };
-      btn.style.background = ac.bg; btn.style.color = ac.color; btn.style.borderColor = ac.border;
-    } else {
-      const c = artistBtnColors[a] || { bg:'#f9fafb', color:'#6b7280', border:'#e5e7eb' };
-      btn.style.background = c.bg; btn.style.color = c.color; btn.style.borderColor = c.border;
-    }
-  });
-  // Bento card active state
-  const bentoMap = { Pond:'pond', Phuwin:'phuwin', Permpoon:'permpoon', all:'total' };
-  const colorMap = { pond:'#f97316', phuwin:'#6b7280', permpoon:'#22c55e', total:'#a855f7' };
-  ['pond','phuwin','permpoon','total'].forEach(k => {
-    const c = document.getElementById('bento-card-'+k);
-    if (!c) return;
-    const isActive = bentoMap[artist] === k;
-    c.style.boxShadow = isActive ? `0 0 0 2px ${colorMap[k]}` : 'none';
-    c.style.transform = isActive ? 'scale(1.015)' : 'scale(1)';
-    c.style.borderColor = isActive ? colorMap[k] : '#f0f0f0';
-  });
-  scheduleRender();
-}
 
 let _searchDebounce = null;
 function onHomeSearch(val) {
@@ -6295,7 +6023,7 @@ function startDelete(k)  { deleteConfirmIds.add(k);    const r=document.querySel
 function cancelDelete(k) { deleteConfirmIds.delete(k); const r=document.querySelector(`#admin-events-list [data-event-id="${k}"]`); const e=findEventByKey(k); if(r&&e)updateAdminRow(r,e); }
 async function confirmDelete(key) {
   const ev = findEventByKey(key);
-  if (!ev) { deleteConfirmIds.delete(key); await loadEventsFromSheets(true); return; }
+  if (!ev) { deleteConfirmIds.delete(key); await _fetchAllData(true); return; }
   deleteConfirmIds.delete(key);
   const rowEl = document.querySelector(`#admin-events-list [data-event-id="${key}"]`);
   if (rowEl) rowEl.style.opacity = '0.5';
@@ -6481,7 +6209,7 @@ async function adminRefresh() {
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-top-color:#111;"></span>'; }
   Cache.clearAll(); _fetchingEvents = false; _fetchingBdays = false; _fetchingAnnivs = false;
   try { await apiPost({ action: 'clearCache' }); } catch(e) {}
-  await loadEventsFromSheets(true);
+  await _fetchAllData(true);
   if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="refresh-cw" style="width:14px;height:14px;"></i>Refresh'; debounceLucide(); }
   showToast('Refreshed ✓');
 }
@@ -6508,12 +6236,7 @@ function navigate(page) {
     debounceLucide();
     // refresh ข้างหลังทันที ไม่ block UI
     if (!_fetchingAll && !_optimisticPending) {
-      fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now(), 12000)
-        .then(function(res) {
-          var ref = { v: false };
-          _applyAllData(res, true, ref);
-          if (ref.v) { renderTrend(); renderAdminTrendList(); debounceLucide(); }
-        }).catch(function() { _fetchAllData(true).catch(function(){}); });
+      _fetchAllData(true).catch(function(){});
     }
     return;
   }
@@ -7819,20 +7542,10 @@ document.addEventListener('visibilitychange', () => {
     if (_optimisticPending) return;
     if (_fetchingAll) return;
     Cache.clearAll();
-    // ดึง Apps Script โดยตรง ไม่รอ GitHub Pages CDN
-    fetchWithTimeout(APPS_SCRIPT_ADMIN_URL + '?action=getAll&fresh=1&t=' + Date.now(), 12000)
-      .then(function(res) {
-        var ref = { v: false };
-        _applyAllData(res, true, ref);
-        if (ref.v) {
-          _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
-          _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
-          _refreshAllPages();
-          renderBirthdayBanners();
-        }
-      })
-      .catch(function() {
-        _fetchAllData(true).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e); });
+    _fetchAllData(true).then(function() {
+      _refreshAllPages();
+      renderBirthdayBanners();
+    }).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e);
       });
   }
 });
@@ -7872,7 +7585,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── STEP 1: Try to load from cache immediately (< 5ms, zero network) ──
-  homeFilter = 'all';
   const cacheHit = _fastHydrateFromCache();
 
   // ── หลัง cache hydrate แล้วค่อย render works list (ให้ allWorks มีข้อมูลก่อน) ──
