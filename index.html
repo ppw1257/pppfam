@@ -9,21 +9,21 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>PondPhuwinPermpoon Schedule</title>
+  <title>PPP Family</title>
   <!-- PWA / installable — enables instant load from home screen -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="PPP Schedule">
-  <link rel="manifest" href='data:application/manifest+json,{"name":"PondPhuwinPermpoon Schedule","short_name":"PPP Schedule","start_url":"/","display":"standalone","theme_color":"#ffffff","background_color":"#ffffff","icons":[{"src":"https://pocketbase-production-510d.up.railway.app/favicon.png","sizes":"192x192","type":"image/png"}]}'>
+  <meta name="apple-mobile-web-app-title" content="PPP Family">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"PPP Family","short_name":"PPP Family","start_url":"/","display":"standalone","theme_color":"#ffffff","background_color":"#ffffff","icons":[{"src":"https://pocketbase-production-510d.up.railway.app/favicon.png","sizes":"192x192","type":"image/png"}]}'>
   <!-- Open Graph for social sharing -->
-  <meta property="og:title" content="PondPhuwinPermpoon Schedule">
+  <meta property="og:title" content="PPP Family">
   <meta property="og:description" content="Pond · Phuwin · Permpoon — Events & Schedule 2026">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://pocketbase-production-510d.up.railway.app">
   <meta property="og:image" content="https://pocketbase-production-510d.up.railway.app/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PondPhuwinPermpoon Schedule">
+  <meta name="twitter:title" content="PPP Family">
   <meta name="twitter:description" content="Pond · Phuwin · Permpoon — Events & Schedule 2026">
   <!-- DNS prefetch + preconnect for external assets -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1204,7 +1204,7 @@
         <div style="width:7px;height:7px;border-radius:50%;background:#94a3b8;"></div>
         <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
       </div>
-      <span id="nav-site-title">PPP Schedule</span>
+      <span id="nav-site-title">PPP Family</span>
      </div>
      <div class="nav-links-wrap" id="nav-links">
       <span class="nav-link active" data-page="home" onclick="navigate('home')"><i data-lucide="home" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label" >Home</span></span>
@@ -6740,9 +6740,9 @@ function showToast(msg) {
 try {
   if (window.elementSdk) {
     window.elementSdk.init({
-      defaultConfig: { site_title:'PondPhuwinPermpoon Schedule', site_tagline:'Pond · Phuwin · Permpoon' },
+      defaultConfig: { site_title:'PPP Family', site_tagline:'Pond · Phuwin · Permpoon' },
       onConfigChange: async (config) => {
-        const t  = config.site_title  || 'PondPhuwinPermpoon Schedule';
+        const t  = config.site_title  || 'PPP Family';
         const tl = config.site_tagline || 'Pond · Phuwin · Permpoon';
         const navEl    = document.getElementById('nav-site-title');
         const titleEl  = document.getElementById('home-title');
@@ -6753,7 +6753,7 @@ try {
       },
       mapToCapabilities: () => ({ recolorables:[], borderables:[] }),
       mapToEditPanelValues: (config) => new Map([
-        ['site_title',   config.site_title   || 'PondPhuwinPermpoon Schedule'],
+        ['site_title',   config.site_title   || 'PPP Family'],
         ['site_tagline', config.site_tagline  || 'Pond · Phuwin · Permpoon']
       ])
     });
