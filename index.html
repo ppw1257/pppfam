@@ -2711,8 +2711,10 @@ const PB_URL = 'https://pocketbase-production-510d.up.railway.app';
 async function fetchFromPocketBase(collection, perPage = 500) {
   let allItems = [];
   let page = 1;
+  // เรียงตาม release_date จากใหม่ไปเก่า สำหรับ works
+  const sortParam = collection === 'works' ? '&sort=-release_date' : '';
   while (true) {
-    const res = await fetchWithTimeout(`${PB_URL}/api/collections/${collection}/records?perPage=${perPage}&page=${page}`);
+    const res = await fetchWithTimeout(`${PB_URL}/api/collections/${collection}/records?perPage=${perPage}&page=${page}${sortParam}`);
     const items = res.items || [];
     allItems = allItems.concat(items);
     if (allItems.length >= (res.totalItems || 0) || items.length < perPage) break;
@@ -7399,11 +7401,8 @@ function renderWorks() {
     return c;
   }
 
-  // Default ไปที่ปีปัจจุบันถ้า _worksYear เป็น 'all' หรือปีเก่า
   const _currentYear = String(new Date().getFullYear());
-  const _effectiveYear = (!_worksYear || _worksYear === 'all' || Number(_worksYear) < Number(_currentYear))
-    ? _currentYear
-    : _worksYear;
+  const _effectiveYear = _worksYear || _currentYear;
 
   let filtered = allWorks;
   // กรองปีเฉพาะเมื่อ: เลือกปีเฉพาะ (ไม่ใช่ all)
@@ -7422,17 +7421,18 @@ function renderWorks() {
     return w.artists.split(',').map(a=>a.trim()).includes(_worksArtist);
   });
 
-  // Sort: newest release_date first within each year
-  const _origOrder = new Map(filtered.map((w, i) => [w.__backendId || w.rowNumber || i, i]));
+  // Sort: newest release_date first (รองรับทั้ง YYYY-MM-DD และ ISO datetime จาก PocketBase)
+  const _toDateStr = v => v ? String(v).slice(0, 10) : '';
+  const _origOrder = new Map(filtered.map((w, i) => [w.__backendId || w.__rowNumber || i, i]));
   filtered = [...filtered].sort((a, b) => {
-    const da = a.release_date || '';
-    const db = b.release_date || '';
+    const da = _toDateStr(a.release_date);
+    const db = _toDateStr(b.release_date);
     if (da && db) return db.localeCompare(da);
     if (da) return -1;
     if (db) return 1;
-    const ia = _origOrder.get(a.__backendId || a.rowNumber) ?? 0;
-    const ib = _origOrder.get(b.__backendId || b.rowNumber) ?? 0;
-    return ia - ib;
+    const ia = _origOrder.get(a.__backendId || a.__rowNumber) ?? 0;
+    const ib = _origOrder.get(b.__backendId || b.__rowNumber) ?? 0;
+    return ib - ia;
   });
 
   if (filtered.length === 0) {
@@ -7442,7 +7442,7 @@ function renderWorks() {
   }
   if (empty) empty.style.display = 'none';
 
-  // Group by year, sorted descending (latest first)
+  // Group by year — ใช้ลำดับจาก filtered (ที่ sort แล้ว) ไม่ sort ใหม่
   const yearMap = {};
   filtered.forEach(w => {
     const y = w.year || 'Unknown';
@@ -7535,19 +7535,17 @@ function renderWorks() {
   const flatGrid = document.createElement('div');
   flatGrid.style.cssText = gridCols;
   flatGrid.className = 'works-year-grid';
-  years.forEach(year => {
-    yearMap[year].forEach(w => {
+  filtered.forEach(w => {
       const card = buildCard(w);
       const thumb = card.querySelector('div[style*="aspect-ratio"]');
       if (thumb) {
         thumb.style.position = 'relative';
         const badge = document.createElement('span');
-        badge.textContent = w.year || year;
+        badge.textContent = w.year || '';
         badge.style.cssText = 'position:absolute;top:6px;right:6px;font-size:0.6rem;font-weight:800;background:#111;color:#fff;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;z-index:2;pointer-events:none;';
         thumb.appendChild(badge);
       }
       flatGrid.appendChild(card);
-    });
   });
   _wFrag.appendChild(flatGrid);
 
