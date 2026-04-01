@@ -3653,8 +3653,8 @@ function renderTrend() {
       : `style="cursor:default;"`;
     return `<div class="event-card" ${cardClick}>
       ${t.image
-        ? `<div style="width:100%;flex-shrink:0;overflow:hidden;background:#f8f9fa;border-radius:var(--radius-card) var(--radius-card) 0 0;">
-             <img src="${escHtml(t.image)}" style="width:100%;height:auto;display:block;object-fit:contain;" loading="lazy" onerror="_onImgError(this)">
+        ? `<div style="width:100%;height:180px;flex-shrink:0;overflow:hidden;background:#f8f9fa;border-radius:var(--radius-card) var(--radius-card) 0 0;">
+             <img src="${escHtml(t.image)}" style="width:100%;height:100%;display:block;object-fit:cover;object-position:top center;" loading="lazy" onerror="_onImgError(this)">
            </div>`
         : `<div style="height:4px;background:${mainColor};flex-shrink:0;"></div>`}
       <div style="padding:0.65rem 0.75rem;display:flex;flex-direction:column;flex:1;">
@@ -7422,17 +7422,17 @@ function renderWorks() {
     return w.artists.split(',').map(a=>a.trim()).includes(_worksArtist);
   });
 
-  // Sort: newest release_date first within each year
-  const _origOrder = new Map(filtered.map((w, i) => [w.__backendId || w.rowNumber || i, i]));
+  // Sort: newest first — ใช้ index ใน allWorks (แถวล่างสุดใน Sheet = ใหม่สุด = index สูงสุด)
+  const _globalOrder = new Map(allWorks.map((w, i) => [w.__backendId || w.rowNumber || i, i]));
   filtered = [...filtered].sort((a, b) => {
     const da = a.release_date || '';
     const db = b.release_date || '';
     if (da && db) return db.localeCompare(da);
     if (da) return -1;
     if (db) return 1;
-    const ia = _origOrder.get(a.__backendId || a.rowNumber) ?? 0;
-    const ib = _origOrder.get(b.__backendId || b.rowNumber) ?? 0;
-    return ia - ib;
+    const ia = _globalOrder.get(a.__backendId || a.rowNumber) ?? 0;
+    const ib = _globalOrder.get(b.__backendId || b.rowNumber) ?? 0;
+    return ib - ia;  // index สูง = แถวใหม่กว่า → ขึ้นก่อน
   });
 
   if (filtered.length === 0) {
