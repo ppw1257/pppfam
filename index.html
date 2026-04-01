@@ -1180,7 +1180,7 @@
   #works-grid .cal-ev-card-img {
     height: clamp(80px, 28vw, 180px) !important;
     object-fit: cover !important;
-    object-position: top center !important;
+    object-position: center !important;
   }
   #works-grid .cal-ev-card-body {
     padding: clamp(5px, 1.5vw, 10px) clamp(6px, 1.8vw, 12px) !important;
@@ -2447,8 +2447,18 @@
        <div style="grid-column:1/-1;">
         <label class="form-label">Image URL</label>
         <input class="form-input" id="wf-image" name="image" placeholder="https://....jpg" oninput="previewWorksImg()">
-        <div id="wf-prev-image" style="display:none;margin-top:8px;border-radius:8px;overflow:hidden;max-height:140px;">
-         <img id="wf-prev-img-tag" style="width:100%;height:140px;object-fit:cover;object-position:top;display:block;" onerror="document.getElementById('wf-prev-image').style.display='none'">
+        <div id="wf-prev-image" style="display:none;margin-top:8px;">
+         <div style="font-size:0.72rem;font-weight:600;color:#6b7280;margin-bottom:5px;display:flex;align-items:center;gap:6px;">
+           <span>&#128205;</span><span>ลากจุดเพื่อเลือกตำแหน่งรูป</span>
+           <span id="wf-pos-label" style="margin-left:auto;font-size:0.68rem;color:#9ca3af;font-weight:400;font-family:monospace;"></span>
+         </div>
+         <div id="wf-pos-picker" style="position:relative;border-radius:10px;overflow:hidden;cursor:crosshair;user-select:none;touch-action:none;height:160px;background:#f3f4f6;">
+           <img id="wf-prev-img-tag" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;" onerror="document.getElementById('wf-prev-image').style.display='none'">
+           <div id="wf-pos-hline" style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,0.5);pointer-events:none;"></div>
+           <div id="wf-pos-vline" style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.5);pointer-events:none;"></div>
+           <div id="wf-pos-dot" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #f97316;box-shadow:0 2px 8px rgba(0,0,0,0.35);pointer-events:none;"></div>
+         </div>
+         <input type="hidden" id="wf-image-position" value="50% 50%">
         </div>
        </div>
        <div>
@@ -5635,8 +5645,59 @@ function previewWorksImg() {
   const img  = document.getElementById('wf-prev-img-tag');
   if (!url || !wrap || !img) { if(wrap) wrap.style.display='none'; return; }
   img.src = url;
-  img.onload  = () => { wrap.style.display = 'block'; };
+  img.onload  = () => { wrap.style.display = 'block'; _initPosPicker(); };
   img.onerror = () => { wrap.style.display = 'none'; };
+}
+
+function _initPosPicker() {
+  const hidden = document.getElementById('wf-image-position');
+  const label  = document.getElementById('wf-pos-label');
+  if (!document.getElementById('wf-pos-picker')) return;
+
+  // Parse saved value
+  const parts = (hidden ? hidden.value : '50% 50%').split(' ');
+  const initX = parseFloat(parts[0]) || 50;
+  const initY = parseFloat(parts[1]) || 50;
+
+  // Clone picker to remove old listeners
+  const oldPicker = document.getElementById('wf-pos-picker');
+  const newPicker = oldPicker.cloneNode(true);
+  oldPicker.parentNode.replaceChild(newPicker, oldPicker);
+
+  const picker = document.getElementById('wf-pos-picker');
+  const dot    = document.getElementById('wf-pos-dot');
+  const hline  = document.getElementById('wf-pos-hline');
+  const vline  = document.getElementById('wf-pos-vline');
+  const img    = document.getElementById('wf-prev-img-tag');
+
+  function applyPos(xPct, yPct) {
+    xPct = Math.max(0, Math.min(100, xPct));
+    yPct = Math.max(0, Math.min(100, yPct));
+    if (dot)   { dot.style.left = xPct + '%'; dot.style.top = yPct + '%'; }
+    if (hline) hline.style.top  = yPct + '%';
+    if (vline) vline.style.left = xPct + '%';
+    const val = Math.round(xPct) + '% ' + Math.round(yPct) + '%';
+    if (hidden) hidden.value = val;
+    if (label)  label.textContent = val;
+    if (img)    img.style.objectPosition = val;
+  }
+  applyPos(initX, initY);
+
+  let dragging = false;
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    const rect = picker.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    applyPos(((cx - rect.left) / rect.width) * 100, ((cy - rect.top) / rect.height) * 100);
+  }
+  picker.addEventListener('mousedown',  (e) => { dragging = true; onMove(e); if(dot) dot.style.boxShadow='0 0 0 5px rgba(249,115,22,0.25),0 2px 8px rgba(0,0,0,0.35)'; });
+  picker.addEventListener('touchstart', (e) => { dragging = true; onMove(e); }, { passive: false });
+  window.addEventListener('mousemove',  onMove);
+  window.addEventListener('touchmove',  onMove, { passive: false });
+  window.addEventListener('mouseup',  () => { dragging = false; if(dot) dot.style.boxShadow='0 2px 8px rgba(0,0,0,0.35)'; });
+  window.addEventListener('touchend', () => { dragging = false; });
 }
 
 function openWorksPreviewPopup() {
@@ -6840,7 +6901,7 @@ function openEditWorksModal(work) {
   // clear preview image
   const prevImg = document.getElementById('wf-prev-image');
   if (prevImg) prevImg.style.display = 'none';
-  if (work.image) previewWorksImg();
+  if (work.image) { previewWorksImg(); setTimeout(_initPosPicker, 150); }
   const modal = _dom('works-form-modal');
   modal.style.display = 'flex';
   // Reset scroll to top of modal box
@@ -6867,6 +6928,7 @@ function _clearWorksForm() {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.querySelectorAll('.artist-check-w').forEach(c => c.checked = false);
+  const _posReset = document.getElementById('wf-image-position'); if(_posReset) _posReset.value = '50% 50%';
 }
 
 function _fillWorksForm(w) {
@@ -6888,6 +6950,7 @@ function _fillWorksForm(w) {
     if (_txt) { _txt.style.color = _isEnded ? '#334155' : '#6b7280'; _txt.textContent = (_isEnded && _hiddenDate.value) ? 'Contract Ended · ' + _hiddenDate.value : 'Contract Ended'; }
   }
   set('wf-description', w.description); set('wf-category', w.category); set('wf-type', w.type);
+  const _posEl = document.getElementById('wf-image-position'); if(_posEl) _posEl.value = w.image_position || '50% 50%';
   const artistArr = (w.artists||'').split(',').map(a=>a.trim());
   document.querySelectorAll('.artist-check-w').forEach(c => { c.checked = artistArr.includes(c.value); });
 }
@@ -6899,7 +6962,7 @@ function _readWorksForm() {
     title: gv('wf-title'), category: gv('wf-category'), year: gv('wf-year'),
     artists, brand: gv('wf-brand'), magazine: gv('wf-magazine'),
     type: gv('wf-type'), role: gv('wf-role'), project: gv('wf-project'),
-    image: gv('wf-image'), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');if(!_cb||!_cb.checked)return '';const _ex=document.getElementById('wf-contractEndDate');if(_ex&&_ex.value)return _ex.value;const _d=new Date();return _d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');})(), link: gv('wf-link'),
+    image: gv('wf-image'), image_position: (()=>{ const _p=document.getElementById('wf-image-position'); return _p?_p.value:'50% 50%'; })(), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');if(!_cb||!_cb.checked)return '';const _ex=document.getElementById('wf-contractEndDate');if(_ex&&_ex.value)return _ex.value;const _d=new Date();return _d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');})(), link: gv('wf-link'),
     description: gv('wf-description')
   };
 }
@@ -7505,7 +7568,7 @@ function renderWorks() {
       : '';
 
     const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)"></div>`
+      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
     const wab = getArtistBg(w.artists);
