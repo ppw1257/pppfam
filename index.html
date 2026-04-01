@@ -7422,24 +7422,21 @@ function renderWorks() {
     return w.artists.split(',').map(a=>a.trim()).includes(_worksArtist);
   });
 
-  // Sort: newest first — ใช้ release_date ก่อน ถ้าไม่มีใช้ created จาก PocketBase
-  const _globalOrder = new Map(allWorks.map((w, i) => [w.__backendId || w.rowNumber || i, i]));
+  // Sort: เรียงตามวันที่ล่าสุดก่อนเสมอ
+  // ใช้ release_date ถ้ามี, ถ้าไม่มีใช้ year + '-12-31' แทน, ถ้าไม่มีทั้งคู่ใช้ created
+  function _workSortKey(w) {
+    if (w.release_date) return w.release_date;
+    if (w.year)         return String(w.year) + '-12-31';
+    if (w.created)      return w.created.slice(0, 10);
+    return '0000-01-01';
+  }
   filtered = [...filtered].sort((a, b) => {
-    const da = a.release_date || '';
-    const db = b.release_date || '';
-    if (da && db) return db.localeCompare(da);
-    if (da) return -1;
-    if (db) return 1;
-    // fallback: ใช้ created timestamp จาก PocketBase (ใหม่สุดขึ้นก่อน)
+    const da = _workSortKey(a);
+    const db = _workSortKey(b);
+    if (da !== db) return db.localeCompare(da);
     const ca = a.created || '';
     const cb = b.created || '';
-    if (ca && cb) return cb.localeCompare(ca);
-    if (ca) return -1;
-    if (cb) return 1;
-    // last resort: index ใน allWorks (สูง = แถวใหม่กว่า)
-    const ia = _globalOrder.get(a.__backendId || a.rowNumber) ?? 0;
-    const ib = _globalOrder.get(b.__backendId || b.rowNumber) ?? 0;
-    return ib - ia;
+    return cb.localeCompare(ca);
   });
 
   if (filtered.length === 0) {
