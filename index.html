@@ -15,10 +15,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="PPP Schedule">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"PondPhuwinPermpoon Schedule","short_name":"PPP Schedule","start_url":"/","display":"standalone","theme_color":"#ffffff","background_color":"#ffffff","icons":[{"src":"https://pocketbase-production-510d.up.railway.app/favicon.png","sizes":"192x192","type":"image/png"}]}'>
   <!-- Open Graph for social sharing -->
   <meta property="og:title" content="PondPhuwinPermpoon Schedule">
   <meta property="og:description" content="Pond · Phuwin · Permpoon — Events & Schedule 2026">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pocketbase-production-510d.up.railway.app">
+  <meta property="og:image" content="https://pocketbase-production-510d.up.railway.app/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PondPhuwinPermpoon Schedule">
+  <meta name="twitter:description" content="Pond · Phuwin · Permpoon — Events & Schedule 2026">
   <!-- DNS prefetch + preconnect for external assets -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1255,21 +1261,21 @@
   /* ── Trend card grid: responsive ── */
   #trend-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)) !important;
-    gap: 14px !important;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)) !important;
+    gap: 8px !important;
     align-items: start !important;
   }
   @media (max-width: 480px) {
-    #trend-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    #trend-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
   }
   @media (min-width: 481px) and (max-width: 700px) {
-    #trend-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    #trend-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 7px !important; }
   }
   @media (min-width: 701px) and (max-width: 1000px) {
-    #trend-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    #trend-grid { grid-template-columns: repeat(4, 1fr) !important; }
   }
   @media (min-width: 1001px) {
-    #trend-grid { grid-template-columns: repeat(4, 1fr) !important; }
+    #trend-grid { grid-template-columns: repeat(6, 1fr) !important; }
   }
   .trend-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12) !important; transform: translateY(-3px) !important; }
   </style>
@@ -1602,7 +1608,7 @@
       <p style="font-size:0.78rem;color:#9ca3af;font-weight:500;margin:0 0 0.75rem;">A summary of trending posts from the past 24 hours</p>
       <div id="trend-filter-bar" class="filter-bar" style="margin-bottom:6px;"></div>
      </div>
-     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;"></div>
+     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:8px;"></div>
      <div id="trend-empty" style="display:none;text-align:center;padding:4rem 1rem;color:#9ca3af;">
       <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 1rem;display:block;opacity:0.4;"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
       <p style="font-weight:600;color:#6b7280;">ยังไม่มีข้อมูล Trend</p>
@@ -3601,12 +3607,11 @@ function renderTrend() {
   const _trendBase = _trendFilter === 'all'
     ? allTrends.slice()
     : allTrends.filter(t => (t.artists||'').split(',').map(a=>a.trim()).includes(_trendFilter));
+  const _toD = v => v ? String(v).slice(0, 10) : '';
   const filtered = _trendBase.sort((a, b) => {
-    const da = a.date || '';
-    const db = b.date || '';
-    if (db > da) return 1;
-    if (db < da) return -1;
-    return 0;
+    const da = _toD(a.date);
+    const db = _toD(b.date);
+    return db > da ? 1 : db < da ? -1 : 0;
   });
 
   if (!filtered.length) {
@@ -3618,7 +3623,7 @@ function renderTrend() {
 
   // ── Responsive card grid — set once, ไม่ override CSS ซ้ำ ──
   if (!grid.dataset.styled) {
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;';
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:8px;';
     grid.dataset.styled = '1';
   }
 
@@ -3635,7 +3640,7 @@ function renderTrend() {
 
     // Artist badges row
     const badgesHtml = artists.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
-      ${artists.map(a => `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:0.65rem;font-weight:700;background:${artistBg[a]||'#f3f4f6'};color:${artistTextColor[a]||'#374151'};border:1px solid ${artistBorder[a]||'#e5e7eb'};"><span style="width:5px;height:5px;border-radius:50%;background:${artistColor[a]||'#6b7280'};display:inline-block;flex-shrink:0;"></span>${a}</span>`).join('')}
+      ${artists.map(a => `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:0.6rem;font-weight:700;background:${artistBg[a]||'#f3f4f6'};color:${artistTextColor[a]||'#374151'};border:1px solid ${artistBorder[a]||'#e5e7eb'};"><span style="width:5px;height:5px;border-radius:50%;background:${artistColor[a]||'#6b7280'};display:inline-block;flex-shrink:0;"></span>${a}</span>`).join('')}
       ${dateStr ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;color:#9ca3af;margin-left:auto;padding:2px 0;">${dateStr}</span>` : ''}
     </div>` : (dateStr ? `<div style="margin-bottom:6px;"><span style="font-size:0.65rem;color:#9ca3af;">${dateStr}</span></div>` : '');
 
@@ -3655,13 +3660,13 @@ function renderTrend() {
       : `style="cursor:default;"`;
     return `<div class="event-card" ${cardClick}>
       ${t.image
-        ? `<div style="width:100%;height:180px;flex-shrink:0;overflow:hidden;background:#f8f9fa;border-radius:var(--radius-card) var(--radius-card) 0 0;">
-             <img src="${escHtml(t.image)}" style="width:100%;height:100%;display:block;object-fit:cover;object-position:top center;" loading="lazy" onerror="_onImgError(this)">
+        ? `<div style="width:100%;flex-shrink:0;overflow:hidden;border-radius:var(--radius-card) var(--radius-card) 0 0;background:#f8f9fa;">
+             <img src="${escHtml(t.image)}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
            </div>`
         : `<div style="height:4px;background:${mainColor};flex-shrink:0;"></div>`}
-      <div style="padding:0.65rem 0.75rem;display:flex;flex-direction:column;flex:1;">
+      <div style="padding:0.45rem 0.55rem;display:flex;flex-direction:column;flex:1;">
         ${badgesHtml}
-        ${t.caption ? `<p style="font-size:0.78rem;font-weight:700;line-height:1.35;color:#111;margin:0;word-break:break-word;">${escHtml(t.caption)}</p>` : ''}
+        ${t.caption ? `<p style="font-size:0.7rem;font-weight:700;line-height:1.35;color:#111;margin:0;word-break:break-word;">${escHtml(t.caption)}</p>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -6905,6 +6910,7 @@ async function handleWorksFormSubmit() {
   if (!data.category) { showToast('Category is required'); document.getElementById('wf-category').focus(); return; }
   if (!data.year) { showToast('Year is required'); document.getElementById('wf-year').focus(); return; }
   if (!/^\d{4}$/.test(data.year)) { showToast('Year must be a 4-digit number (e.g. 2026)'); document.getElementById('wf-year').focus(); return; }
+  if (data.release_date && !/^\d{4}-\d{2}-\d{2}$/.test(data.release_date)) { showToast('Release date must be YYYY-MM-DD'); document.getElementById('wf-releaseDate').focus(); return; }
   const btn=document.getElementById('works-submit-btn');
   const txt=document.getElementById('works-submit-text');
   const spin=document.getElementById('works-submit-spinner');
@@ -7402,7 +7408,7 @@ function renderWorks() {
   }
 
   const _currentYear = String(new Date().getFullYear());
-  const _effectiveYear = _worksYear || _currentYear;
+  const _effectiveYear = _worksYear; // ใช้ตรงๆ ไม่ force
 
   let filtered = allWorks;
   // กรองปีเฉพาะเมื่อ: เลือกปีเฉพาะ (ไม่ใช่ all)
@@ -7437,7 +7443,17 @@ function renderWorks() {
 
   if (filtered.length === 0) {
     accordion.style.display = 'none';
-    if (empty) empty.style.display = 'block';
+    if (empty) {
+      const _emptyMsg = empty.querySelector('p');
+      if (_emptyMsg) {
+        _emptyMsg.textContent =
+          _worksTab !== 'all' ? `ไม่มีผลงานในหมวดนี้` :
+          _worksArtist !== 'all' ? `ไม่มีผลงานของ ${_worksArtist}` :
+          _worksYear && _worksYear !== 'all' ? `ไม่มีผลงานในปี ${_worksYear}` :
+          'No data yet';
+      }
+      empty.style.display = 'block';
+    }
     return;
   }
   if (empty) empty.style.display = 'none';
@@ -7517,8 +7533,8 @@ function renderWorks() {
   // Build ลง fragment ก่อน swap ครั้งเดียว — ไม่มี blank flash
   const _wFrag = document.createDocumentFragment();
 
-  // เลือกปีเฉพาะ หรือ All Years โดยไม่มี filter อื่น → การ์ดตรงๆ ไม่มี divider
-  if (_effectiveYear !== 'all' && _worksTab === 'all' && _worksArtist === 'all') {
+  // ไม่มี filter tab หรือ artist → single grid (ไม่มี year badge)
+  if (_worksTab === 'all' && _worksArtist === 'all') {
     const cardGrid = document.createElement('div');
     cardGrid.style.cssText = gridCols;
     cardGrid.className = 'works-year-grid';
