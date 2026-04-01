@@ -4059,6 +4059,40 @@ function _fixImgSrc(url) {
 }
 
 // ── Image error handler — retry ด้วย proxy เมื่อโหลดไม่ได้ ──
+
+// ── Face Detection — auto object-position ──
+const _faceDetector = (typeof FaceDetector !== 'undefined' && FaceDetector.isSupported?.()) || typeof FaceDetector !== 'undefined'
+  ? (() => { try { return new FaceDetector({ fastMode: true, maxDetectedFaces: 3 }); } catch(e) { return null; } })()
+  : null;
+
+async function _facePos(img) {
+  // ถ้าไม่รองรับ หรือรูปยังโหลดไม่เสร็จ → ข้าม
+  if (!_faceDetector || !img.complete || !img.naturalWidth) return;
+  // ถ้ามี image_position ตั้งไว้แล้ว ไม่ต้อง detect
+  if (img.closest('[data-has-pos]')) return;
+  try {
+    const faces = await _faceDetector.detect(img);
+    if (!faces || !faces.length) return;
+    // คำนวณ bounding box รวมของทุกหน้า
+    let minX = Infinity, minY = Infinity, maxX = 0, maxY = 0;
+    faces.forEach(f => {
+      const b = f.boundingBox;
+      if (b.x < minX) minX = b.x;
+      if (b.y < minY) minY = b.y;
+      if (b.x + b.width  > maxX) maxX = b.x + b.width;
+      if (b.y + b.height > maxY) maxY = b.y + b.height;
+    });
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    const xPct = Math.round((cx / img.naturalWidth)  * 100);
+    // ดึงหน้าขึ้นมาหน่อย (บวก 10%) เพื่อให้เห็นทรงผม
+    const yPct = Math.max(0, Math.round((cy / img.naturalHeight) * 100) - 10);
+    img.style.objectPosition = xPct + '% ' + yPct + '%';
+  } catch(e) {
+    // FaceDetector อาจ throw บน cross-origin image — ไม่ต้องทำอะไร
+  }
+}
+
 function _onImgError(img) {
   const original = img.getAttribute('data-original-src') || img.src;
   if (!img.getAttribute('data-original-src')) img.setAttribute('data-original-src', original);
@@ -5665,10 +5699,10 @@ function _initPosPicker() {
   oldPicker.parentNode.replaceChild(newPicker, oldPicker);
 
   const picker = document.getElementById('wf-pos-picker');
-  const dot    = document.getElementById('wf-pos-dot');
-  const hline  = document.getElementById('wf-pos-hline');
-  const vline  = document.getElementById('wf-pos-vline');
-  const img    = document.getElementById('wf-prev-img-tag');
+  const dot    = picker.querySelector('#wf-pos-dot');
+  const hline  = picker.querySelector('#wf-pos-hline');
+  const vline  = picker.querySelector('#wf-pos-vline');
+  const img    = picker.querySelector('img');
 
   function applyPos(xPct, yPct) {
     xPct = Math.max(0, Math.min(100, xPct));
@@ -7568,7 +7602,7 @@ function renderWorks() {
       : '';
 
     const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)"></div>`
+      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
     const wab = getArtistBg(w.artists);
