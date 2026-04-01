@@ -334,7 +334,7 @@
   .cal-date-chip-num { font-size:0.9rem;font-weight:700;color:#111;flex-shrink:0; }
   .cal-date-chip-dot { width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0; }
   /* card grid */
-  .cal-card-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px; }
+  .cal-card-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px; }
   .cal-ev-card { background:#fff;border-radius:var(--radius-card);border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;transition:box-shadow 0.18s, transform 0.18s; }
   .cal-ev-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform:translateY(-4px); }
   .cal-ev-card-img { width:100%;height:120px;object-fit:cover;object-position:top;display:block;background:#f3f4f6; }
@@ -420,7 +420,7 @@
   /* ── Fluid card grid — truly infinite, auto-fills forever ── */
   .cards-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(clamp(160px, 15vw, 240px), 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
     gap: clamp(8px, 1.2vw, 14px) !important;
     
     width: 100% !important;
@@ -428,44 +428,7 @@
   }
   /* Phone override only — let auto-fill handle everything else */
   @media (max-width: 480px) { .cards-grid { grid-template-columns: 1fr !important; } }
-  /* ══ Works grid: responsive ทุกขนาดหน้าจอ ══ */
-  #works-grid, #works-loading {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: clamp(6px, 2vw, 12px) !important;
-  }
-  /* มือถือเล็ก < 360px: 2 คอลัมน์ */
-  @media (max-width: 360px) {
-    #works-grid, #works-loading {
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 5px !important;
-    }
-  }
-  /* มือถือ 361-600px: 3 คอลัมน์ (default) */
-  @media (min-width: 361px) and (max-width: 600px) {
-    #works-grid, #works-loading {
-      grid-template-columns: repeat(3, 1fr) !important;
-      gap: 6px !important;
-    }
-  }
-  /* มือถือใหญ่ / แท็บเล็ต 601-900px: 4 คอลัมน์ */
-  @media (min-width: 601px) and (max-width: 900px) {
-    #works-grid, #works-loading {
-      grid-template-columns: repeat(4, 1fr) !important;
-      gap: 8px !important;
-    }
-  }
-  /* เดสก์ท็อปเล็ก 901-1200px: 5 คอลัมน์ */
-  @media (min-width: 901px) and (max-width: 1200px) {
-    #works-grid, #works-loading {
-      grid-template-columns: repeat(5, 1fr) !important;
-    }
-  }
-  /* เดสก์ท็อปใหญ่ > 1200px: 6 คอลัมน์ */
-  @media (min-width: 1201px) {
-    #works-grid, #works-loading {
-      grid-template-columns: repeat(6, 1fr) !important;
-    }
-  }
+
   /* works-tabs: scroll บน desktop, wrap บนมือถือ */
   #works-tabs {
     flex-wrap: wrap !important;
@@ -933,14 +896,10 @@
   }
 
   /* ── Calendar card grid: fluid auto-fill ── */
-  /* Calendar card grid: 2-3 คอลัมน์ ดูสบายตา */
   #cal-card-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
     gap: clamp(8px, 1.5vw, 14px) !important;
   }
-  @media (max-width: 900px)  { #cal-card-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-  @media (max-width: 600px)  { #cal-card-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-  @media (max-width: 360px)  { #cal-card-grid { grid-template-columns: 1fr !important; } }
 
   /* ── List view: stack to 1 col on small screens ── */
   @media (max-width: 600px) {
@@ -952,8 +911,8 @@
   /* ── Cards grid: fully fluid responsive ── */
   .cards-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-    gap: clamp(8px, 1.5vw, 20px);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: clamp(8px, 1.5vw, 14px) !important;
     align-items: stretch;
     width: 100%;
   }
@@ -983,38 +942,7 @@
      FULLY RESPONSIVE — all screen sizes
   ══════════════════════════════════════════════ */
 
-  /* Cards grid: 5 columns on desktop, scales down on smaller screens */
-  .cards-grid {
-    display: grid !important;
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: clamp(6px, 1vw, 14px) !important;
-    align-items: stretch;
-  }
-
-  /* Small phones: 1 column */
-  @media (max-width: 400px) {
-    .cards-grid { grid-template-columns: 1fr !important; }
-  }
-
-  /* Medium phones: 2 columns */
-  @media (min-width: 401px) and (max-width: 600px) {
-    .cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  }
-
-  /* Large phones: 3 columns */
-  @media (min-width: 601px) and (max-width: 800px) {
-    .cards-grid { grid-template-columns: repeat(3, 1fr) !important; }
-  }
-
-  /* Tablets: 4 columns */
-  @media (min-width: 801px) and (max-width: 1100px) {
-    .cards-grid { grid-template-columns: repeat(4, 1fr) !important; }
-  }
-
-  /* Desktop: 5 columns */
-  @media (min-width: 1101px) {
-    .cards-grid { grid-template-columns: repeat(5, 1fr) !important; }
-  }
+  
 
   /* Card image: scale with card size */
   .card-img-wrap {
@@ -1209,13 +1137,9 @@
 
   /* ══ Works grid: 6 col desktop, responsive ══ */
   #works-grid, #works-loading, .works-year-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
     gap: clamp(8px, 1.2vw, 14px) !important;
   }
-  @media (max-width: 1100px) { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(4, 1fr) !important; } }
-  @media (max-width: 900px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-  @media (max-width: 600px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; } }
-  @media (max-width: 400px)  { #works-grid, #works-loading, .works-year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; } }
 
   /* ══ Works filter tabs: wrap บนมือถือ ══ */
   #works-tabs {
@@ -1239,16 +1163,6 @@
     gap: 12px !important;
   }
 
-  /* ══ Home cards grid: 5 col desktop ══ */
-  .cards-grid {
-    display: grid !important;
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: clamp(6px, 1vw, 14px) !important;
-    align-items: stretch;
-  }
-  @media (max-width: 1100px) { .cards-grid { grid-template-columns: repeat(4, 1fr) !important; } }
-  @media (max-width: 800px)  { .cards-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-  @media (max-width: 600px)  { .cards-grid { grid-template-columns: repeat(2, 1fr) !important; } }
   @media (max-width: 400px)  { .cards-grid { grid-template-columns: 1fr !important; } }
 
   /* ══ Card image fluid ══ */
@@ -4197,8 +4111,10 @@ function renderHome() {
     el('bento-next-meta').textContent = meta;
     if (el('bento-next-bg')) {
       const heroSrc = next.heroImage || next.image;
+      const heroPos = next.heroImage ? (next.heroImagePos || next.imagePos || 'top center') : (next.imagePos || 'top center');
       if (heroSrc) {
         el('bento-next-bg').style.backgroundImage = `url('${heroSrc}')`;
+        el('bento-next-bg').style.backgroundPosition = heroPos;
       }
     }
     if (days !== null && days <= 1) {
@@ -4225,8 +4141,10 @@ function renderHome() {
     el('bento-next2-meta').textContent = meta2;
     el('bento-next2-meta').style.display = 'block';
     const hero2Src = next2.heroImage || next2.image;
+    const hero2Pos = next2.heroImage ? (next2.heroImagePos || next2.imagePos || 'top center') : (next2.imagePos || 'top center');
     if (hero2Src && el('bento-next2-bg')) {
       el('bento-next2-bg').style.backgroundImage = `url('${hero2Src}')`;
+      el('bento-next2-bg').style.backgroundPosition = hero2Pos;
     }
     if (el('bento-ev2')) el('bento-ev2').dataset.id = next2.__backendId;
     if (days2 !== null && days2 <= 1) {
@@ -6494,6 +6412,9 @@ function fillForm(ev) {
   parsetime(ev.endTime,   'ev-endTime',   'ev-endTimezone',   _evTzFallback);
 
   set('title',ev.title); set('image',ev.image); set('heroImage',ev.heroImage);
+  // โหลด imagePos กลับมาใส่ hidden input
+  const _ipEl = document.getElementById('ev-image-pos'); if(_ipEl) _ipEl.value = ev.imagePos || '50% 0%';
+  const _hpEl = document.getElementById('ev-heroImage-pos'); if(_hpEl) _hpEl.value = ev.heroImagePos || '50% 0%';
   set('country',ev.country); set('city',ev.city); set('location',ev.location);
   set('description',ev.description); set('type',ev.type); set('note',ev.note);
   set('tv',ev.tv); set('map',ev.map); set('hashtags',ev.hashtags); set('keywords',ev.keywords);
@@ -6569,7 +6490,8 @@ function readFormSchema() {
   return {
     dateStart:fv('dateStart'), dateEnd:fv('dateEnd'),
     startTime:fvTime('startTime'), endTime:fvTime('endTime'),
-    title:fv('title'), image:fv('image'),
+    title:fv('title'), image:fv('image'), heroImage:fv('heroImage'),
+    imagePos:(()=>{const _p=document.getElementById('ev-image-pos');return _p?_p.value:'50% 0%';})(), heroImagePos:(()=>{const _p=document.getElementById('ev-heroImage-pos');return _p?_p.value:'50% 0%';})(),
     artists:artists.join(','), country:fv('country'), city:fv('city'),
     location:fv('location'), description:fv('description'),
     type:fv('type'), note:fv('note'), tv:fv('tv'), map:fv('map'), hashtags:fv('hashtags'), keywords:fv('keywords'),
@@ -6609,7 +6531,7 @@ async function handleEventFormSubmit() {
   const payload = {
     dateStart:schema.dateStart, dateEnd:schema.dateEnd,
     startTime:schema.startTime, endTime:schema.endTime,
-    title:schema.title, image:schema.image, artists:schema.artists,
+    title:schema.title, image:schema.image, heroImage:schema.heroImage, imagePos:schema.imagePos, heroImagePos:schema.heroImagePos, artists:schema.artists,
     country:schema.country, city:schema.city, location:schema.location,
     description:schema.description, type:schema.type, note:schema.note,
     tv:schema.tv, map:schema.map, hashtags:schema.hashtags, keywords:schema.keywords, timezone:schema.timezone,
@@ -7571,7 +7493,7 @@ function renderWorks() {
   // Responsive grid cols CSS
   const gridCols = `
     display:grid;
-    grid-template-columns:repeat(5,1fr);
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
     gap:clamp(6px,1.2vw,14px);
   `;
 
@@ -7602,7 +7524,7 @@ function renderWorks() {
       : '';
 
     const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}"></div>`
+      ? `<div style="width:100%;aspect-ratio:16/9;min-height:180px;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
     const wab = getArtistBg(w.artists);
@@ -7616,7 +7538,7 @@ function renderWorks() {
       card.style.cursor = 'default';
     }
     card.innerHTML = `${thumb}
-      <div style="padding:0.6rem 0.7rem;display:flex;flex-direction:column;flex:1;">
+      <div style="padding:0.85rem 0.9rem;display:flex;flex-direction:column;flex:1;">
         <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
         <div style="font-size:0.78rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
