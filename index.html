@@ -2526,7 +2526,7 @@ async function hashPassword(pw) {
 const CACHE_VERSION    = 'ppp_v18'; // bumped: fix bfcache + stale cache issues
 const CACHE_TTL_MS     = 10 * 1000;              // 10s — real-time: ดึงใหม่เกือบทุกครั้ง
 const CACHE_MAX_AGE_MS = 5 * 60 * 1000;         // 5 min — fallback offline สั้นลง
-const FETCH_TIMEOUT_MS = 6000;
+const FETCH_TIMEOUT_MS = 15000;
 const RETRY_DELAYS     = [1000, 3000, 6000];
 const DEBOUNCE_RENDER  = 16;
 const DEBOUNCE_RESIZE  = 200;
@@ -3097,25 +3097,35 @@ async function _fetchAllData(force = false) {
     _rateLimit.reset('annivs');
   }
   _fetchingAll = true;
-  try {
-    // ── PRIMARY: PocketBase (real-time) ──
-    const res = await fetchAllFromPocketBase();
-    const dataChangedRef = { v: false };
-    _applyAllData(res, force, dataChangedRef);
-    hideConnectionError();
-    if (dataChangedRef.v) {
-      _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
-      _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
-      scheduleRender();
-      renderBirthdayBanners();
+  let _pbRetry = 0;
+  const _maxRetry = 2;
+  while (_pbRetry <= _maxRetry) {
+    try {
+      // ── PRIMARY: PocketBase (real-time) ──
+      const res = await fetchAllFromPocketBase();
+      const dataChangedRef = { v: false };
+      _applyAllData(res, force, dataChangedRef);
+      hideConnectionError();
+      if (dataChangedRef.v) {
+        _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
+        _adminListFP = ''; _adminWorksListFP = ''; _trendLastFP = '';
+        scheduleRender();
+        renderBirthdayBanners();
+      }
+      _scheduleEventStartTimers();
+      break;
+    } catch(e) {
+      console.warn(`[PPP] PocketBase fetch failed (attempt ${_pbRetry + 1}):`, e.message);
+      if (_pbRetry < _maxRetry) {
+        _pbRetry++;
+        await new Promise(r => setTimeout(r, 2000 * _pbRetry));
+      } else {
+        showConnectionError();
+        break;
+      }
     }
-    _scheduleEventStartTimers();
-  } catch(e) {
-    console.warn('[PPP] PocketBase fetch failed:', e.message);
-    showConnectionError();
-  } finally {
-    _fetchingAll = false;
   }
+  _fetchingAll = false;
 }
 
 // loadEventsFromSheets removed — using _fetchAllData(true) instead
@@ -3912,8 +3922,8 @@ function showConnectionError() {
     <div style="width:48px;height:48px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     </div>
-    <p style="font-weight:700;color:#374151;margin-bottom:0.35rem;">Cannot connect to Google Sheets</p>
-    <p style="font-size:0.82rem;margin-bottom:1.25rem;">Please check that your Apps Script is deployed</p>
+    <p style="font-weight:700;color:#374151;margin-bottom:0.35rem;">ไม่สามารถเชื่อมต่อได้</p>
+    <p style="font-size:0.82rem;margin-bottom:1.25rem;">เซิร์ฟเวอร์อาจกำลังตื่น กรุณารอสักครู่แล้วลองใหม่</p>
     <button onclick="retryConnection()" style="background:#111;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.25rem;font-size:0.88rem;font-weight:600;cursor:pointer;">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:5px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Retry
     </button>
