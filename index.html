@@ -406,7 +406,7 @@
     box-shadow: 0 2px 8px rgba(22,163,74,0.4);
     font-weight: 700;
   }
-  .detail-hero { width: 100%; max-height: 520px; object-fit: contain; background: transparent; display: block; border-radius: 0; }
+  .detail-hero { width: 100%; max-height: 520px; object-fit: cover; object-position: top center; background: transparent; display: block; border-radius: 0; }
   .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 99px; border: 1px solid #e5e7eb; font-size: 0.82rem; font-weight: 600; color: #374151; text-decoration: none; transition: border-color 0.15s, background 0.15s; }
   .link-btn:hover { background: #f7f7f5; border-color: #c0c0bc; }
   footer { background: transparent; border-top: none; margin-top: auto; flex-shrink: 0; }
@@ -415,7 +415,7 @@
   @media (max-width: 640px) {
     .cal-event-dot { font-size: 0.68rem; padding: 2px 4px; }
     .cal-day { height: 80px; padding: 4px; }
-    .detail-hero { height: 200px; }
+    .detail-hero { height: 320px; object-fit: cover; object-position: top center; }
   }
   /* ── Fluid card grid — auto-fill based on card min-width, not viewport ── */
   .cards-grid {
@@ -471,6 +471,39 @@
   .bday-today { }
   @keyframes bday-pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  /* ── Animated nav dots ── */
+  @keyframes navDotPulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.55; transform:scale(0.72); }
+  }
+  .nav-dot-1 { animation: navDotPulse 2.2s ease-in-out infinite; }
+  .nav-dot-2 { animation: navDotPulse 2.2s ease-in-out 0.4s infinite; }
+  .nav-dot-3 { animation: navDotPulse 2.2s ease-in-out 0.8s infinite; }
+  /* ── Global Search overlay ── */
+  #search-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;display:none;align-items:flex-start;justify-content:center;padding-top:80px;padding-bottom:40px; }
+  #search-overlay.active { display:flex; }
+  #search-box { background:#fff;border-radius:16px;width:100%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;max-height:calc(100vh - 140px);display:flex;flex-direction:column; }
+  #search-input-wrap { display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #f0f0f0; }
+  #search-input { flex:1;border:none;outline:none;font-size:1rem;font-family:inherit;color:#111;background:transparent; }
+  #search-results { overflow-y:auto;flex:1; }
+  .search-result-item { display:flex;align-items:center;gap:12px;padding:10px 18px;cursor:pointer;border-bottom:0.5px solid #f5f5f5;transition:background 0.12s; }
+  .search-result-item:hover,.search-result-item.focused { background:#f9f9f9; }
+  .search-result-thumb { width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#f3f4f6; }
+  .search-result-thumb-placeholder { width:44px;height:44px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center; }
+  /* ── My Schedule (bookmark) styles ── */
+  .bookmark-btn { background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;transition:transform 0.15s; }
+  .bookmark-btn:hover { transform:scale(1.2); }
+  .bookmark-btn svg { transition:fill 0.15s, stroke 0.15s; }
+  /* ── Share ticket card canvas overlay ── */
+
+  /* ── Focus ring accessibility ── */
+  .event-card:focus-visible,.nav-link:focus-visible,.artist-filter-btn:focus-visible,.btn-primary:focus-visible,.btn-secondary:focus-visible { outline:2px solid #f97316;outline-offset:2px; }
+  /* ── Countdown on Bento hero ── */
+  #bento-countdown-wrap { display:flex;gap:6px;margin-top:8px; }
+  .bento-cd-box { display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:8px;padding:5px 8px;min-width:38px; }
+  .bento-cd-num { font-size:1rem;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.02em; }
+  .bento-cd-label { font-size:0.45rem;font-weight:700;color:rgba(255,255,255,0.5);margin-top:2px;letter-spacing:0.1em; }
+  @media (max-width:480px) { .bento-cd-num { font-size:0.88rem; } .bento-cd-box { padding:4px 6px;min-width:32px; } }
   .bday-icon { font-size:1.3rem;flex-shrink:0; }
   .bday-countdown { font-size:0.7rem;font-weight:800;padding:3px 8px;border-radius:99px;margin-left:auto;flex-shrink:0;letter-spacing:0.05em; }
   .month-group { margin-bottom: 2.5rem; padding-top: 1.5rem; }
@@ -1197,17 +1230,19 @@
     <div class="nav-inner">
      <div class="nav-logo" onclick="navigate('home')" style="display:flex;align-items:center;gap:8px;">
       <div style="display:flex;gap:3px;flex-shrink:0;">
-        <div style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div>
-        <div style="width:7px;height:7px;border-radius:50%;background:#94a3b8;"></div>
-        <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
+        <div class="nav-dot-1" style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div>
+        <div class="nav-dot-2" style="width:7px;height:7px;border-radius:50%;background:#94a3b8;"></div>
+        <div class="nav-dot-3" style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
       </div>
       <span id="nav-site-title">PPP Family</span>
      </div>
      <div class="nav-links-wrap" id="nav-links">
+
       <span class="nav-link active" data-page="home" onclick="navigate('home')"><i data-lucide="home" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label" >Home</span></span>
       <span class="nav-link" data-page="calendar" onclick="navigate('calendar')"><i data-lucide="calendar" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Calendar</span></span>
       <span class="nav-link" data-page="works" onclick="navigate('works')"><i data-lucide="star" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Works</span></span>
       <span class="nav-link" data-page="trend" onclick="navigate('trend')"><i data-lucide="trending-up" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Trend</span></span>
+      <span class="nav-link" data-page="myschedule" onclick="navigate('myschedule')" id="nav-myschedule-link"><i data-lucide="heart" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">My Recap</span></span>
       <span class="nav-link" data-page="admin" id="nav-admin-link" style="display:none;" onclick="navigate('admin')"><i data-lucide="settings" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Admin</span></span>
 
      </div>
@@ -1235,7 +1270,12 @@
         <div id="bento-next-label" style="margin-bottom:6px;"><span style="background:#f97316;color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">NEXT EVENT</span></div>
         <div id="bento-next-title" style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:5px;">Loading...</div>
         <div id="bento-next-meta" style="font-size:0.62rem;color:rgba(255,255,255,0.4);margin-bottom:4px;"></div>
-
+        <div id="bento-countdown-wrap" style="display:none;">
+          <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-d">--</span><span class="bento-cd-label">DAYS</span></div>
+          <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-h">--</span><span class="bento-cd-label">HRS</span></div>
+          <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-m">--</span><span class="bento-cd-label">MIN</span></div>
+          <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-s">--</span><span class="bento-cd-label">SEC</span></div>
+        </div>
        </div>
       </div>
       <!-- Event 2 -->
@@ -1539,6 +1579,50 @@
     </div>
    </div>
 
+   <!-- GLOBAL SEARCH OVERLAY -->
+  <div id="search-overlay" onclick="if(event.target===this)closeSearch()">
+    <div id="search-box">
+      <div id="search-input-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="search-input" type="text" placeholder="Search events, works..." autocomplete="off" oninput="doSearch(this.value)" onkeydown="handleSearchKey(event)">
+        <button onclick="closeSearch()" style="background:none;border:none;cursor:pointer;padding:2px;color:#9ca3af;font-size:0.8rem;">ESC</button>
+      </div>
+      <div id="search-results">
+        <div id="search-placeholder" style="padding:2rem;text-align:center;color:#9ca3af;font-size:0.88rem;">Start typing to search...</div>
+      </div>
+    </div>
+  </div>
+
+
+   <!-- MY RECAP PAGE -->
+   <div class="page" id="page-myschedule">
+    <div style="width:100%;padding:2rem 1rem;box-sizing:border-box;overflow-x:hidden;">
+
+     <!-- Header -->
+     <div style="margin-bottom:1.25rem;">
+      <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;color:#111;margin:0 0 0.25rem;">My Recap</h2>
+      <p style="font-size:0.78rem;color:#9ca3af;font-weight:500;margin:0;">Events you've attended ❤️</p>
+     </div>
+
+     <!-- Year filter tabs -->
+     <div id="recap-year-bar" class="filter-bar" style="margin-bottom:1.25rem;"></div>
+
+     <!-- Empty state -->
+     <div id="myschedule-empty" style="display:none;text-align:center;padding:3rem 1rem;">
+      <div style="width:64px;height:64px;border-radius:18px;background:#fdf2f8;border:1px solid #fbcfe8;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <p style="font-weight:700;color:#111;font-size:1rem;margin-bottom:6px;">No events saved yet</p>
+      <p style="font-size:0.82rem;color:#9ca3af;">Tap ❤️ on any event to add it to your Recap</p>
+     </div>
+
+     <!-- Event list -->
+     <div id="myschedule-list" style="width:100%;"></div>
+
+    </div>
+    <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer>
+   </div>
+
       <div class="page" id="page-admin">
     <div id="admin-login" style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;">
      <div style="background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,0.08);padding:2.5rem;max-width:380px;width:100%;">
@@ -1760,9 +1844,6 @@
      <button onclick="closeDetailModal()" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);border:none;border-radius:99px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;">
       <i data-lucide="x" style="width:16px;height:16px;color:#fff;stroke-width:2.5;"></i>
      </button>
-     <button id="detail-share-btn" onclick="shareDetailModal()" style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.5);border:none;border-radius:99px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;" title="Share">
-      <i data-lucide="share-2" style="width:16px;height:16px;color:#fff;stroke-width:2.5;"></i>
-     </button>
     </div>
     <div style="padding:1.25rem;">
      <div id="detail-artist-badge" style="margin-bottom:0.6rem;"></div>
@@ -1776,7 +1857,17 @@
       <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.75rem;" >LINKS</p>
       <div id="detail-links" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
      </div>
-     <div id="detail-cal-wrap" style="display:none;margin-bottom:1.25rem;"></div>
+     <div id="detail-cal-wrap" style="margin-bottom:1.25rem;">
+      <div style="display:flex;align-items:center;margin-bottom:0.6rem;">
+       <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin:0;">ADD TO CALENDAR</p>
+      </div>
+      <div id="detail-cal-btns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;"></div>
+      <button id="detail-bookmark-btn" onclick="toggleBookmarkFromModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;border:2px solid #fbcfe8;background:#fdf2f8;cursor:pointer;font-size:0.92rem;font-weight:700;color:#ec4899;transition:all 0.18s;" title="Save to My Recap"
+       onmouseenter="this.style.background='#fce7f3';this.style.borderColor='#f9a8d4'" onmouseleave="this.style.background=this.dataset.saved==='1'?'#fce7f3':'#fdf2f8';this.style.borderColor=this.dataset.saved==='1'?'#f9a8d4':'#fbcfe8'">
+       <svg id="detail-bookmark-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+       <span id="detail-bookmark-label">Add to My Recap</span>
+      </button>
+     </div>
      <div id="detail-ticket-wrap" style="display:none;margin-bottom:1.25rem;">
       <p style="font-size:0.75rem;font-weight:700;color:#f97316;letter-spacing:0.08em;margin-bottom:0.75rem;">
        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
@@ -2057,7 +2148,8 @@
 
        <div>
         <label class="form-label" for="ev-country"><span>Country</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
-        <input class="form-input" id="ev-country" name="country" placeholder="e.g. Thailand">
+        <input class="form-input" id="ev-country" name="country" placeholder="e.g. Thailand"
+          oninput="(function(v){const cb=document.getElementById('ev-isInternational');if(cb){const c=v.toLowerCase().trim();cb.checked=!!c&&c!=='thailand'&&c!=='ไทย'&&c!=='th';}})(this.value)">
        </div>
        <div>
         <label class="form-label" for="ev-city"><span>City</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
@@ -2065,9 +2157,9 @@
        </div>
        <div style="grid-column:1/-1;">
         <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:10px;border:1.5px solid #bfdbfe;background:#eff6ff;width:fit-content;box-sizing:border-box;">
-         <input type="checkbox" id="ev-isInternational" name="isInternational" style="width:16px;height:16px;accent-color:#2563eb;cursor:pointer;flex-shrink:0;">
+         <input type="checkbox" id="ev-isInternational" name="isInternational" style="width:16px;height:16px;accent-color:#2563eb;cursor:pointer;flex-shrink:0;" disabled title="Auto-detected from Country field">
          <span style="font-size:0.88rem;font-weight:700;color:#1d4ed8;">🌏 International Event</span>
-         <span style="font-size:0.78rem;color:#6b7280;font-weight:400;">งานนอกประเทศไทย</span>
+         <span style="font-size:0.78rem;color:#6b7280;font-weight:400;">Auto-detected — fill in Country above (non-Thailand)</span>
         </label>
        </div>
 
@@ -2894,6 +2986,10 @@ function processEvents(raw) {
     country:     safeText(r.country     || ''),
     city:        safeText(r.city        || ''),
     location:    safeText(r.location    || r.location_name || ''),
+    get isInternational() {
+      const c = (this.country || '').toLowerCase().trim();
+      return !!c && c !== 'thailand' && c !== 'ไทย' && c !== 'th';
+    },
     description: rawStr(r.description  || ''),
     type:        safeText(r.type        || r.event_type    || ''),
     note:        safeText(r.note        || ''),
@@ -4156,12 +4252,8 @@ function renderHome() {
         el('bento-next-bg').style.backgroundPosition = heroPos;
       }
     }
-    if (days !== null && days <= 1) {
-      startCountdown(next.dateStart, next.startTime);
-    } else {
-      const cdEl = document.getElementById('bento-countdown');
-      if (cdEl) cdEl.style.display = 'none';
-    }
+    // Always start bento live countdown for next event (hides itself when expired)
+    startBentoCountdown(next);
     if (el('bento-next')) el('bento-next').dataset.id = next.__backendId;
   }
   // Event 2
@@ -4936,7 +5028,7 @@ function openDetailModal(id) {
   // Image
   const imgWrap = document.getElementById('detail-img-wrap');
   imgWrap.innerHTML = ev.image
-    ? `<img src="${_fixImgSrc(ev.image)}" style="width:100%;height:auto;display:block;" alt="${escHtml(ev.title)}" loading="lazy" decoding="async">`
+    ? `<img src="${_fixImgSrc(ev.image)}" class="detail-hero" alt="${escHtml(ev.title)}" loading="lazy" decoding="async">`
     : '';
 
   // Artist badge
@@ -4974,9 +5066,75 @@ function openDetailModal(id) {
   if (linksHtml) { linksWrap.style.display = 'block'; document.getElementById('detail-links').innerHTML = linksHtml; }
   else linksWrap.style.display = 'none';
 
-  // Add to Calendar — removed per UI update
+  // Add to Calendar
   const calWrap = document.getElementById('detail-cal-wrap');
-  if (calWrap) { calWrap.style.display = 'none'; }
+  const calBtns = document.getElementById('detail-cal-btns');
+  if (calWrap && calBtns && ev.dateStart) {
+    const _buildCalLinks = (ev) => {
+      const title = encodeURIComponent(ev.title || '');
+      const loc   = encodeURIComponent([ev.location, ev.city, ev.country].filter(Boolean).join(', '));
+      const desc  = encodeURIComponent(ev.description || '');
+      // Date formatting for calendar URLs: YYYYMMDD
+      const _toCalDate = (d) => d ? d.replace(/-/g,'') : '';
+      const dStart = _toCalDate(ev.dateStart);
+      const dEnd   = _toCalDate(ev.dateEnd || ev.dateStart);
+      // Add 1 day to end for all-day Google Calendar
+      const _addDay = (ds) => {
+        const d = new Date(ds.slice(0,4)+'-'+ds.slice(4,6)+'-'+ds.slice(6,8)+'T00:00:00');
+        d.setDate(d.getDate()+1);
+        return d.toISOString().slice(0,10).replace(/-/g,'');
+      };
+      const gcEnd = _addDay(dEnd);
+      // Time handling
+      let gcDates, icsStart, icsEnd;
+      if (ev.startTime) {
+        const _parseT = (ts) => {
+          const m = (ts||'').match(/(\d{1,2})[:\.](\d{2})\s*(AM|PM|am|pm)?/);
+          if (!m) return null;
+          let h = parseInt(m[1]), mi = m[2], p = (m[3]||'').toUpperCase();
+          if (p==='PM'&&h<12) h+=12; if (p==='AM'&&h===12) h=0;
+          return String(h).padStart(2,'0')+mi+'00';
+        };
+        const ts = _parseT(ev.startTime);
+        const te = ev.endTime ? _parseT(ev.endTime) : null;
+        if (ts) {
+          gcDates  = `${dStart}T${ts}/${dEnd}T${te||ts}`;
+          icsStart = `${dStart}T${ts}`;
+          icsEnd   = `${dEnd}T${te||ts}`;
+        }
+      }
+      if (!gcDates) { gcDates = `${dStart}/${gcEnd}`; icsStart = `${dStart}`; icsEnd = `${gcEnd}`; }
+      const gcUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${gcDates}&location=${loc}&details=${desc}`;
+      // ICS for Apple / Outlook
+      const icsAllDay = !ev.startTime;
+      const icsContent = [
+        'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//PPPFamily//EN',
+        'BEGIN:VEVENT',
+        `SUMMARY:${ev.title||''}`,
+        icsAllDay ? `DTSTART;VALUE=DATE:${icsStart}` : `DTSTART:${icsStart}Z`,
+        icsAllDay ? `DTEND;VALUE=DATE:${icsEnd}`     : `DTEND:${icsEnd}Z`,
+        `LOCATION:${[ev.location,ev.city,ev.country].filter(Boolean).join(', ')}`,
+        `DESCRIPTION:${ev.description||''}`,
+        'END:VEVENT','END:VCALENDAR'
+      ].join('\r\n');
+      const icsBlob = new Blob([icsContent], {type:'text/calendar'});
+      const icsUrl  = URL.createObjectURL(icsBlob);
+      return { gcUrl, icsUrl };
+    };
+    const { gcUrl, icsUrl } = _buildCalLinks(ev);
+    calBtns.innerHTML = `
+      <a href="${gcUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;border:1px solid #e5e7eb;font-size:0.82rem;font-weight:600;color:#374151;text-decoration:none;background:#fff;cursor:pointer;white-space:nowrap;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Google Calendar
+      </a>
+      <a href="${icsUrl}" download="${(ev.title||'event').replace(/[^a-z0-9]/gi,'_')}.ics" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;border:1px solid #e5e7eb;font-size:0.82rem;font-weight:600;color:#374151;text-decoration:none;background:#fff;cursor:pointer;white-space:nowrap;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Apple / Outlook (.ics)
+      </a>`;
+    calWrap.style.display = 'block';
+  } else if (calWrap) {
+    calWrap.style.display = 'none';
+  }
 
   // Ticket buttons
   const ticketWrap = document.getElementById('detail-ticket-wrap');
@@ -5051,6 +5209,7 @@ function openDetailModal(id) {
   }
 
   _dom('detail-modal').style.display = 'flex';
+  window._currentDetailId = id;
   const modalBox = document.querySelector('#detail-modal .modal-box');
   if (modalBox) {
     modalBox.scrollTop = 0;
@@ -5063,18 +5222,26 @@ function openDetailModal(id) {
 
   // Share button visibility
   const shareBtn2 = document.getElementById('detail-share-btn');
-  if (shareBtn2) shareBtn2.style.display = ev.image ? 'flex' : 'none';
+  if (shareBtn2) shareBtn2.style.display = 'flex';
+
+  // Bookmark button state
+  const bkBtn = document.getElementById('detail-bookmark-btn');
+  const bkIcon = document.getElementById('detail-bookmark-icon');
+  const bkLabel = document.getElementById('detail-bookmark-label');
+  if (bkBtn && bkIcon) {
+    const saved = isBookmarked(id);
+    bkIcon.setAttribute('fill', saved ? '#ec4899' : 'none');
+    bkIcon.setAttribute('stroke', '#ec4899');
+    bkBtn.style.background = saved ? '#fce7f3' : '#fdf2f8';
+    bkBtn.style.borderColor = saved ? '#f9a8d4' : '#fbcfe8';
+    bkBtn.dataset.saved = saved ? '1' : '0';
+    if (bkLabel) bkLabel.textContent = saved ? 'Saved ✓' : 'Add to My Recap';
+    bkBtn.style.display = 'flex';
+  }
 
   debounceLucide();
 }
 
-function shareDetailModal() {
-  const id = window._currentDetailId;
-  if (!id) return;
-  const ev = allEvents.find(e => e.__backendId === id);
-  if (!ev) return;
-  shareEvent(ev.title, id);
-}
 function copyPill(el, text) {
   if (!navigator.clipboard) return;
   navigator.clipboard.writeText(text).then(() => {
@@ -6389,6 +6556,13 @@ function navigate(page) {
   const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
   if (navEl) navEl.classList.add('active');
 
+  // My Schedule
+  if (page === 'myschedule') {
+    renderMySchedule();
+    debounceLucide();
+    return;
+  }
+
   // Trend
   if (page === 'trend') {
     renderTrend();
@@ -6525,7 +6699,11 @@ function fillForm(ev) {
   set('iq',ev.iq);
   set('ticket1',ev.ticket1); set('ticket2',ev.ticket2); set('ticket3',ev.ticket3);
   set('ticket-live',ev.ticketLive); set('ticket-fanclub',ev.ticketFanclub);
-  const intlCb = document.getElementById('ev-isInternational'); if(intlCb) intlCb.checked = !!ev.isInternational;
+  const intlCb = document.getElementById('ev-isInternational');
+  if (intlCb) {
+    const c = (ev.country || '').toLowerCase().trim();
+    intlCb.checked = !!c && c !== 'thailand' && c !== 'ไทย' && c !== 'th';
+  }
   const arr = ev.artists ? ev.artists.split(',').map(a=>a.trim()) : [];
   document.querySelectorAll('.artist-check').forEach(c => { c.checked = arr.includes(c.value); });
 
@@ -6604,7 +6782,10 @@ function readFormSchema() {
     iq:fv('iq'),
     ticket1:fv('ticket1'), ticket2:fv('ticket2'), ticket3:fv('ticket3'),
     ticketLive:fv('ticket-live'), ticketFanclub:fv('ticket-fanclub'),
-    isInternational:(()=>{ const _cb=document.getElementById('ev-isInternational'); return _cb ? _cb.checked : false; })()
+    get isInternational() {
+      const c = (this.country || '').toLowerCase().trim();
+      return !!c && c !== 'thailand' && c !== 'ไทย' && c !== 'th';
+    }
   };
 }
 function getFormPreviewData() {
@@ -7774,7 +7955,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const pwField = document.getElementById('login-pw-field');
   if (pwField) pwField.addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin().catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); }); });
   document.addEventListener('keydown', function(e) {
+    // Ctrl+K or Cmd+K → open search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      openSearch();
+      return;
+    }
     if (e.key === 'Escape') {
+      // Close search first
+      const srch = document.getElementById('search-overlay');
+      if (srch && srch.classList.contains('active')) { closeSearch(); return; }
       const detail = _dom('detail-modal');
       if (detail && detail.style.display !== 'none') { closeDetailModal(); return; }
       const modal = _dom('event-form-modal');
@@ -7895,6 +8085,349 @@ function _fastHydrateFromCache() {
   // clear on unload
   window.addEventListener('pagehide', () => clearInterval(_debugTimer));
 })();
+
+// ═══════════════════════════════════════════════════════════════════
+// GLOBAL SEARCH
+// ═══════════════════════════════════════════════════════════════════
+let _searchFocusIdx = -1;
+
+function openSearch() {
+  const overlay = document.getElementById('search-overlay');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  const inp = document.getElementById('search-input');
+  if (inp) { inp.value = ''; inp.focus(); }
+  document.getElementById('search-placeholder').style.display = 'block';
+  document.getElementById('search-results').innerHTML = '<div id="search-placeholder" style="padding:2rem;text-align:center;color:#9ca3af;font-size:0.88rem;">Start typing to search events and works...</div>';
+  _searchFocusIdx = -1;
+}
+
+function closeSearch() {
+  const overlay = document.getElementById('search-overlay');
+  if (overlay) overlay.classList.remove('active');
+}
+
+function handleSearchKey(e) {
+  const items = document.querySelectorAll('.search-result-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _searchFocusIdx = Math.min(_searchFocusIdx + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('focused', i === _searchFocusIdx));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _searchFocusIdx = Math.max(_searchFocusIdx - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('focused', i === _searchFocusIdx));
+  } else if (e.key === 'Enter' && _searchFocusIdx >= 0 && items[_searchFocusIdx]) {
+    items[_searchFocusIdx].click();
+  }
+}
+
+function _highlightMatch(text, query) {
+  if (!query || !text) return escHtml(text || '');
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx < 0) return escHtml(text);
+  return escHtml(text.slice(0, idx)) +
+    `<mark style="background:#fef08a;border-radius:2px;padding:0 1px;">${escHtml(text.slice(idx, idx + query.length))}</mark>` +
+    escHtml(text.slice(idx + query.length));
+}
+
+function doSearch(q) {
+  const results = document.getElementById('search-results');
+  if (!results) return;
+  q = (q || '').trim();
+  _searchFocusIdx = -1;
+  if (!q) {
+    results.innerHTML = '<div style="padding:2rem;text-align:center;color:#9ca3af;font-size:0.88rem;">Start typing to search events and works...</div>';
+    return;
+  }
+  const ql = q.toLowerCase();
+
+  // Search events
+  const evMatches = (allEvents || []).filter(ev =>
+    ev.title && (
+      ev.title.toLowerCase().includes(ql) ||
+      (ev.artists || '').toLowerCase().includes(ql) ||
+      (ev.location || '').toLowerCase().includes(ql) ||
+      (ev.type || '').toLowerCase().includes(ql) ||
+      (ev.description || '').toLowerCase().includes(ql)
+    )
+  ).slice(0, 8);
+
+  // Search works
+  const workMatches = (allWorks || []).filter(w =>
+    w.title && (
+      w.title.toLowerCase().includes(ql) ||
+      (w.artists || '').toLowerCase().includes(ql) ||
+      (w.category || '').toLowerCase().includes(ql)
+    )
+  ).slice(0, 4);
+
+  if (!evMatches.length && !workMatches.length) {
+    results.innerHTML = `<div style="padding:2rem;text-align:center;color:#9ca3af;font-size:0.88rem;">No results for "<strong style="color:#111;">${escHtml(q)}</strong>"</div>`;
+    return;
+  }
+
+  let html = '';
+  if (evMatches.length) {
+    html += `<div style="padding:8px 18px 4px;font-size:0.68rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;">EVENTS</div>`;
+    html += evMatches.map(ev => {
+      const color = getArtistColor(ev.artists);
+      const thumb = ev.image
+        ? `<img src="${_fixImgSrc(ev.image)}" class="search-result-thumb" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="search-result-thumb-placeholder" style="background:${color}18;"><div style="width:8px;height:8px;border-radius:50%;background:${color};"></div></div>`;
+      const meta = [ev.dateStart ? fmtDate(ev.dateStart) : '', ev.location].filter(Boolean).join(' · ');
+      const past = isEventPast(ev);
+      return `<div class="search-result-item" onclick="closeSearch();openDetailModal('${escHtml(ev.__backendId)}')">
+        ${thumb}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.85rem;font-weight:700;color:${past?'#9ca3af':'#111'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${_highlightMatch(ev.title, q)}</div>
+          <div style="font-size:0.72rem;color:#9ca3af;margin-top:2px;">${escHtml(meta)}</div>
+        </div>
+        ${past ? '<span style="font-size:0.65rem;color:#9ca3af;background:#f3f4f6;padding:2px 7px;border-radius:99px;flex-shrink:0;">Past</span>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  if (workMatches.length) {
+    html += `<div style="padding:8px 18px 4px;font-size:0.68rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;border-top:0.5px solid #f5f5f5;margin-top:4px;">WORKS</div>`;
+    html += workMatches.map(w => {
+      const thumb = w.image
+        ? `<img src="${_fixImgSrc(w.image)}" class="search-result-thumb" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="search-result-thumb-placeholder" style="background:#f3f4f6;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`;
+      return `<div class="search-result-item" onclick="closeSearch();navigate('works')">
+        ${thumb}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.85rem;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${_highlightMatch(w.title, q)}</div>
+          <div style="font-size:0.72rem;color:#9ca3af;margin-top:2px;">${escHtml(w.category || w.artists || '')}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  results.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MY SCHEDULE — Bookmarks (localStorage per device)
+// ═══════════════════════════════════════════════════════════════════
+const BOOKMARK_KEY = 'ppp_bookmarks_v1';
+
+// ── LocalStorage helpers ──────────────────────────────────────────
+function _loadBookmarks() {
+  try { return JSON.parse(localStorage.getItem(BOOKMARK_KEY) || '[]'); } catch(e) { return []; }
+}
+function _saveBookmarks(arr) {
+  try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+
+// ── Bookmark toggle ───────────────────────────────────────────────
+function isBookmarked(id) { return _loadBookmarks().includes(id); }
+
+function toggleBookmark(id) {
+  let arr = _loadBookmarks();
+  let saved;
+  if (arr.includes(id)) {
+    arr = arr.filter(x => x !== id);
+    saved = false;
+    showToast('Removed from My Recap');
+  } else {
+    arr.push(id);
+    saved = true;
+    showToast('❤️ Added to My Recap');
+  }
+  _saveBookmarks(arr);
+  return saved;
+}
+
+function toggleBookmarkFromModal() {
+  const id = window._currentDetailId;
+  if (!id) return;
+  const saved = toggleBookmark(id);
+  const bkIcon = document.getElementById('detail-bookmark-icon');
+  const bkBtn = document.getElementById('detail-bookmark-btn');
+  const bkLabel = document.getElementById('detail-bookmark-label');
+  if (bkIcon) {
+    bkIcon.setAttribute('fill', saved ? '#ec4899' : 'none');
+    bkIcon.setAttribute('stroke', '#ec4899');
+  }
+  if (bkBtn) {
+    bkBtn.style.background = saved ? '#fce7f3' : '#fdf2f8';
+    bkBtn.style.borderColor = saved ? '#f9a8d4' : '#fbcfe8';
+    bkBtn.dataset.saved = saved ? '1' : '0';
+  }
+  if (bkLabel) bkLabel.textContent = saved ? 'Saved ✓' : 'Add to My Recap';
+  if (currentPage === 'myschedule') renderMySchedule();
+}
+
+// ── (Legacy stubs — kept so any remaining references don't crash) ──
+async function createSyncCode() {}
+function showEnterCodeUI() {}
+function copySyncCode() {}
+function forgetSyncCode() {}
+async function syncNow() {}
+function _showSyncHasCode() {}
+function selectScheduleUser() {}
+function switchScheduleUser() {}
+
+async function loadSyncCode() {}
+
+// ── Render My Recap page ───────────────────────────────────────
+let _recapActiveYear = 'all';
+
+function renderMySchedule() {
+  const list  = document.getElementById('myschedule-list');
+  const empty = document.getElementById('myschedule-empty');
+  if (!list || !empty) return;
+  const ids = _loadBookmarks();
+  _renderMyScheduleList(list, empty, ids);
+}
+
+function _renderMyScheduleList(list, empty, ids) {
+  const saved = ids.map(id => allEvents.find(e => e.__backendId === id)).filter(Boolean);
+  const bar = document.getElementById('recap-year-bar');
+  if (!saved.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    if (bar) bar.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Sort newest first
+  saved.sort((a, b) => {
+    const da = a.dateStart ? new Date(a.dateStart) : new Date(0);
+    const db = b.dateStart ? new Date(b.dateStart) : new Date(0);
+    return db - da;
+  });
+
+  const upcoming = saved.filter(ev => !isEventPast(ev));
+  const past     = saved.filter(ev => isEventPast(ev));
+  const years = [...new Set(past.map(ev => ev.dateStart ? new Date(ev.dateStart).getFullYear() : null).filter(Boolean))].sort((a,b) => b - a);
+
+  // Validate active year
+  const valid = ['all', ...(upcoming.length ? ['upcoming'] : []), ...years.map(String)];
+  if (!valid.includes(_recapActiveYear)) _recapActiveYear = 'all';
+
+  // Render year tab bar
+  if (bar) {
+    const tabs = [
+      { key: 'all', label: 'All', count: saved.length },
+      ...(upcoming.length ? [{ key: 'upcoming', label: 'Upcoming', count: upcoming.length }] : []),
+      ...years.map(yr => ({ key: String(yr), label: String(yr), count: past.filter(ev => ev.dateStart && new Date(ev.dateStart).getFullYear() === yr).length }))
+    ];
+    bar.innerHTML = tabs.map(t => {
+      const a = _recapActiveYear === t.key;
+      return `<button onclick="_recapSetYear('${t.key}')" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:99px;border:1.5px solid ${a?'#111':'#e5e7eb'};background:${a?'#111':'#fff'};color:${a?'#fff':'#6b7280'};font-size:0.78rem;font-weight:${a?700:500};cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s;">${t.label}<span style="font-size:0.65rem;font-weight:700;background:${a?'rgba(255,255,255,0.2)':'#f3f4f6'};color:${a?'#fff':'#6b7280'};border-radius:99px;padding:1px 6px;">${t.count}</span></button>`;
+    }).join('');
+  }
+
+  function _eventCard(ev) {
+    const color  = getArtistColor(ev.artists);
+    const days   = daysUntilEvent(ev.dateStart);
+    const isPast = isEventPast(ev);
+    const dayBadge = !isPast && days !== null && days <= 7
+      ? `<span style="position:absolute;top:8px;left:8px;font-size:0.6rem;font-weight:800;padding:3px 9px;border-radius:99px;background:${days===0?'#ef4444':'#f97316'};color:#fff;z-index:3;letter-spacing:0.04em;">${days===0?'TODAY':days+'d'}</span>`
+      : '';
+    const pastOverlay = isPast
+      ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.18);border-radius:14px 14px 0 0;z-index:2;"></div>`
+      : '';
+    return `<div style="background:#fff;border:1px solid #f0f0f0;border-radius:14px;box-shadow:0 1px 8px rgba(0,0,0,0.06);cursor:pointer;transition:box-shadow 0.18s,transform 0.18s;display:flex;flex-direction:column;overflow:hidden;position:relative;"
+      onclick="openDetailModal('${escHtml(ev.__backendId)}')"
+      onmouseenter="this.style.boxShadow='0 6px 24px rgba(0,0,0,0.11)';this.style.transform='translateY(-3px)'"
+      onmouseleave="this.style.boxShadow='0 1px 8px rgba(0,0,0,0.06)';this.style.transform='translateY(0)'">
+      <div style="position:relative;width:100%;height:160px;flex-shrink:0;background:${color}18;overflow:hidden;">
+        ${ev.image
+          ? `<img src="${_fixImgSrc(ev.image)}" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;" alt="" loading="lazy">`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><div style="width:36px;height:36px;border-radius:50%;background:${color}40;display:flex;align-items:center;justify-content:center;"><div style="width:14px;height:14px;border-radius:50%;background:${color};"></div></div></div>`}
+        ${pastOverlay}
+        ${dayBadge}
+        <button onclick="event.stopPropagation();removeBookmark('${escHtml(ev.__backendId)}')" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.9);border:none;cursor:pointer;padding:5px;border-radius:8px;display:flex;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,0.12);" title="Remove">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#ec4899" stroke="#ec4899" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div style="padding:10px 12px;flex:1;min-width:0;">
+        <div style="font-size:0.82rem;font-weight:700;color:${isPast?'#6b7280':'#111'};line-height:1.35;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${escHtml(ev.title)}</div>
+        <div style="font-size:0.68rem;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${ev.dateStart ? fmtDate(ev.dateStart) : ''}${ev.location ? ' · ' + escHtml(ev.location) : ''}</div>
+      </div>
+    </div>`;
+  }
+  function _wrapGrid(cardsHtml) {
+    return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:14px;margin-bottom:8px;">${cardsHtml}</div>`;
+  }
+
+  function _sectionHeader(label, count, color) {
+    return `<div style="display:flex;align-items:center;gap:10px;margin:1.25rem 0 0.75rem;"><div style="font-size:1rem;font-weight:800;color:#111;letter-spacing:-0.02em;">${label}</div><div style="font-size:0.65rem;font-weight:700;background:${color};color:#fff;border-radius:99px;padding:2px 9px;">${count} event${count!==1?'s':''}</div><div style="flex:1;height:1px;background:#f0f0f0;"></div></div>`;
+  }
+
+  if (_recapActiveYear === 'all') {
+    let html = '';
+    if (upcoming.length) { html += _sectionHeader('Upcoming', upcoming.length, '#f97316'); html += _wrapGrid(upcoming.map(_eventCard).join('')); }
+    years.forEach(yr => {
+      const evs = past.filter(ev => ev.dateStart && new Date(ev.dateStart).getFullYear() === yr);
+      if (evs.length) { html += _sectionHeader(String(yr), evs.length, '#111'); html += _wrapGrid(evs.map(_eventCard).join('')); }
+    });
+    list.innerHTML = html;
+  } else if (_recapActiveYear === 'upcoming') {
+    list.innerHTML = _wrapGrid(upcoming.map(_eventCard).join(''));
+  } else {
+    const yr = parseInt(_recapActiveYear);
+    list.innerHTML = _wrapGrid(past.filter(ev => ev.dateStart && new Date(ev.dateStart).getFullYear() === yr).map(_eventCard).join(''));
+  }
+}
+
+function _recapSetYear(yr) {
+  _recapActiveYear = yr;
+  renderMySchedule();
+}
+
+function removeBookmark(id) {
+  let arr = _loadBookmarks().filter(x => x !== id);
+  _saveBookmarks(arr);
+  showToast('Removed from My Recap');
+  renderMySchedule();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BENTO HERO LIVE COUNTDOWN
+// ═══════════════════════════════════════════════════════════════════
+let _bentoCountdownTimer = null;
+
+function startBentoCountdown(ev) {
+  if (_bentoCountdownTimer) clearInterval(_bentoCountdownTimer);
+  const wrap = document.getElementById('bento-countdown-wrap');
+  if (!wrap || !ev || !ev.dateStart) { if(wrap) wrap.style.display='none'; return; }
+
+  function _update() {
+    const ms = msUntilEvent(ev);
+    if (ms === null || ms <= 0) {
+      // Countdown finished — hide immediately, re-render home
+      wrap.style.display = 'none';
+      if (_bentoCountdownTimer) clearInterval(_bentoCountdownTimer);
+      _bentoCountdownTimer = null;
+      if (!window._cdRenderPending) {
+        window._cdRenderPending = true;
+        setTimeout(() => { window._cdRenderPending = false; scheduleRender(); }, 200);
+      }
+      return;
+    }
+    const d = Math.floor(ms / 86400000);
+    const h = Math.floor((ms % 86400000) / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    const dEl = document.getElementById('bcd-d');
+    const hEl = document.getElementById('bcd-h');
+    const mEl = document.getElementById('bcd-m');
+    const sEl = document.getElementById('bcd-s');
+    if (dEl) dEl.textContent = d;
+    if (hEl) hEl.textContent = String(h).padStart(2,'0');
+    if (mEl) mEl.textContent = String(m).padStart(2,'0');
+    if (sEl) sEl.textContent = String(s).padStart(2,'0');
+    wrap.style.display = 'flex';
+  }
+  _update();
+  _bentoCountdownTimer = setInterval(_update, 1000);
+}
+
   </script>
  
    <!-- TREND FORM MODAL -->
