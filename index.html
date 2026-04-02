@@ -2148,8 +2148,7 @@
 
        <div>
         <label class="form-label" for="ev-country"><span>Country</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
-        <input class="form-input" id="ev-country" name="country" placeholder="e.g. Thailand"
-          oninput="(function(v){const cb=document.getElementById('ev-isInternational');if(cb){const c=v.toLowerCase().trim();cb.checked=!!c&&c!=='thailand'&&c!=='ไทย'&&c!=='th';}})(this.value)">
+        <input class="form-input" id="ev-country" name="country" placeholder="e.g. Thailand">
        </div>
        <div>
         <label class="form-label" for="ev-city"><span>City</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
@@ -2157,9 +2156,9 @@
        </div>
        <div style="grid-column:1/-1;">
         <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:10px;border:1.5px solid #bfdbfe;background:#eff6ff;width:fit-content;box-sizing:border-box;">
-         <input type="checkbox" id="ev-isInternational" name="isInternational" style="width:16px;height:16px;accent-color:#2563eb;cursor:pointer;flex-shrink:0;" disabled title="Auto-detected from Country field">
+         <input type="checkbox" id="ev-isInternational" name="isInternational" style="width:16px;height:16px;accent-color:#2563eb;cursor:pointer;flex-shrink:0;" title="งานนอกประเทศไทย">
          <span style="font-size:0.88rem;font-weight:700;color:#1d4ed8;">🌏 International Event</span>
-         <span style="font-size:0.78rem;color:#6b7280;font-weight:400;">Auto-detected — fill in Country above (non-Thailand)</span>
+         <span style="font-size:0.78rem;color:#6b7280;font-weight:400;">งานนอกประเทศไทย</span>
         </label>
        </div>
 
@@ -6701,8 +6700,7 @@ function fillForm(ev) {
   set('ticket-live',ev.ticketLive); set('ticket-fanclub',ev.ticketFanclub);
   const intlCb = document.getElementById('ev-isInternational');
   if (intlCb) {
-    const c = (ev.country || '').toLowerCase().trim();
-    intlCb.checked = !!c && c !== 'thailand' && c !== 'ไทย' && c !== 'th';
+    intlCb.checked = !!ev.isInternational;
   }
   const arr = ev.artists ? ev.artists.split(',').map(a=>a.trim()) : [];
   document.querySelectorAll('.artist-check').forEach(c => { c.checked = arr.includes(c.value); });
@@ -6780,12 +6778,9 @@ function readFormSchema() {
     x:fv('x'), tiktok:fv('tiktok'), website:fv('website'),
     whatsapp:fv('whatsapp'), shopee:fv('shopee'), live:fv('live'), download:fv('download'),
     iq:fv('iq'),
+    isInternational: !!(document.getElementById('ev-isInternational')?.checked),
     ticket1:fv('ticket1'), ticket2:fv('ticket2'), ticket3:fv('ticket3'),
     ticketLive:fv('ticket-live'), ticketFanclub:fv('ticket-fanclub'),
-    get isInternational() {
-      const c = (this.country || '').toLowerCase().trim();
-      return !!c && c !== 'thailand' && c !== 'ไทย' && c !== 'th';
-    }
   };
 }
 function getFormPreviewData() {
@@ -6823,6 +6818,7 @@ async function handleEventFormSubmit() {
     x:schema.x, tiktok:schema.tiktok, website:schema.website,
     whatsapp:schema.whatsapp, shopee:schema.shopee, live:schema.live, download:schema.download,
     iq:schema.iq,
+    isInternational: schema.isInternational,
     ticket1:schema.ticket1, ticket2:schema.ticket2, ticket3:schema.ticket3,
     ticketLive:schema.ticketLive, ticketFanclub:schema.ticketFanclub
   };
