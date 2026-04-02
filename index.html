@@ -2985,10 +2985,7 @@ function processEvents(raw) {
     country:     safeText(r.country     || ''),
     city:        safeText(r.city        || ''),
     location:    safeText(r.location    || r.location_name || ''),
-    get isInternational() {
-      const c = (this.country || '').toLowerCase().trim();
-      return !!c && c !== 'thailand' && c !== 'ไทย' && c !== 'th';
-    },
+    isInternational: !!r.isInternational,
     description: rawStr(r.description  || ''),
     type:        safeText(r.type        || r.event_type    || ''),
     note:        safeText(r.note        || ''),
