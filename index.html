@@ -931,17 +931,10 @@
     gap: clamp(8px, 1.5vw, 14px) !important;
   }
 
-  /* ── List view: stack to 1 col on small screens ── */
-  @media (max-width: 600px) {
-    #events-grid div[style*="repeat(2"] {
-      grid-template-columns: 1fr !important;
-    }
-  }
-
   /* ── Cards grid: fully fluid responsive ── */
   .cards-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
     gap: clamp(8px, 1.5vw, 14px) !important;
     align-items: stretch;
     width: 100%;
