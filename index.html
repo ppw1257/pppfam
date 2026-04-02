@@ -651,7 +651,7 @@
 
     /* ── Event cards: fully responsive ── */
     .cards-grid {
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+      grid-template-columns: repeat(2, 1fr) !important;
       gap: 10px !important;
     }
 
@@ -1193,7 +1193,7 @@
     gap: 12px !important;
   }
 
-  @media (max-width: 400px)  { .cards-grid { grid-template-columns: 1fr !important; } }
+  @media (max-width: 400px)  { .cards-grid { grid-template-columns: repeat(2, 1fr) !important; } }
 
   /* ══ Card image fluid ══ */
   .card-img-wrap { height: clamp(100px, 12vw, 180px) !important; }
