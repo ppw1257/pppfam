@@ -4425,25 +4425,14 @@ function _vsInit(groups) {
     }
   }
 
-  // Render items in chunks via rAF to avoid blocking main thread
-  const CHUNK = 30;
-  function renderChunk() {
-    const end = Math.min(idx + CHUNK, groups.length);
-    while (idx < end) buildItem(groups[idx++]);
-    if (idx < groups.length) {
-      requestAnimationFrame(renderChunk);
-    } else {
-      // Swap into DOM once — no blank period
-      _vsGrid.style.display = 'flex';
-      _vsGrid.style.flexDirection = 'column';
-      _vsGrid.innerHTML = '';
-      _vsGrid.appendChild(frag);
-      debounceLucide();
-      startCardCountdowns();
-    }
-  }
-
-  renderChunk();
+  // Build all items at once into DocumentFragment, swap to DOM once — no jank
+  groups.forEach(item => buildItem(item));
+  _vsGrid.style.display = 'flex';
+  _vsGrid.style.flexDirection = 'column';
+  _vsGrid.innerHTML = '';
+  _vsGrid.appendChild(frag);
+  debounceLucide();
+  startCardCountdowns();
 }
 
 // ═══════════════════════════════════════════════════════════════════
