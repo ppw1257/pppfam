@@ -105,6 +105,9 @@
     --shadow-card: none;
     --border-card: none;
     --color-accent: #111;
+    /* Card size slider: 1=small, 2=medium(default), 3=large */
+    --card-size: 2;
+    --card-min-px: 180px;  /* dynamic, set by JS */
     --accent-primary: #f97316;
     --accent-gradient: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
     /* Fluid spacing */
@@ -1204,24 +1207,50 @@
   /* ══ Never overflow ══ */
   body, #app { overflow-x: hidden !important; }
   * { box-sizing: border-box; }
-  /* ── Trend card grid: responsive ── */
+  /* ── Card Size Slider ── */
+  #card-size-slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    background: #f5f5f5;
+    border-radius: 99px;
+    padding: 4px 10px 4px 8px;
+    border: 1px solid #ebebeb;
+  }
+  #card-size-slider-wrap svg { flex-shrink: 0; opacity: 0.5; }
+  #card-size-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 64px;
+    height: 3px;
+    border-radius: 99px;
+    background: #e0e0e0;
+    outline: none;
+    cursor: pointer;
+  }
+  #card-size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #111;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+  #card-size-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #111;
+    cursor: pointer;
+    border: none;
+  }
+  
   #trend-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)) !important;
-    gap: 8px !important;
     align-items: start !important;
-  }
-  @media (max-width: 480px) {
-    #trend-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
-  }
-  @media (min-width: 481px) and (max-width: 700px) {
-    #trend-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 7px !important; }
-  }
-  @media (min-width: 701px) and (max-width: 1000px) {
-    #trend-grid { grid-template-columns: repeat(4, 1fr) !important; }
-  }
-  @media (min-width: 1001px) {
-    #trend-grid { grid-template-columns: repeat(6, 1fr) !important; }
   }
   .trend-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12) !important; transform: translateY(-3px) !important; }
   </style>
@@ -1316,12 +1345,18 @@
      </div>
 
      <!-- TYPE FILTER BAR -->
-     <div class="filter-bar" id="home-type-bar" style="margin-bottom:1rem;">
+     <div class="filter-bar" id="home-type-bar" style="margin-bottom:1rem;align-items:center;">
       <button class="artist-filter-btn active" data-type="all" onclick="setHomeTypeFilter('all',this)" style="background:#111;color:#fff;border:1.5px solid #111;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;">All</button>
       <button class="artist-filter-btn" data-type="concert" onclick="setHomeTypeFilter('concert',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Concert</button>
       <button class="artist-filter-btn" data-type="fanmeet" onclick="setHomeTypeFilter('fanmeet',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Fan Meet</button>
       <button class="artist-filter-btn" data-type="series" onclick="setHomeTypeFilter('series',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Series / Movie</button>
       <button class="artist-filter-btn" data-type="event" onclick="setHomeTypeFilter('event',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Event</button>
+      <!-- Card size slider -->
+      <div id="card-size-slider-wrap" style="margin-left:auto;display:none;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <input id="card-size-slider" type="range" min="1" max="5" value="3" step="1" oninput="applyCardSize(this.value)" title="ปรับขนาดการ์ด">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect x="13" y="13" width="9" height="9" rx="1.5"/></svg>
+      </div>
      </div>
 
      <div id="events-grid"></div>
@@ -8361,6 +8396,66 @@ function _renderMyScheduleList(list, empty, ids) {
     list.innerHTML = _wrapGrid(past.filter(ev => ev.dateStart && new Date(ev.dateStart).getFullYear() === yr).map(_eventCard).join(''));
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// CARD SIZE SLIDER
+// ═══════════════════════════════════════════════════════════════════
+function applyCardSize(val) {
+  val = parseInt(val);
+  // Map slider 1–5 → layout config
+  const sizeMap = {
+    1: { minPx: 120, imgH: '80px',   bodyPad: '6px 8px',   titleSize: '0.68rem', metaSize: '0.56rem', gap: '6px'  },
+    2: { minPx: 170, imgH: '120px',  bodyPad: '8px 10px',  titleSize: '0.74rem', metaSize: '0.60rem', gap: '8px'  },
+    3: { minPx: 230, imgH: '165px',  bodyPad: '10px 12px', titleSize: '0.80rem', metaSize: '0.66rem', gap: '12px' },
+    4: { minPx: 310, imgH: '220px',  bodyPad: '12px 14px', titleSize: '0.88rem', metaSize: '0.70rem', gap: '14px' },
+    5: { minPx: 400, imgH: '280px',  bodyPad: '14px 16px', titleSize: '0.95rem', metaSize: '0.74rem', gap: '16px' },
+  };
+  const cfg = sizeMap[val] || sizeMap[3];
+
+  const styleId = 'card-size-override';
+  let el = document.getElementById(styleId);
+  if (!el) { el = document.createElement('style'); el.id = styleId; document.head.appendChild(el); }
+  el.textContent = `
+    .cards-grid, #trend-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, ${cfg.minPx}px), 1fr)) !important;
+      gap: ${cfg.gap} !important;
+    }
+    .card-img-wrap {
+      height: ${cfg.imgH} !important;
+    }
+    .event-card > div:last-child {
+      padding: ${cfg.bodyPad} !important;
+    }
+    .event-card h3 {
+      font-size: ${cfg.titleSize} !important;
+    }
+    .event-card [style*="font-size:0.72rem"][style*="color:#6b7280"],
+    .event-card [style*="font-size:0.70rem"],
+    .event-card [style*="font-size:0.68rem"] {
+      font-size: ${cfg.metaSize} !important;
+    }
+  `;
+
+  // Persist choice
+  try { localStorage.setItem('ppp_card_size', val); } catch(e) {}
+}
+
+// Restore slider value on load
+(function() {
+  let saved = 3;
+  try { const v = localStorage.getItem('ppp_card_size'); if (v) saved = parseInt(v); } catch(e) {}
+  document.addEventListener('DOMContentLoaded', function() {
+    const sl = document.getElementById('card-size-slider');
+    if (sl) { sl.value = saved; }
+    applyCardSize(saved);
+  });
+  // Also apply immediately in case DOM already ready
+  if (document.readyState !== 'loading') {
+    const sl = document.getElementById('card-size-slider');
+    if (sl) { sl.value = saved; }
+    applyCardSize(saved);
+  }
+})();
 
 function _recapSetYear(yr) {
   _recapActiveYear = yr;
