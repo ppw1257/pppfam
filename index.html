@@ -3683,7 +3683,7 @@ function renderTrend() {
     return `<div class="event-card" ${cardClick}>
       ${t.image
         ? `<div style="width:100%;flex-shrink:0;overflow:hidden;border-radius:var(--radius-card) var(--radius-card) 0 0;background:#f8f9fa;">
-             <img src="${escHtml(t.image)}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
+             <img src="${_fixImgSrc(t.image)}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
            </div>`
         : `<div style="height:4px;background:${mainColor};flex-shrink:0;"></div>`}
       <div style="padding:0.45rem 0.55rem;display:flex;flex-direction:column;flex:1;">
@@ -3710,7 +3710,7 @@ function renderAdminTrendList() {
   list.innerHTML = allTrends.map(t => {
     const artistLabel = (t.artists||'').split(',').map(a=>a.trim()).filter(Boolean).join(', ');
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid #f0f0f0;background:#fff;">
-      ${t.image ? `<img src="${escHtml(t.image)}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="_onImgError(this)">` : '<div style="width:48px;height:48px;border-radius:8px;background:#f3f4f6;flex-shrink:0;"></div>'}
+      ${t.image ? `<img src="${_fixImgSrc(t.image)}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="_onImgError(this)">` : '<div style="width:48px;height:48px;border-radius:8px;background:#f3f4f6;flex-shrink:0;"></div>'}
       <div style="flex:1;min-width:0;">
        <div style="font-size:0.85rem;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(t.caption||'(no caption)')}</div>
        <div style="font-size:0.72rem;color:#9ca3af;">${escHtml(artistLabel)} ${t.date?'· '+t.date:''}</div>
@@ -4060,6 +4060,10 @@ function _pbFileUrl(record, filename) {
 function _fixImgSrc(url) {
   if (!url) return '';
   url = url.trim().replace(/&amp;/g, '&');
+  // PocketBase URLs — return as-is (already full URL, no proxy needed)
+  if (url.includes('pocketbase-production-510d.up.railway.app') || url.startsWith(PB_URL)) {
+    return url;
+  }
   // Google Drive any format → use thumbnail API (not blocked by browser)
   if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
     const id = _extractDriveId(url);
@@ -4108,6 +4112,13 @@ async function _facePos(img) {
 function _onImgError(img) {
   const original = img.getAttribute('data-original-src') || img.src;
   if (!img.getAttribute('data-original-src')) img.setAttribute('data-original-src', original);
+  // PocketBase URLs — ไม่ต้อง retry ด้วย proxy (URL ถูกต้องอยู่แล้ว)
+  if (original.includes('pocketbase-production-510d.up.railway.app') || (typeof PB_URL !== 'undefined' && original.startsWith(PB_URL))) {
+    img.style.display = 'none';
+    const wrap = img.closest('.card-img-wrap,[style*="aspect-ratio"]');
+    if (wrap) wrap.style.background = '#f5f2ee';
+    return;
+  }
   const attempt = parseInt(img.getAttribute('data-attempt') || '0');
   // If Google Drive thumbnail, try another format first
   const driveThumb = original.match(/drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]+)/);
@@ -4182,7 +4193,7 @@ function renderHome() {
   if (heroImg) {
     const firstWithImg = events.find(ev => ev.image);
     if (firstWithImg) {
-      heroImg.style.backgroundImage = `url('${firstWithImg.image}')`;
+      heroImg.style.backgroundImage = `url('${_fixImgSrc(firstWithImg.image)}')`;
       heroImg.style.display = 'block';
     } else {
       heroImg.style.display = 'none';
@@ -4231,7 +4242,7 @@ function renderHome() {
       const heroSrc = next.heroImage || next.image;
       const heroPos = next.heroImage ? (next.heroImagePos || next.imagePos || 'top center') : (next.imagePos || 'top center');
       if (heroSrc) {
-        el('bento-next-bg').style.backgroundImage = `url('${heroSrc}')`;
+        el('bento-next-bg').style.backgroundImage = `url('${_fixImgSrc(heroSrc)}')`;
         el('bento-next-bg').style.backgroundPosition = heroPos;
       }
     }
@@ -4257,7 +4268,7 @@ function renderHome() {
     const hero2Src = next2.heroImage || next2.image;
     const hero2Pos = next2.heroImage ? (next2.heroImagePos || next2.imagePos || 'top center') : (next2.imagePos || 'top center');
     if (hero2Src && el('bento-next2-bg')) {
-      el('bento-next2-bg').style.backgroundImage = `url('${hero2Src}')`;
+      el('bento-next2-bg').style.backgroundImage = `url('${_fixImgSrc(hero2Src)}')`;
       el('bento-next2-bg').style.backgroundPosition = hero2Pos;
     }
     if (el('bento-ev2')) el('bento-ev2').dataset.id = next2.__backendId;
