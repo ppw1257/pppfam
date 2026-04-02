@@ -1316,7 +1316,6 @@
      <!-- TYPE FILTER BAR -->
      <div class="filter-bar" id="home-type-bar" style="margin-bottom:1rem;">
       <button class="artist-filter-btn active" data-type="all" onclick="setHomeTypeFilter('all',this)" style="background:#111;color:#fff;border:1.5px solid #111;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;">All</button>
-      <button class="artist-filter-btn" data-type="upcoming" onclick="setHomeTypeFilter('upcoming',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Upcoming</button>
       <button class="artist-filter-btn" data-type="concert" onclick="setHomeTypeFilter('concert',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Concert</button>
       <button class="artist-filter-btn" data-type="fanmeet" onclick="setHomeTypeFilter('fanmeet',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Fan Meet</button>
       <button class="artist-filter-btn" data-type="series" onclick="setHomeTypeFilter('series',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Series / Movie</button>
@@ -4164,12 +4163,7 @@ function renderHome() {
     if (homeTypeFilter && homeTypeFilter !== 'all') {
       const t = (ev.type||'').toLowerCase();
       const country = (ev.country||'').toLowerCase();
-      if (homeTypeFilter === 'upcoming') {
-        // within 7 days
-        if (!ev.dateStart) return false;
-        const diff = Math.round((new Date(ev.dateStart + 'T00:00:00') - new Date(todayStr + 'T00:00:00')) / 86400000);
-        if (diff < 0 || diff > 7) return false;
-      } else if (homeTypeFilter === 'concert') {
+      if (homeTypeFilter === 'concert') {
         if (!['concert','live event','live','tpop fest','fancon','fanfest','music mv','music video'].includes(t)) return false;
       } else if (homeTypeFilter === 'fanmeet') {
         if (!['fan meet','fan meeting','fanmeet','fansign','fan party','fanday'].includes(t)) return false;
