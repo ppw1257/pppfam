@@ -1321,7 +1321,6 @@
       <button class="artist-filter-btn" data-type="fanmeet" onclick="setHomeTypeFilter('fanmeet',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Fan Meet</button>
       <button class="artist-filter-btn" data-type="series" onclick="setHomeTypeFilter('series',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Series / Movie</button>
       <button class="artist-filter-btn" data-type="event" onclick="setHomeTypeFilter('event',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Event</button>
-      <button class="artist-filter-btn" data-type="intl" onclick="setHomeTypeFilter('intl',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">International Events</button>
      </div>
 
      <div id="events-grid"></div>
@@ -1376,11 +1375,6 @@
         <div style="text-align:center;">
          <div id="cal-stat-past" style="font-size:1.2rem;font-weight:800;color:#374151;line-height:1;">-</div>
          <div style="font-size:0.55rem;color:#6b7280;margin-top:3px;font-weight:700;letter-spacing:0.06em;">Past</div>
-        </div>
-        <div style="width:1px;height:24px;background:#e5e7eb;"></div>
-        <div style="text-align:center;">
-         <div id="cal-stat-intl" style="font-size:1.2rem;font-weight:800;color:#2563eb;line-height:1;">-</div>
-         <div style="font-size:0.55rem;color:#6b7280;margin-top:3px;font-weight:700;letter-spacing:0.06em;">Intl</div>
         </div>
         <div style="width:1px;height:24px;background:#e5e7eb;"></div>
         <div style="text-align:center;">
@@ -2158,14 +2152,6 @@
         <label class="form-label" for="ev-city"><span>City</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-city" name="city" placeholder="e.g. Bangkok">
        </div>
-       <div style="grid-column:1/-1;">
-        <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border-radius:10px;border:1.5px solid #bfdbfe;background:#eff6ff;width:fit-content;box-sizing:border-box;">
-         <input type="checkbox" id="ev-isInternational" name="isInternational" style="width:16px;height:16px;accent-color:#2563eb;cursor:pointer;flex-shrink:0;" title="งานนอกประเทศไทย">
-         <span style="font-size:0.88rem;font-weight:700;color:#1d4ed8;">🌏 International Event</span>
-         <span style="font-size:0.78rem;color:#6b7280;font-weight:400;">งานนอกประเทศไทย</span>
-        </label>
-       </div>
-
        <div style="grid-column:1/-1;">
         <label class="form-label" for="ev-location"><span>Location Name</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
         <input class="form-input" id="ev-location" name="location" placeholder="e.g. Impact Arena">
@@ -2989,7 +2975,6 @@ function processEvents(raw) {
     country:     safeText(r.country     || ''),
     city:        safeText(r.city        || ''),
     location:    safeText(r.location    || r.location_name || ''),
-    isInternational: !!r.isInternational,
     description: rawStr(r.description  || ''),
     type:        safeText(r.type        || r.event_type    || ''),
     note:        safeText(r.note        || ''),
@@ -3174,12 +3159,10 @@ async function pbGetToken() {
   let token = '';
   try { token = sessionStorage.getItem('pppPbToken') || ''; } catch(e) {}
   if (token) return token;
-  const adminPw = (() => { try { return sessionStorage.getItem('pppAdminPass') || ''; } catch(e) { return ''; } })();
-  if (!adminPw) throw new Error('Not logged in');
-  const res = await fetch(`${PB_URL}/api/collections/users/auth-with-password`, {
+  const res = await fetch(`${PB_URL}/api/collections/_superusers/auth-with-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ identity: 'admin@pppfam.local', password: adminPw })
+    body: JSON.stringify({ identity: 'trendforpondphuwin@gmail.com', password: 'ppppondphuwin1257ppw' })
   });
   const data = await res.json();
   if (!data.token) throw new Error('PocketBase auth failed');
@@ -4183,8 +4166,6 @@ function renderHome() {
         if (!['series','short drama','variety & game show','onair'].includes(t)) return false;
       } else if (homeTypeFilter === 'event') {
         if (!['event','collab','private event','fashion week','birthday event'].includes(t)) return false;
-      } else if (homeTypeFilter === 'intl') {
-        if (!ev.isInternational) return false;
       }
     }
     return true;
@@ -5736,14 +5717,12 @@ function renderCalYearStats() {
   const upcoming = eventsInYear.filter(ev => !isEventPast(ev)).length;
   const total    = eventsInYear.length;
   const pct      = total > 0 ? Math.round((past / total) * 100) : 0;
-  const intl     = eventsInYear.filter(ev => !!ev.isInternational).length;
 
   const g = id => document.getElementById(id);
   if (g('cal-stat-year-label')) g('cal-stat-year-label').textContent = `Total`;
   if (g('cal-stat-total'))    g('cal-stat-total').textContent    = total;
   if (g('cal-stat-past'))     g('cal-stat-past').textContent     = past;
   if (g('cal-stat-upcoming')) g('cal-stat-upcoming').textContent = upcoming;
-  if (g('cal-stat-intl'))     g('cal-stat-intl').textContent     = intl;
   if (g('cal-stat-pct'))      g('cal-stat-pct').textContent      = pct + '%';
 
   // Count total years with events (not just selected year)
@@ -6720,10 +6699,6 @@ function fillForm(ev) {
   set('iq',ev.iq);
   set('ticket1',ev.ticket1); set('ticket2',ev.ticket2); set('ticket3',ev.ticket3);
   set('ticket-live',ev.ticketLive); set('ticket-fanclub',ev.ticketFanclub);
-  const intlCb = document.getElementById('ev-isInternational');
-  if (intlCb) {
-    intlCb.checked = !!ev.isInternational;
-  }
   const arr = ev.artists ? ev.artists.split(',').map(a=>a.trim()) : [];
   document.querySelectorAll('.artist-check').forEach(c => { c.checked = arr.includes(c.value); });
 
@@ -6800,7 +6775,6 @@ function readFormSchema() {
     x:fv('x'), tiktok:fv('tiktok'), website:fv('website'),
     whatsapp:fv('whatsapp'), shopee:fv('shopee'), live:fv('live'), download:fv('download'),
     iq:fv('iq'),
-    isInternational: !!(document.getElementById('ev-isInternational')?.checked),
     ticket1:fv('ticket1'), ticket2:fv('ticket2'), ticket3:fv('ticket3'),
     ticketLive:fv('ticket-live'), ticketFanclub:fv('ticket-fanclub'),
   };
@@ -6840,7 +6814,6 @@ async function handleEventFormSubmit() {
     x:schema.x, tiktok:schema.tiktok, website:schema.website,
     whatsapp:schema.whatsapp, shopee:schema.shopee, live:schema.live, download:schema.download,
     iq:schema.iq,
-    isInternational: schema.isInternational,
     ticket1:schema.ticket1, ticket2:schema.ticket2, ticket3:schema.ticket3,
     ticketLive:schema.ticketLive, ticketFanclub:schema.ticketFanclub
   };
