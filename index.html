@@ -1033,10 +1033,10 @@
     font-size: clamp(0.78rem, 1.2vw, 0.92rem) !important;
   }
 
-  /* ══ Works grid: 6 col desktop, responsive ══ */
+  /* ══ Works grid: large 16:9 cards ══ */
   #works-grid, #works-loading, .works-year-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-    gap: clamp(8px, 1.2vw, 14px) !important;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    gap: clamp(10px, 1.5vw, 18px) !important;
   }
 
   /* #works-tabs responsive rules defined above (single authoritative block) */
@@ -1188,20 +1188,6 @@
       </div>
      </div>
 
-     <!-- TYPE FILTER BAR -->
-     <div class="filter-bar" id="home-type-bar" style="margin-bottom:1rem;align-items:center;">
-      <button class="artist-filter-btn active" data-type="all" onclick="setHomeTypeFilter('all',this)" style="background:#111;color:#fff;border:1.5px solid #111;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;">All</button>
-      <button class="artist-filter-btn" data-type="concert" onclick="setHomeTypeFilter('concert',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Concert</button>
-      <button class="artist-filter-btn" data-type="fanmeet" onclick="setHomeTypeFilter('fanmeet',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Fan Meet</button>
-      <button class="artist-filter-btn" data-type="series" onclick="setHomeTypeFilter('series',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Series / Movie</button>
-      <button class="artist-filter-btn" data-type="event" onclick="setHomeTypeFilter('event',this)" style="background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;cursor:pointer;">Event</button>
-      <!-- Card size slider -->
-      <div id="card-size-slider-wrap" style="margin-left:auto;display:none;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <input id="card-size-slider" type="range" min="1" max="5" value="3" step="1" oninput="applyCardSize(this.value)" title="ปรับขนาดการ์ด">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect x="13" y="13" width="9" height="9" rx="1.5"/></svg>
-      </div>
-     </div>
 
      <div id="events-grid"></div>
      <div id="no-events" style="display:none;padding:3rem 1rem;">
@@ -4120,22 +4106,21 @@ function renderHome() {
       const haystack = (ev.title + ' ' + (ev.location||'') + ' ' + (ev.city||'') + ' ' + (ev.country||'') + ' ' + (ev.artists||'') + ' ' + (ev.type||'') + ' ' + (ev.tv||'')).toLowerCase();
       if (!haystack.includes(q)) return false;
     }
-    // Type filter
+    // Status / date filter
     if (homeTypeFilter && homeTypeFilter !== 'all') {
-      const t = (ev.type||'').toLowerCase();
-      const country = (ev.country||'').toLowerCase();
-      if (homeTypeFilter === 'concert') {
-        const concertKeys = ['concert','live concert','fancon','fan fest','fanfest','tpop fest','tpopfest','music & mv','music mv','music video'];
-        if (!concertKeys.some(k => t.includes(k))) return false;
-      } else if (homeTypeFilter === 'fanmeet') {
-        const fanmeetKeys = ['fan meet','fan meeting','fanmeet','fansign','fan party','fanday','fanparty'];
-        if (!fanmeetKeys.some(k => t.includes(k))) return false;
-      } else if (homeTypeFilter === 'series') {
-        const seriesKeys = ['series','short drama','movie','variety & game show','variety and game show','on air','onair','variety show'];
-        if (!seriesKeys.some(k => t.includes(k))) return false;
-      } else if (homeTypeFilter === 'event') {
-        const eventKeys = ['brand event','fashion week','award show','birthday event','private event','collab','special event','live event','event'];
-        if (!eventKeys.some(k => t.includes(k))) return false;
+      if (!ev.dateStart) return false;
+      const now = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      const todayStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+      const evDate = ev.dateStart.slice(0,10);
+      const [ey,em,ed] = evDate.split('-').map(Number);
+      const evD = new Date(ey, em-1, ed);
+      if (homeTypeFilter === 'thisweek') {
+        const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+        const endOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + 6, 23, 59, 59);
+        if (evD < startOfWeek || evD > endOfWeek) return false;
+      } else if (homeTypeFilter === 'thismonth') {
+        if (evDate.slice(0,7) !== todayStr.slice(0,7)) return false;
       }
     }
     return true;
@@ -4346,7 +4331,7 @@ let _vsLastFingerprint = ''; // skip re-render when event list unchanged
 
 function _vsComputeFingerprint(groups) {
   // Include viewMode and filter so switching tab/filter always re-renders
-  return _viewMode + '|' + homeSearch + '|' +
+  return _viewMode + '|' + homeSearch + '|' + (typeof homeTypeFilter !== 'undefined' ? homeTypeFilter : '') + '|' +
     groups.filter(g => g.type === 'card').map(g => g.ev.__backendId + ':' + (g.ev._isPast?1:0)).join('|');
 }
 
@@ -7780,8 +7765,8 @@ function renderWorks() {
   // Responsive grid cols CSS
   const gridCols = `
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-    gap:clamp(6px,1.2vw,14px);
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:clamp(10px,1.5vw,18px);
   `;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
@@ -7799,7 +7784,7 @@ function renderWorks() {
       const dot = artistColors[a] || '#64748b';
       const txt = artistTextColors[a] || '#64748b';
       const divider = i > 0 ? `<span style="width:1px;height:10px;background:#e5e7eb;display:inline-block;flex-shrink:0;"></span>` : '';
-      return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
+      return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:700;color:${txt};"><span style="width:6px;height:6px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
     }).join('');
 
     // ── Contract expired check ──
@@ -7811,7 +7796,7 @@ function renderWorks() {
       : '';
 
     const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;min-height:180px;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}"></div>`
+      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
     const wab = getArtistBg(w.artists);
@@ -7825,12 +7810,12 @@ function renderWorks() {
       card.style.cursor = 'default';
     }
     card.innerHTML = `${thumb}
-      <div style="padding:0.85rem 0.9rem;display:flex;flex-direction:column;flex:1;">
+      <div style="padding:0.9rem 1rem;display:flex;flex-direction:column;flex:1;">
         <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
-        <div style="font-size:0.78rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
+        <div style="font-size:0.88rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:8px;">${escHtml(w.title)}</div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-          ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:3px 9px;white-space:nowrap;">${cat.label}</span>` : ''}
-          ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:3px 9px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
+          ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:4px 10px;white-space:nowrap;">${cat.label}</span>` : ''}
+          ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:4px 10px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
         </div>
       </div>`;
     return card;
