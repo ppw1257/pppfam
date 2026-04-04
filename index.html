@@ -135,7 +135,7 @@
   .nav-link { cursor: pointer; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: 8px; color: #9ca3af; letter-spacing: 0em; transition: color 0.1s, background 0.1s; }
   .nav-link:hover { color: #111; background: #f5f5f5; }
   .nav-link.active { color: #111; background: transparent; border-radius: 8px; font-weight: 700; box-shadow: none; }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #f0f0f0; box-shadow: 0 1px 8px rgba(0,0,0,0.05); height: 100%; position: relative; transition: box-shadow 0.12s, transform 0.12s; will-change: transform; }
+  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100%; position: relative; transition: box-shadow 0.12s, transform 0.12s; will-change: transform; }
   .month-group { }
   .event-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #e8e8e8; }
   .next-card-label {
@@ -895,7 +895,6 @@
   /* img-loading / img-loaded defined above (line ~158) */
   /* ── Reduce heavy shadows on mobile (perf) ── */
   @media (max-width: 767px) {
-    .event-card { box-shadow: 0 2px 12px rgba(0,0,0,0.07) !important; }
     .event-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12) !important; }
     .modal-box { box-shadow: 0 4px 24px rgba(0,0,0,0.15) !important; }
   }
@@ -3633,7 +3632,7 @@ function renderTrend() {
         ? `<div style="width:100%;flex-shrink:0;overflow:hidden;border-radius:var(--radius-card) var(--radius-card) 0 0;background:#f8f9fa;">
              <img src="${_fixImgSrc(t.image)}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
            </div>`
-        : `<div style="height:4px;background:${mainColor};flex-shrink:0;"></div>`}
+        : `<div class="card-img-wrap" style="background:#f8f9fa;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" fill="none" stroke="${mainColor}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`}
       <div style="padding:0.45rem 0.55rem;display:flex;flex-direction:column;flex:1;">
         ${badgesHtml}
         ${t.caption ? `<p style="font-size:0.7rem;font-weight:700;line-height:1.35;color:#111;margin:0;word-break:break-word;">${escHtml(t.caption)}</p>` : ''}
@@ -4869,7 +4868,7 @@ function createCard(ev) {
   const _typeOverlayEarly = ev.type ? `<div style="position:absolute;top:10px;left:10px;z-index:4;pointer-events:none;">${buildTypePill(ev.type,'sm')}</div>` : '';
   const imgHtml = ev.image
     ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}</div>`
-    : `<div style="height:4px;background:${color};flex-shrink:0;"></div>`;
+    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
@@ -4931,9 +4930,9 @@ function createCard(ev) {
   const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${'View details →'}</div></div></div>`;
   const imgSection = ev.image
     ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}</div>`
-    : `<div style="height:3px;background:${color};flex-shrink:0;opacity:0.7;"></div>`;
+    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
-  const noImgBadge = !ev.image ? buildCountdownImgBadge(ev, true) : '';
+  const noImgBadge = ''; // badges now rendered inside card-img-wrap for all cases
   card.style.flexDirection = '';
   card.innerHTML = `${nextBadge}${imgSection}${hoverOverlay}
     <div style="padding:0.65rem 0.75rem;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;position:relative;">
@@ -4941,6 +4940,7 @@ function createCard(ev) {
       ${artistBadge}
       <h3 style="font-weight:700;font-size:0.78rem;letter-spacing:-0.01em;margin-bottom:4px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:#111;">${escHtml(ev.title)}</h3>
       ${dtRow}${locRow}${pillsRow}${noteRow}${descRow}
+      <div style="flex:1;min-height:0;"></div>
       ${socialHtml ? `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;" onclick="event.stopPropagation()">${socialHtml}</div>` : ''}
     </div>`;
   return card;
