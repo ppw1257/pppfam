@@ -26,7 +26,7 @@
   <!-- Security: prevent search engine indexing (fan site, not for public search) -->
   <meta name="robots" content="noindex, nofollow">
   <!-- Security: Content Security Policy — prevent XSS -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://pocketbase-production-510d.up.railway.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https://pocketbase-production-510d.up.railway.app; frame-src https://www.google.com https://maps.google.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://pocketbase-production-510d.up.railway.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src * data: blob:; connect-src 'self' https://pocketbase-production-510d.up.railway.app https://images.weserv.nl https://wsrv.nl; frame-src https://www.google.com https://maps.google.com;">
   <!-- DNS prefetch + preconnect for external assets -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -4008,17 +4008,26 @@ function _pbFileUrl(record, filename) {
 function _fixImgSrc(url) {
   if (!url) return '';
   url = url.trim().replace(/&amp;/g, '&');
-  // PocketBase URLs — return as-is (already full URL, no proxy needed)
+  // PocketBase URLs — return as-is (no proxy needed, same origin)
   if (url.includes('pocketbase-production-510d.up.railway.app') || url.startsWith(PB_URL)) {
     return url;
   }
-  // Google Drive any format → use thumbnail API (not blocked by browser)
+  // Already a proxy URL — don't double-wrap
+  if (url.includes('weserv.nl') || url.includes('wsrv.nl')) {
+    return url;
+  }
+  // Google Drive any format → use thumbnail API (fastest, no proxy needed)
   if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
     const id = _extractDriveId(url);
     if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w600`;
   }
-  // Dropbox: dl=0 → dl=1
+  // Dropbox: use direct download link
   if (url.includes('dropbox.com')) return url.replace('dl=0','dl=1').replace('www.dropbox','dl.dropboxusercontent');
+  // All other external URLs — route through proxy to bypass hotlink/CORS blocks
+  // (covers Twitter/X, Instagram, Facebook, LINE, any CDN, etc.)
+  if (url.startsWith('http')) {
+    return `https://images.weserv.nl/?url=${encodeURIComponent(url)}`;
+  }
   return url;
 }
 
@@ -4076,8 +4085,11 @@ function _onImgError(img) {
     proxies.push(`https://drive.google.com/uc?export=view&id=${driveId}`);
     proxies.push(`https://lh3.googleusercontent.com/d/${driveId}`);
   }
-  proxies.push(`https://images.weserv.nl/?url=${encodeURIComponent(original)}`);
-  proxies.push(`https://wsrv.nl/?url=${encodeURIComponent(original)}`);
+  // Only add proxy if not already a proxy URL
+  if (!original.includes('weserv.nl') && !original.includes('wsrv.nl')) {
+    proxies.push(`https://images.weserv.nl/?url=${encodeURIComponent(original)}`);
+    proxies.push(`https://wsrv.nl/?url=${encodeURIComponent(original)}`);
+  }
   if (attempt < proxies.length) {
     img.setAttribute('data-attempt', attempt + 1);
     img.src = proxies[attempt];
@@ -4867,8 +4879,9 @@ function createCard(ev) {
   const nextBadge = ''; // NEXT badge removed
 
   const _typeOverlayEarly = ev.type ? `<div style="position:absolute;top:10px;left:10px;z-index:4;pointer-events:none;">${buildTypePill(ev.type,'sm')}</div>` : '';
+  const _imgPosEarly = ev.imagePos || 'top center';
   const imgHtml = ev.image
-    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}</div>`
+    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" style="object-position:${_imgPosEarly}" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}</div>`
     : `<div style="height:4px;background:${color};flex-shrink:0;"></div>`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
@@ -4929,8 +4942,9 @@ function createCard(ev) {
   const socialHtml = buildSocialIcons(ev);
   const shareBtn = ``;
   const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${'View details →'}</div></div></div>`;
+  const _imgPos = ev.imagePos || 'top center';
   const imgSection = ev.image
-    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}</div>`
+    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" style="object-position:${_imgPos}" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}</div>`
     : `<div class="card-img-wrap" style="background:${ab};position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}<svg width="40" height="40" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.2;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   const noImgBadge = '';
