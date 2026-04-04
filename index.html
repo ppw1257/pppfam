@@ -7494,6 +7494,20 @@ function renderAdminWorksList() {
     row.dataset.wid = wid;
     row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;';
 
+    // Thumbnail image block
+    if (w.image) {
+      const thumbWrap = document.createElement('div');
+      thumbWrap.style.cssText = 'width:56px;height:56px;border-radius:8px;overflow:hidden;background:#f3f4f6;flex-shrink:0;';
+      const thumbImg = document.createElement('img');
+      thumbImg.src = (typeof _fixImgSrc === 'function') ? _fixImgSrc(w.image) : w.image;
+      thumbImg.alt = w.title || '';
+      thumbImg.loading = 'lazy';
+      thumbImg.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:' + (w.image_position || 'top center') + ';display:block;';
+      thumbImg.onerror = function() { this.parentNode.style.background = '#e5e7eb'; this.style.display = 'none'; };
+      thumbWrap.appendChild(thumbImg);
+      row.appendChild(thumbWrap);
+    }
+
     // Info block
     const info = document.createElement('div');
     info.style.cssText = 'flex:1;min-width:0;';
