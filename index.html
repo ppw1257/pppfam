@@ -135,7 +135,7 @@
   .nav-link { cursor: pointer; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: 8px; color: #9ca3af; letter-spacing: 0em; transition: color 0.1s, background 0.1s; }
   .nav-link:hover { color: #111; background: #f5f5f5; }
   .nav-link.active { color: #111; background: transparent; border-radius: 8px; font-weight: 700; box-shadow: none; }
-  .event-card { background: #fff; border-radius: var(--radius-card); cursor: pointer; display: flex; flex-direction: column; border: 1px solid #d4d4d4; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100%; min-height: 260px; position: relative; transition: box-shadow 0.12s, transform 0.12s; will-change: transform; }
+  .event-card { background: #fff; border-radius: var(--radius-card); cursor: pointer; display: flex; flex-direction: column; border: 1px solid #d4d4d4; box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-height: 260px; position: relative; transition: box-shadow 0.12s, transform 0.12s; will-change: transform; }
   .month-group { }
   .event-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #e8e8e8; }
   .next-card-label {
@@ -880,7 +880,7 @@
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)) !important;
     gap: clamp(10px, 1.5vw, 18px) !important;
-    align-items: stretch;
+    align-items: start;
     width: 100%;
     min-width: 0;
   }
@@ -4868,7 +4868,7 @@ function createCard(ev) {
   const _typeOverlayEarly = ev.type ? `<div style="position:absolute;top:10px;left:10px;z-index:4;pointer-events:none;">${buildTypePill(ev.type,'sm')}</div>` : '';
   const imgHtml = ev.image
     ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}</div>`
-    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;min-height:clamp(110px,12vw,160px);">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    : `<div class="card-img-wrap" style="background:${ab};position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
@@ -4930,7 +4930,7 @@ function createCard(ev) {
   const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${'View details →'}</div></div></div>`;
   const imgSection = ev.image
     ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}</div>`
-    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;min-height:clamp(110px,12vw,160px);">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    : `<div class="card-img-wrap" style="background:${ab};position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   const noImgBadge = ''; // badges now rendered inside card-img-wrap for all cases
   card.style.flexDirection = '';
@@ -8393,7 +8393,7 @@ function applyCardSize(val) {
       gap: ${cfg.gap} !important;
     }
     .event-card {
-      min-height: ${cfg.minCardH} !important;
+      height: ${cfg.minCardH} !important;
     }
     .card-img-wrap {
       height: ${cfg.imgH} !important;
