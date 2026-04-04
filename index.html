@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>PPP Family</title>
   <!-- PWA / installable — enables instant load from home screen -->
   <meta name="description" content="ติดตามกำหนดการและอีเวนต์ของ Pond, Phuwin และ Permpoon — PPP Family Schedule 2026">
@@ -26,19 +25,16 @@
   <!-- Security: prevent search engine indexing (fan site, not for public search) -->
   <meta name="robots" content="noindex, nofollow">
   <!-- Security: Content Security Policy — prevent XSS -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://pocketbase-production-510d.up.railway.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src * data: blob:; connect-src 'self' https://pocketbase-production-510d.up.railway.app https://images.weserv.nl https://wsrv.nl; frame-src https://www.google.com https://maps.google.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://pocketbase-production-510d.up.railway.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src * data: blob:; connect-src 'self' https://pocketbase-production-510d.up.railway.app https://images.weserv.nl https://wsrv.nl; frame-src https://www.google.com https://maps.google.com;">
   <!-- DNS prefetch + preconnect for external assets -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
   <!-- Load font as blocking to prevent FOUT (font flash) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=K2D:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=K2D:wght@400;600;700;800&display=swap"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap"></noscript>
   <!-- Non-blocking scripts -->
   <script src="/_sdk/element_sdk.js" defer></script>
-  <!-- Tailwind loads before render to prevent layout shift (no defer) -->
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" defer></script>
   <!-- bfcache fix — when user navigates back/forward, always hard-reload -->
   <script>
@@ -96,12 +92,7 @@
     --color-pondphuwinpermpoon-text-dark:#312e81;
 
     --radius-card: 18px;
-    --shadow-card: none;
-    --border-card: none;
     --color-accent: #111;
-    /* Card size slider: 1=small, 2=medium(default), 3=large */
-    --card-size: 2;
-    --card-min-px: 180px;  /* dynamic, set by JS */
     --accent-primary: #f97316;
     --accent-gradient: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
     /* Fluid spacing */
@@ -136,7 +127,6 @@
   .nav-link:hover { color: #111; background: #f5f5f5; }
   .nav-link.active { color: #111; background: transparent; border-radius: 8px; font-weight: 700; box-shadow: none; }
   .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #d8d8d8; box-shadow: 0 1px 8px rgba(0,0,0,0.05); height: 100%; position: relative; transition: box-shadow 0.12s, transform 0.12s; }
-  .month-group { }
   .event-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #e8e8e8; }
   .next-card-label {
     display: inline-flex; align-items: center; gap: 4px;
@@ -173,7 +163,6 @@
   .list-card-body { flex:1;min-width:0; }
   .list-card-title { font-size:0.85rem;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px; }
   .list-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;gap:8px;flex-wrap:wrap; }
-  .event-card:active { }
   /* ── Card countdown timer ── */
   .card-countdown { display:none !important; }
   .count-box { background:rgba(0,0,0,0.08); color:#111; padding:4px 6px; border-radius:6px; font-size:0.65rem; font-weight:800; text-align:center; line-height:1.2; min-width:34px; letter-spacing:0.02em; }
@@ -210,9 +199,6 @@
   .cal-day-selected { background: #111 !important; box-shadow: none; }
   .cal-day-has-event::after { content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#6b7280; }
   .cal-day-selected.cal-day-has-event::after { background:#fff; }
-  .cal-events-wrap { display:none; }
-  .cal-event-dot { display:none; }
-  .cal-event-dot-circle { display:none; }
   /* event list right side */
   .cal-list-item { display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-card);background:#fff;border:1px solid #f0f0f0;box-shadow:0 1px 6px rgba(0,0,0,0.04);cursor:pointer;transition:box-shadow 0.18s, transform 0.18s; }
   .cal-list-item:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); transform:translateY(-2px); }
@@ -488,8 +474,6 @@
   .month-group:first-child { padding-top: 0; }
   .month-group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; margin-top: 1.25rem; padding-bottom: 8px; }
   .month-group-header-box { display: inline-flex; align-items: center; gap: 6px; }
-  .month-group-header-dots { display: none; }
-  .month-group-header-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .month-group-header-label { font-size: 1.35rem; font-weight: 800; color: #111; letter-spacing: -0.02em; line-height: 1; }
   .month-group-header-line { display: block; flex: 1; height: 1px; background: #f0f0f0; }
   .month-group-header-count { font-size: 0.65rem; font-weight: 700; color: #fff; background: #111; border-radius: 99px; padding: 2px 9px; border: none; letter-spacing: 0.02em; }
@@ -854,12 +838,6 @@
   .card-img        { height: 100%; }
   .cal-ev-card-img { height: clamp(120px, 14vw, 200px); }
 
-  /* ── Fluid typography ── */
-  #home-title        { font-size: var(--text-3xl) !important; }
-  #cal-section-title { font-size: var(--text-2xl) !important; }
-  /* section-header & month-group-header-label font sizes — defined in fluid section below */
-  /* timeline-card-title, list-card-title, timeline-card-meta, list-card-meta — defined in fluid section below */
-
   /* ── Hero bento fluid ── */
   #bento-next-title, #bento-next2-title {
     font-size: clamp(0.85rem, 1.2vw, 1.25rem) !important;
@@ -899,8 +877,6 @@
     .event-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.12) !important; }
     .modal-box { box-shadow: 0 4px 24px rgba(0,0,0,0.15) !important; }
   }
-  /* ── Smooth infinite-scroll transition ── */
-  .month-group { }
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -2471,7 +2447,6 @@ const DEBOUNCE_RENDER  = 16;
 const DEBOUNCE_RESIZE  = 200;
 const SKELETON_COUNT   = 4; // fewer skeletons = faster perceived load
 const PAGE_SIZE        = 20;
-const IMG_OBSERVER_OPTS = { rootMargin: '200px 0px', threshold: 0 };
 
 // ── RATE LIMITER — prevents API spam even on traffic spike ────────
 const _rateLimit = {
@@ -2688,11 +2663,6 @@ async function fetchAllFromPocketBase() {
  * from the CDN/Drive. Falls back to Apps Script doGet if static URL fails.
  * This is the HIGH-TRAFFIC read path — no Apps Script quota consumed.
  */
-// fetchStaticJSON removed — using PocketBase only
-
-// Legacy alias — used by write operations (admin panel)
-// API_URL removed — using PocketBase only
-
 // ═══════════════════════════════════════════════════════════════════
 // CACHE LAYER — L2: localStorage with TTL + version control
 // Falls back gracefully if storage is full or blocked
@@ -2766,97 +2736,8 @@ async function fetchWithTimeout(url, timeoutMs = FETCH_TIMEOUT_MS) {
   }
 }
 
-function fetchJSONP(url, timeoutMs = FETCH_TIMEOUT_MS) {
-  return new Promise((resolve, reject) => {
-    const cb = '__pppCb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
-    const fullUrl = url + '&callback=' + encodeURIComponent(cb);
-    let el;
-    const cleanup = () => {
-      delete window[cb];
-      if (el && el.parentNode) el.parentNode.removeChild(el);
-    };
-    const tid = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, timeoutMs);
-    window[cb] = d => { clearTimeout(tid); cleanup(); resolve(d); };
-    el = document.createElement('script');
-    el.onerror = () => { clearTimeout(tid); cleanup(); reject(new Error('JSONP error')); };
-    el.src = fullUrl;
-    document.head.appendChild(el);
-  });
-}
-
-// Maps action names to dataType for static JSON fetch
-const _actionToDataType = {
-  'getEvents':       'events',
-  'getWorks':        'works',
-  'getBirthdays':    'birthdays',
-  'getAnniversaries':'anniversaries',
-  'getAll':          'all',
-};
-
-// apiGetWithRetry removed — using PocketBase only
-
-async function apiPostFetch(body) {
-  const ctrl = new AbortController();
-  const tid = setTimeout(() => ctrl.abort(), 20000);
-  try {
-    // Inject admin password for server-side auth check in Code.gs
-    // No hardcoded fallback — if sessionStorage is empty, session has expired
-    let adminPass = '';
-    try { adminPass = sessionStorage.getItem('pppAdminPass') || ''; } catch(e) {}
-    if (!adminPass) {
-      // Session expired or sessionStorage cleared — force logout
-      adminLogout();
-      throw new Error('Session expired — please log in again');
-    }
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ ...body, password: adminPass }),
-      signal: ctrl.signal
-    });
-    clearTimeout(tid);
-    const text = await res.text();
-    return JSON.parse(text);
-  } finally { clearTimeout(tid); }
-}
-
-function apiWriteJSONP(action, payload) {
-  return new Promise((resolve, reject) => {
-    const cb = '__pppCb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
-    let url = `${API_URL}?action=${encodeURIComponent(action)}&callback=${encodeURIComponent(cb)}`;
-    if (payload.id)          url += '&id='   + encodeURIComponent(payload.id);
-    if (payload.event)       url += '&data=' + encodeURIComponent(JSON.stringify(payload.event));
-    if (payload.birthday)    url += '&data=' + encodeURIComponent(JSON.stringify(payload.birthday));
-    if (payload.anniversary) url += '&data=' + encodeURIComponent(JSON.stringify(payload.anniversary));
-    if (payload.trend)       url += '&data=' + encodeURIComponent(JSON.stringify(payload.trend));
-    if (payload.work)        url += '&data=' + encodeURIComponent(JSON.stringify(payload.work));
-    let el;
-    const cleanup = () => { delete window[cb]; if (el && el.parentNode) el.parentNode.removeChild(el); };
-    const tid = setTimeout(() => { cleanup(); reject(new Error('JSONP write timeout')); }, 20000);
-    window[cb] = d => { clearTimeout(tid); cleanup(); resolve(d); };
-    el = document.createElement('script');
-    el.onerror = () => { clearTimeout(tid); cleanup(); reject(new Error('JSONP write error')); };
-    el.src = url;
-    document.head.appendChild(el);
-  });
-}
-
-async function apiPost(body) {
-  try {
-    const result = await apiPostFetch(body);
-    if (result && result.status) return result;
-    throw new Error('Invalid response');
-  } catch(e) {
-    const payload = {};
-    if (body.id)          payload.id          = body.id;
-    if (body.event)       payload.event       = body.event;
-    if (body.birthday)    payload.birthday    = body.birthday;
-    if (body.anniversary) payload.anniversary = body.anniversary;
-    if (body.trend)       payload.trend       = body.trend;
-    if (body.work)        payload.work        = body.work;
-    return await apiWriteJSONP(body.action, payload);
-  }
-}
+// Legacy stub — apiPost previously called Apps Script (removed). No-op now; PocketBase handles all writes.
+async function apiPost(body) { return { status: 'ok' }; }
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -2941,10 +2822,6 @@ function processEvents(raw) {
   return filtered;
 }
 
-// Legacy wrapper — now handled by _fastHydrateFromCache in DOMContentLoaded
-function hydrateFromCache() { _fastHydrateFromCache(); }
-
-// ── getAll: fetch 4 files from GitHub Pages in parallel ──
 let _fetchingAll = false;
 // ── helper: parse all-in-one response from all.json or Apps Script getAll ──
 function _applyAllData(res, force, dataChangedRef) {
@@ -3906,20 +3783,6 @@ function hideConnectionError() {
   if (warn && warn.parentNode) warn.parentNode.removeChild(warn);
 }
 
-async function forceRefreshAll() {
-  // nav-refresh button removed — this function can still be called from admin/internal
-  Cache.clearAll();
-  _vsLastFingerprint = '';
-  if ('caches' in window) {
-    const keys = await caches.keys().catch(() => []);
-    await Promise.all(keys.filter(k => k.includes('api')).map(k => caches.delete(k))).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
-  }
-  _fetchingEvents = false; _fetchingBdays = false; _fetchingAnnivs = false; _fetchingWorks = false;
-  _fetchingAll = false;
-  showSkeletons();
-  await _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
-}
-
 async function retryConnection() {
   Cache.clearAll();
   _fetchingAll = false;
@@ -4216,12 +4079,6 @@ function renderHome() {
       el('bento-next2-bg').style.backgroundPosition = hero2Pos;
     }
     if (el('bento-ev2')) el('bento-ev2').dataset.id = next2.__backendId;
-    if (days2 !== null && days2 <= 1) {
-      startCountdown2(next2.dateStart, next2.startTime);
-    } else {
-      const cdEl = document.getElementById('bento-countdown2');
-      if (cdEl) cdEl.style.display = 'none';
-    }
   } else if (el('bento-ev2')) {
     el('bento-ev2').style.display = 'none';
   }
@@ -4313,8 +4170,6 @@ function _buildGridCard(ev) {
 // ── End virtual scroll render ──
 // (observer callbacks + infinite-scroll engine defined below)
 
-// debounceLucide + startCardCountdowns still called from _vsRenderBatch
-
 // Original renderHome closing + past events section:
 function _renderHomeEnd() {
   debounceLucide();
@@ -4390,34 +4245,7 @@ function _vsInit(groups) {
   startCardCountdowns();
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// INTERSECTION OBSERVER — Lazy Image Loading
-// Images use data-src; observer swaps to src when near viewport
-// ═══════════════════════════════════════════════════════════════════
-let _imgObserver = null;
-function _getImgObserver() {
-  if (_imgObserver) return _imgObserver;
-  _imgObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const img = entry.target;
-      const src = img.dataset.src;
-      if (src) {
-        img.src = src;
-        img.removeAttribute('data-src');
-        img.classList.add('img-loading');
-        img.onload = () => { img.classList.remove('img-loading'); img.classList.add('img-loaded'); };
-        img.onerror = () => { img.style.display='none'; };
-      }
-      _imgObserver.unobserve(img);
-    });
-  }, IMG_OBSERVER_OPTS);
-  return _imgObserver;
-}
-function _observeLazyImages(root) {
-  // Native loading="lazy" handles lazy loading — no custom observer needed
-  // Keep function to avoid breaking call sites
-}
+function _observeLazyImages(root) {}
 
 function renderPastEvents(grid) {
   const q = homeSearch.trim().toLowerCase();
@@ -5795,12 +5623,6 @@ function _parseEventTarget(dateStr, timeStr) {
 function startCountdown(dateStr, timeStr) {
   if (_countdownTimer) clearInterval(_countdownTimer);
   const cdEl = document.getElementById('bento-countdown');
-  if (cdEl) cdEl.style.display = 'none';
-}
-
-function startCountdown2(dateStr, timeStr) {
-  if (window._countdownTimer2) clearInterval(window._countdownTimer2);
-  const cdEl = document.getElementById('bento-countdown2');
   if (cdEl) cdEl.style.display = 'none';
 }
 
