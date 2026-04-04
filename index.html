@@ -135,7 +135,7 @@
   .nav-link { cursor: pointer; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: 8px; color: #9ca3af; letter-spacing: 0em; transition: color 0.1s, background 0.1s; }
   .nav-link:hover { color: #111; background: #f5f5f5; }
   .nav-link.active { color: #111; background: transparent; border-radius: 8px; font-weight: 700; box-shadow: none; }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100%; position: relative; transition: box-shadow 0.12s, transform 0.12s; will-change: transform; }
+  .event-card { background: #fff; border-radius: var(--radius-card); cursor: pointer; display: flex; flex-direction: column; border: 1px solid #d4d4d4; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100%; min-height: 260px; position: relative; transition: box-shadow 0.12s, transform 0.12s; will-change: transform; }
   .month-group { }
   .event-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #e8e8e8; }
   .next-card-label {
@@ -887,7 +887,7 @@
 
   /* ── CSS containment: paint-only on cards, layout+style on page-level containers ── */
   .event-card {
-    contain: layout style paint;
+    contain: layout style;
   }
   .month-group {
     /* no contain as it breaks sticky/overflow */
@@ -4868,7 +4868,7 @@ function createCard(ev) {
   const _typeOverlayEarly = ev.type ? `<div style="position:absolute;top:10px;left:10px;z-index:4;pointer-events:none;">${buildTypePill(ev.type,'sm')}</div>` : '';
   const imgHtml = ev.image
     ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}</div>`
-    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;min-height:clamp(110px,12vw,160px);">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
@@ -4930,12 +4930,12 @@ function createCard(ev) {
   const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${'View details →'}</div></div></div>`;
   const imgSection = ev.image
     ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}</div>`
-    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    : `<div class="card-img-wrap" style="background:${ab};display:flex;align-items:center;justify-content:center;position:relative;min-height:clamp(110px,12vw,160px);">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}<svg width="44" height="44" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.25;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   const noImgBadge = ''; // badges now rendered inside card-img-wrap for all cases
   card.style.flexDirection = '';
   card.innerHTML = `${nextBadge}${imgSection}${hoverOverlay}
-    <div style="padding:0.65rem 0.75rem;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;position:relative;">
+    <div style="padding:0.65rem 0.75rem;display:flex;flex-direction:column;flex:1;min-height:80px;overflow:hidden;position:relative;">
       ${noImgBadge}
       ${artistBadge}
       <h3 style="font-weight:700;font-size:0.78rem;letter-spacing:-0.01em;margin-bottom:4px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:#111;">${escHtml(ev.title)}</h3>
@@ -8376,11 +8376,11 @@ function applyCardSize(val) {
   val = parseInt(val);
   // Map slider 1–5 → layout config
   const sizeMap = {
-    1: { minPx: 120, imgH: '80px',   bodyPad: '6px 8px',   titleSize: '0.68rem', metaSize: '0.56rem', gap: '6px'  },
-    2: { minPx: 170, imgH: '120px',  bodyPad: '8px 10px',  titleSize: '0.74rem', metaSize: '0.60rem', gap: '8px'  },
-    3: { minPx: 230, imgH: '165px',  bodyPad: '10px 12px', titleSize: '0.80rem', metaSize: '0.66rem', gap: '12px' },
-    4: { minPx: 310, imgH: '220px',  bodyPad: '12px 14px', titleSize: '0.88rem', metaSize: '0.70rem', gap: '14px' },
-    5: { minPx: 400, imgH: '280px',  bodyPad: '14px 16px', titleSize: '0.95rem', metaSize: '0.74rem', gap: '16px' },
+    1: { minPx: 120, imgH: '80px',   minCardH: '160px', bodyPad: '6px 8px',   titleSize: '0.68rem', metaSize: '0.56rem', gap: '6px'  },
+    2: { minPx: 170, imgH: '120px',  minCardH: '210px', bodyPad: '8px 10px',  titleSize: '0.74rem', metaSize: '0.60rem', gap: '8px'  },
+    3: { minPx: 230, imgH: '165px',  minCardH: '270px', bodyPad: '10px 12px', titleSize: '0.80rem', metaSize: '0.66rem', gap: '12px' },
+    4: { minPx: 310, imgH: '220px',  minCardH: '340px', bodyPad: '12px 14px', titleSize: '0.88rem', metaSize: '0.70rem', gap: '14px' },
+    5: { minPx: 400, imgH: '280px',  minCardH: '420px', bodyPad: '14px 16px', titleSize: '0.95rem', metaSize: '0.74rem', gap: '16px' },
   };
   const cfg = sizeMap[val] || sizeMap[3];
 
@@ -8391,6 +8391,9 @@ function applyCardSize(val) {
     .cards-grid, #trend-grid {
       grid-template-columns: repeat(auto-fill, minmax(min(100%, ${cfg.minPx}px), 1fr)) !important;
       gap: ${cfg.gap} !important;
+    }
+    .event-card {
+      min-height: ${cfg.minCardH} !important;
     }
     .card-img-wrap {
       height: ${cfg.imgH} !important;
