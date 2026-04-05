@@ -1371,8 +1371,8 @@
        <button onclick="setWorksTab('variety')"        id="wt-variety"        class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Variety</button>
        <button onclick="setWorksTab('interview')"      id="wt-interview"      class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Interviews</button>
        <button onclick="setWorksTab('bts')"            id="wt-bts"            class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Behind the Scenes</button>
-       <button onclick="setWorksTab('otherworks')"     id="wt-otherworks"     class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Other Works</button>
        <button onclick="setWorksTab('awards')"          id="wt-awards"          class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">🏆 Awards</button>
+       <button onclick="setWorksTab('otherworks')"     id="wt-otherworks"     class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Other Works</button>
       </div>
      </div>
 
@@ -2346,7 +2346,7 @@
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
          <label id="wf-award-won-label" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;border-radius:10px;border:1px solid #fde68a;background:#fffbeb;flex:1;min-width:120px;transition:background 0.15s,border-color 0.15s;">
           <input type="radio" name="wf-award-status" id="wf-award-won" value="won" style="width:15px;height:15px;accent-color:#b45309;cursor:pointer;flex-shrink:0;" onchange="updateAwardStatusStyle()">
-          <span style="font-size:0.88rem;font-weight:700;color:#b45309;">🏆 Won</span>
+          <span style="font-size:0.88rem;font-weight:700;color:#b45309;">🏆 Winner</span>
          </label>
          <label id="wf-award-nominated-label" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;border-radius:10px;border:1px solid #e5e7eb;background:#f9fafb;flex:1;min-width:120px;transition:background 0.15s,border-color 0.15s;">
           <input type="radio" name="wf-award-status" id="wf-award-nominated" value="nominated" style="width:15px;height:15px;accent-color:#6b7280;cursor:pointer;flex-shrink:0;" onchange="updateAwardStatusStyle()">
@@ -2754,8 +2754,6 @@ async function fetchWithTimeout(url, timeoutMs = FETCH_TIMEOUT_MS) {
   }
 }
 
-// Legacy stub — apiPost previously called Apps Script (removed). No-op now; PocketBase handles all writes.
-async function apiPost(body) { return { status: 'ok' }; }
 
 // ═══════════════════════════════════════════════════════════════════
 // DATA LOADERS — cache-first, dedup-guarded, TTL-aware
@@ -3802,19 +3800,6 @@ function showConnectionError() {
   </div>`;
 }
 
-function showStaleWarning() {
-  // Non-intrusive banner at top of grid to inform user data may be stale
-  const grid = _dom('events-grid');
-  if (!grid) return;
-  const existing = document.getElementById('stale-warn');
-  if (existing) return;
-  const warn = document.createElement('div');
-  warn.id = 'stale-warn';
-  warn.style.cssText = 'background:#fef3c7;border-radius:8px;padding:8px 14px;font-size:0.78rem;color:#92400e;margin-bottom:1rem;display:flex;align-items:center;gap:8px;';
-  warn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Showing cached data — retrying...`;
-  grid.insertBefore(warn, grid.firstChild);
-  setTimeout(() => { if (warn.parentNode) warn.parentNode.removeChild(warn); }, 8000);
-}
 
 function hideConnectionError() {
   const grid = _dom('events-grid');
@@ -3869,10 +3854,7 @@ function getArtistLabel(artists) {
   if (!artists) return '';
   return artists.split(',').map(a => a.trim()).filter(Boolean).join(' · ');
 }
-function getFullDateDisplay(dateStr) {
-  if (!dateStr) return '';
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-}
+
 // Memoized escHtml — called thousands of times per render
 const _escCache = new Map();
 // ── Image URL fixer — convert any URL format to always loadable ──
@@ -6056,7 +6038,7 @@ function createAdminRow(ev) {
   const rowKey = ev.__rowNumber ? String(ev.__rowNumber) : (ev.__backendId || String(Math.random()));
   row.dataset.eventId  = rowKey;
   row.dataset.rowNumber = ev.__rowNumber || '';
-  row.style.cssText = 'background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;';
+  row.style.cssText = 'background:#fff;border-radius:12px;padding:0.85rem 1rem;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid #f0f0f0;';
   updateAdminRow(row, ev);
   return row;
 }
@@ -6067,57 +6049,136 @@ function updateAdminRow(row, ev) {
   const color  = getArtistColor(ev.artists);
   const past   = isEventPast(ev);
   const isConf = deleteConfirmIds.has(rowKey);
+  const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
+  const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
 
   row.innerHTML = '';
 
-  // ── Dot
-  const dot = document.createElement('div');
-  dot.style.cssText = `width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;`;
-  row.appendChild(dot);
+  // ── Thumbnail
+  if (ev.image) {
+    const thumbWrap = document.createElement('div');
+    thumbWrap.style.cssText = 'width:56px;height:56px;border-radius:10px;overflow:hidden;background:#f3f4f6;flex-shrink:0;';
+    const thumbImg = document.createElement('img');
+    thumbImg.src = (typeof _fixImgSrc === 'function') ? _fixImgSrc(ev.image) : ev.image;
+    thumbImg.alt = ev.title || '';
+    thumbImg.loading = 'lazy';
+    thumbImg.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:top center;display:block;';
+    thumbImg.onerror = function() { this.parentNode.style.background='#e5e7eb'; this.style.display='none'; };
+    thumbWrap.appendChild(thumbImg);
+    row.appendChild(thumbWrap);
+  } else {
+    const thumbPlaceholder = document.createElement('div');
+    thumbPlaceholder.style.cssText = `width:56px;height:56px;border-radius:10px;background:${color}18;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid ${color}30;`;
+    const dotInner = document.createElement('div');
+    dotInner.style.cssText = `width:10px;height:10px;border-radius:50%;background:${color};`;
+    thumbPlaceholder.appendChild(dotInner);
+    row.appendChild(thumbPlaceholder);
+  }
 
   // ── Info block
   const info = document.createElement('div');
-  info.style.cssText = 'flex:1;min-width:150px;';
+  info.style.cssText = 'flex:1;min-width:0;';
 
+  // Artist dots row
+  const artistArr = ev.artists ? ev.artists.split(',').map(a=>a.trim()).filter(Boolean) : [];
+  if (artistArr.length) {
+    const artistRow = document.createElement('div');
+    artistRow.style.cssText = 'display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;';
+    artistArr.forEach((a, i) => {
+      if (i > 0) {
+        const sep = document.createElement('span');
+        sep.style.cssText = 'width:1px;height:9px;background:#e5e7eb;display:inline-block;';
+        artistRow.appendChild(sep);
+      }
+      const aSpan = document.createElement('span');
+      aSpan.style.cssText = `display:inline-flex;align-items:center;gap:3px;font-size:0.65rem;font-weight:700;color:${artistTextColors[a]||color};`;
+      aSpan.innerHTML = `<span style="width:5px;height:5px;border-radius:50%;background:${artistColors[a]||color};display:inline-block;flex-shrink:0;"></span>${a}`;
+      artistRow.appendChild(aSpan);
+    });
+    info.appendChild(artistRow);
+  }
+
+  // Title
   const titleP = document.createElement('p');
-  titleP.style.cssText = `font-weight:700;font-size:1rem;${past ? 'color:#9ca3af;' : ''}`;
+  titleP.style.cssText = `font-weight:700;font-size:0.9rem;color:${past?'#9ca3af':'#111'};margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
   titleP.textContent = ev.title || '';
 
   if (!ev.__backendId) {
     const badge = document.createElement('span');
     badge.title = 'ID missing';
-    badge.style.cssText = 'font-size:0.68rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;';
+    badge.style.cssText = 'font-size:0.62rem;background:#fef3c7;color:#92400e;padding:1px 5px;border-radius:4px;font-weight:600;margin-left:4px;';
     badge.textContent = '⚠ no id';
     titleP.appendChild(badge);
   }
-  if (past) {
-    const pastBadge = document.createElement('span');
-    pastBadge.style.cssText = 'font-size:0.7rem;background:#f3f4f6;color:#9ca3af;padding:2px 6px;border-radius:4px;font-weight:600;margin-left:4px;';
-    pastBadge.textContent = 'Past Events';
-    titleP.appendChild(pastBadge);
+  info.appendChild(titleP);
+
+  // Meta row: date · time · location
+  const meta = document.createElement('div');
+  meta.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+
+  const dateStr = ev.dateStart ? fmtDate(ev.dateStart) : '';
+  if (dateStr) {
+    const dateEl = document.createElement('span');
+    dateEl.style.cssText = 'font-size:0.72rem;color:#6b7280;font-weight:600;';
+    dateEl.textContent = dateStr;
+    meta.appendChild(dateEl);
+  }
+  if (ev.startTime) {
+    const sep = document.createElement('span');
+    sep.style.cssText = 'font-size:0.65rem;color:#d1d5db;';
+    sep.textContent = '·';
+    meta.appendChild(sep);
+    const timeEl = document.createElement('span');
+    timeEl.style.cssText = 'font-size:0.72rem;color:#9ca3af;';
+    timeEl.textContent = fmtTime(ev.startTime, ev.timezone||'');
+    meta.appendChild(timeEl);
+  }
+  if (ev.location) {
+    const sep2 = document.createElement('span');
+    sep2.style.cssText = 'font-size:0.65rem;color:#d1d5db;';
+    sep2.textContent = '·';
+    meta.appendChild(sep2);
+    const locEl = document.createElement('span');
+    locEl.style.cssText = 'font-size:0.72rem;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;';
+    locEl.textContent = ev.location;
+    meta.appendChild(locEl);
   }
 
-  const metaP = document.createElement('p');
-  metaP.style.cssText = 'font-size:0.78rem;color:#9ca3af;margin-top:2px;';
-  metaP.textContent = `${fmtDate(ev.dateStart)} · ${getArtistLabel(ev.artists)}`;
+  // Badges: type + past
+  const badgeRow = document.createElement('div');
+  badgeRow.style.cssText = 'display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px;';
+  if (ev.type) {
+    const ts = getTypeStyle(ev.type);
+    const typeBadge = document.createElement('span');
+    typeBadge.style.cssText = `font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:99px;background:${ts?ts.bg:'#f3f4f6'};color:${ts?ts.color:'#374151'};`;
+    typeBadge.textContent = ev.type;
+    badgeRow.appendChild(typeBadge);
+  }
+  if (past) {
+    const pastBadge = document.createElement('span');
+    pastBadge.style.cssText = 'font-size:0.62rem;background:#f3f4f6;color:#9ca3af;padding:2px 7px;border-radius:99px;font-weight:600;';
+    pastBadge.textContent = 'Past';
+    badgeRow.appendChild(pastBadge);
+  }
+  if (badgeRow.children.length) info.appendChild(badgeRow);
 
-  info.appendChild(titleP);
-  info.appendChild(metaP);
+  meta.style.cssText = 'display:flex;align-items:center;gap:5px;flex-wrap:wrap;';
+  info.appendChild(meta);
   row.appendChild(info);
 
   // ── Button area
   const btnArea = document.createElement('div');
-  btnArea.style.cssText = 'display:flex;gap:6px;align-items:center;';
+  btnArea.style.cssText = 'display:flex;gap:6px;align-items:center;flex-shrink:0;';
 
   if (isConf) {
-    // Confirm-delete state
     const confirmTxt = document.createElement('span');
-    confirmTxt.style.cssText = 'font-size:0.78rem;color:#dc2626;font-weight:600;';
+    confirmTxt.style.cssText = 'font-size:0.75rem;color:#dc2626;font-weight:600;white-space:nowrap;';
     confirmTxt.textContent = 'Confirm Delete?';
     btnArea.appendChild(confirmTxt);
 
     const yesBtn = document.createElement('button');
     yesBtn.className = 'btn-danger';
+    yesBtn.style.cssText = 'font-size:0.8rem;padding:5px 12px;';
     yesBtn.textContent = 'Yes';
     yesBtn.addEventListener('click', function(e) { e.stopPropagation(); confirmDelete(rowKey); });
     btnArea.appendChild(yesBtn);
@@ -6129,7 +6190,6 @@ function updateAdminRow(row, ev) {
     cancelBtn.addEventListener('click', function(e) { e.stopPropagation(); cancelDelete(rowKey); });
     btnArea.appendChild(cancelBtn);
   } else {
-    // Normal Edit / Delete buttons
     const editBtn = document.createElement('button');
     editBtn.className = 'btn-secondary';
     editBtn.style.cssText = 'font-size:0.8rem;padding:6px 10px;display:inline-flex;align-items:center;gap:4px;';
@@ -6140,7 +6200,7 @@ function updateAdminRow(row, ev) {
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-danger';
     delBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;';
-    delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>' + 'Delete';
+    delBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>Delete';
     delBtn.addEventListener('click', function(e) { e.stopPropagation(); startDelete(rowKey); });
     btnArea.appendChild(delBtn);
   }
@@ -6461,7 +6521,6 @@ function closeEventFormModal() {
   document.documentElement.style.overflow = '';
   editingEventId = null; editingEventRowNumber = null;
 }
-function closeEventFormModalBackdrop(e) { /* intentionally disabled */ }
 function clearForm() {
   const f=document.getElementById('event-form');
   if(f) {
@@ -7425,7 +7484,7 @@ function renderAdminWorksList() {
     if (w.award_status === 'won') {
       const awEl = document.createElement('span');
       awEl.style.cssText = 'font-size:0.65rem;font-weight:800;color:#92400e;background:#fef3c7;border:1px solid #fbbf24;border-radius:4px;padding:1px 6px;';
-      awEl.textContent = '🏆 Won';
+      awEl.textContent = '🏆 Winner';
       meta.appendChild(awEl);
     } else if (w.award_status === 'nominated') {
       const awEl = document.createElement('span');
@@ -7663,12 +7722,10 @@ function renderWorks() {
     return Number(b) - Number(a);
   });
 
-  // Responsive grid cols CSS
-  const gridCols = `
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-    gap:clamp(10px,1.5vw,18px);
-  `;
+  // Responsive grid cols CSS — awards tab uses narrower columns for portrait aspect ratio
+  const gridCols = _worksTab === 'awards'
+    ? `display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(8px,1.5vw,14px);`
+    : `display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:clamp(10px,1.5vw,18px);`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
@@ -7688,19 +7745,51 @@ function renderWorks() {
       return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:700;color:${txt};"><span style="width:6px;height:6px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
     }).join('');
 
-    // ── Contract expired check ──
     const todayStr = _todayInBKK();
     const isExpired = !!(w.contract_end && w.contract_end !== '' && w.contract_end !== 'false');
-    // ribbon-style badge on top-left corner
     const expiredBadge = isExpired
       ? `<div style="position:absolute;top:0;left:0;z-index:4;pointer-events:none;overflow:hidden;width:88px;height:88px;border-radius:10px 0 0 0;"><div style="position:absolute;top:20px;left:-22px;width:100px;background:linear-gradient(135deg,#475569,#334155);color:#fff;font-size:0.52rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;text-align:center;padding:5px 0;transform:rotate(-45deg);transform-origin:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);">EXPIRED</div></div>`
       : '';
 
+    // ── Awards tab: Style C — full image overlay ──
+    if (_worksTab === 'awards') {
+      const card = document.createElement('div');
+      card.style.cssText = `border-radius:16px;overflow:hidden;cursor:${w.link?'pointer':'default'};position:relative;aspect-ratio:3/4;background:#1a1a1a;box-shadow:0 2px 12px rgba(0,0,0,0.10);transition:box-shadow 0.18s,transform 0.18s;`;
+      card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 10px 32px rgba(0,0,0,0.18)'; card.style.transform = 'translateY(-4px)'; });
+      card.addEventListener('mouseleave', () => { card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.10)'; card.style.transform = ''; });
+      if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
+
+      const awardStatusHtml = w.award_status === 'nominated'
+        ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#f1f5f9;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:99px;padding:3px 10px;white-space:nowrap;">🎗️ Nominated</span>`
+        : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:800;color:#92400e;background:#fef3c7;border:1px solid #fbbf24;border-radius:99px;padding:3px 10px;white-space:nowrap;">🏆 Winner</span>`;
+
+      const artistLineOverlay = artistArr.map(a => {
+        const dot = artistColors[a] || '#94a3b8';
+        return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.68rem;font-weight:700;color:#fff;"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
+      }).join(`<span style="color:rgba(255,255,255,0.35);font-size:0.6rem;">·</span>`);
+
+      const imgHtml = w.image
+        ? `<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}">`
+        : `<div style="position:absolute;inset:0;background:${grad};display:flex;align-items:center;justify-content:center;font-size:3rem;">${cat.icon ? cat.icon.replace('width="11"','width="48"').replace('height="11"','height="48"') : '🏆'}</div>`;
+
+      card.innerHTML = `
+        ${imgHtml}
+        ${expiredBadge}
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.3) 50%,rgba(0,0,0,0) 100%);pointer-events:none;"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 14px 14px;">
+          ${awardStatusHtml ? `<div style="margin-bottom:6px;">${awardStatusHtml}</div>` : ''}
+          <div style="font-size:0.82rem;font-weight:700;color:#fff;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
+          <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">${artistLineOverlay}${w.year ? `<span style="color:rgba(255,255,255,0.45);font-size:0.65rem;">· ${w.year}</span>` : ''}</div>
+        </div>
+      `;
+      return card;
+    }
+
+    // ── Default card (all other tabs) ──
     const thumb = w.image
       ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}"></div>`
       : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
     const card = document.createElement('div');
-    const wab = getArtistBg(w.artists);
     card.style.cssText = `background:${isExpired?'#f9fafb':'#fff'};border-radius:16px;border:1px solid ${isExpired?'#e5e7eb':'#efefef'};box-shadow:0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'});overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:box-shadow 0.18s,transform 0.18s;${isExpired?'opacity:0.6;':''}`;
     card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 8px 28px rgba(0,0,0,0.12)'; card.style.transform = 'translateY(-4px)'; });
     card.addEventListener('mouseleave', () => { card.style.boxShadow = `0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'})`; card.style.transform = ''; });
@@ -7717,7 +7806,7 @@ function renderWorks() {
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
           ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:4px 10px;white-space:nowrap;">${cat.label}</span>` : ''}
           ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:4px 10px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
-          ${w.award_status === 'won' ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:800;color:#92400e;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fbbf24;border-radius:6px;padding:4px 10px;white-space:nowrap;">🏆 Won</span>` : ''}
+          ${w.award_status === 'won' ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:800;color:#92400e;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fbbf24;border-radius:6px;padding:4px 10px;white-space:nowrap;">🏆 Winner</span>` : ''}
           ${w.award_status === 'nominated' ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;color:#374151;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:4px 10px;white-space:nowrap;">🎗️ Nominated</span>` : ''}
         </div>
       </div>`;
@@ -7747,13 +7836,15 @@ function renderWorks() {
   flatGrid.className = 'works-year-grid';
   filtered.forEach(w => {
       const card = buildCard(w);
-      const thumb = card.querySelector('div[style*="aspect-ratio"]');
-      if (thumb) {
-        thumb.style.position = 'relative';
-        const badge = document.createElement('span');
-        badge.textContent = w.year || '';
-        badge.style.cssText = 'position:absolute;top:6px;right:6px;font-size:0.6rem;font-weight:800;background:#111;color:#fff;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;z-index:2;pointer-events:none;';
-        thumb.appendChild(badge);
+      if (_worksTab !== 'awards') {
+        const thumb = card.querySelector('div[style*="aspect-ratio"]');
+        if (thumb) {
+          thumb.style.position = 'relative';
+          const badge = document.createElement('span');
+          badge.textContent = w.year || '';
+          badge.style.cssText = 'position:absolute;top:6px;right:6px;font-size:0.6rem;font-weight:800;background:#111;color:#fff;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;z-index:2;pointer-events:none;';
+          thumb.appendChild(badge);
+        }
       }
       flatGrid.appendChild(card);
   });
