@@ -385,7 +385,6 @@
   .blink-heart { color: #22c55e; display:inline-block; animation: blink-pulse 2s ease-in-out infinite; }
   @keyframes blink-pulse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
   @media (max-width: 640px) {
-    .cal-event-dot { font-size: 0.68rem; padding: 2px 4px; }
     .cal-day { height: 80px; padding: 4px; }
     .detail-hero { height: 320px; object-fit: cover; object-position: top center; }
   }
@@ -1164,7 +1163,6 @@
       </div>
      </div>
 
-
      <div id="events-grid"></div>
      <div id="no-events" style="display:none;padding:3rem 1rem;">
       <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;">
@@ -1410,6 +1408,7 @@
       <h2 style="font-size:clamp(1.5rem,4vw,1.9rem);font-weight:800;letter-spacing:-0.04em;color:#111;margin:0 0 0.25rem;">Trend</h2>
       <p style="font-size:0.78rem;color:#9ca3af;font-weight:500;margin:0 0 0.75rem;">A summary of trending posts from the past 24 hours</p>
       <div id="trend-filter-bar" class="filter-bar" style="margin-bottom:6px;"></div>
+      <div id="trend-year-bar" class="filter-bar" style="margin-bottom:6px;"></div>
      </div>
      <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:8px;"></div>
      <div id="trend-empty" style="display:none;text-align:center;padding:4rem 1rem;color:#9ca3af;">
@@ -2446,7 +2445,6 @@ const RETRY_DELAYS     = [1000, 3000, 6000];
 const DEBOUNCE_RENDER  = 16;
 const DEBOUNCE_RESIZE  = 200;
 const SKELETON_COUNT   = 4; // fewer skeletons = faster perceived load
-const PAGE_SIZE        = 20;
 
 // ── RATE LIMITER — prevents API spam even on traffic spike ────────
 const _rateLimit = {
@@ -2738,8 +2736,6 @@ async function fetchWithTimeout(url, timeoutMs = FETCH_TIMEOUT_MS) {
 
 // Legacy stub — apiPost previously called Apps Script (removed). No-op now; PocketBase handles all writes.
 async function apiPost(body) { return { status: 'ok' }; }
-
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ═══════════════════════════════════════════════════════════════════
 // DATA LOADERS — cache-first, dedup-guarded, TTL-aware
@@ -3398,6 +3394,7 @@ let allTrends = [];
 let trendsLoaded = false;
 let _editingTrendId = null;
 let _trendFilter = 'all';
+let _trendYearFilter = 'all';
 let _trendLastFP = '';
 const TREND_ARTISTS = ['Pond', 'Phuwin', 'Permpoon'];
 
@@ -3409,7 +3406,7 @@ function renderTrend() {
   if (!grid) return;
 
   // ── fingerprint guard: if data unchanged, skip DOM rebuild to prevent jank ──
-  const fp = _trendFilter + '|' + allTrends.map(t => (t.__backendId||'') + (t.caption||'') + (t.image||'') + (t.link||'') + (t.date||'')).join(',');
+  const fp = _trendFilter + '|' + _trendYearFilter + '|' + allTrends.map(t => (t.__backendId||'') + (t.caption||'') + (t.image||'') + (t.link||'') + (t.date||'')).join(',');
   if (fp === _trendLastFP && grid.children.length > 0) return;
   _trendLastFP = fp;
 
@@ -3437,11 +3434,29 @@ function renderTrend() {
     }).join('');
   } // end filterBar rebuild
 
+  // Year filter bar — rebuild whenever year filter or data changes
+  const yearBar = document.getElementById('trend-year-bar');
+  if (yearBar) {
+    const years = [...new Set(allTrends.map(t => t.date ? String(t.date).slice(0,4) : '').filter(Boolean))].sort((a,b) => b-a);
+    const yearBarKey = _trendYearFilter + '|' + years.join(',');
+    if (yearBar.dataset.lastKey !== yearBarKey) {
+      yearBar.dataset.lastKey = yearBarKey;
+      const allBtn = `<button onclick="setTrendYearFilter('all')" style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:99px;border:1px solid ${_trendYearFilter==='all'?'#111':'#e5e7eb'};background:${_trendYearFilter==='all'?'#111':'#fff'};color:${_trendYearFilter==='all'?'#fff':'#6b7280'};font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">All Years</button>`;
+      const yearBtns = years.map(y => {
+        const isActive = _trendYearFilter === y;
+        return `<button onclick="setTrendYearFilter('${y}')" style="display:inline-flex;align-items:center;padding:5px 14px;border-radius:99px;border:1px solid ${isActive?'#111':'#e5e7eb'};background:${isActive?'#111':'#fff'};color:${isActive?'#fff':'#6b7280'};font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">${y}</button>`;
+      }).join('');
+      yearBar.innerHTML = allBtn + yearBtns;
+    }
+  }
+
   const _trendBase = _trendFilter === 'all'
     ? allTrends.slice()
     : allTrends.filter(t => (t.artists||'').split(',').map(a=>a.trim()).includes(_trendFilter));
   const _toD = v => v ? String(v).slice(0, 10) : '';
-  const filtered = _trendBase.sort((a, b) => {
+  const filtered = _trendBase
+    .filter(t => _trendYearFilter === 'all' || (t.date && String(t.date).slice(0,4) === _trendYearFilter))
+    .sort((a, b) => {
     const da = _toD(a.date);
     const db = _toD(b.date);
     return db > da ? 1 : db < da ? -1 : 0;
@@ -3494,7 +3509,7 @@ function renderTrend() {
     return `<div class="event-card" ${cardClick}>
       ${t.image
         ? `<div style="width:100%;flex-shrink:0;overflow:hidden;border-radius:var(--radius-card) var(--radius-card) 0 0;background:#f8f9fa;">
-             <img src="${_fixImgSrc(t.image)}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
+             <img src="${t.image ? `https://images.weserv.nl/?url=${encodeURIComponent(t.image)}` : ''}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
            </div>`
         : `<div style="height:4px;background:${mainColor};flex-shrink:0;"></div>`}
       <div style="padding:0.45rem 0.55rem;display:flex;flex-direction:column;flex:1;">
@@ -3507,6 +3522,13 @@ function renderTrend() {
 
 function setTrendFilter(v) {
   _trendFilter = v;
+  _trendLastFP = '';
+  renderTrend();
+}
+
+function setTrendYearFilter(y) {
+  _trendYearFilter = y;
+  _trendLastFP = '';
   renderTrend();
 }
 
@@ -3918,13 +3940,6 @@ async function _facePos(img) {
 function _onImgError(img) {
   const original = img.getAttribute('data-original-src') || img.src;
   if (!img.getAttribute('data-original-src')) img.setAttribute('data-original-src', original);
-  // PocketBase URLs — ไม่ต้อง retry ด้วย proxy (URL ถูกต้องอยู่แล้ว)
-  if (original.includes('pocketbase-production-510d.up.railway.app') || (typeof PB_URL !== 'undefined' && original.startsWith(PB_URL))) {
-    img.style.display = 'none';
-    const wrap = img.closest('.card-img-wrap,[style*="aspect-ratio"]');
-    if (wrap) wrap.style.background = '#f5f2ee';
-    return;
-  }
   const attempt = parseInt(img.getAttribute('data-attempt') || '0');
   // If Google Drive thumbnail, try another format first
   const driveThumb = original.match(/drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]+)/);
@@ -3934,7 +3949,7 @@ function _onImgError(img) {
     proxies.push(`https://drive.google.com/uc?export=view&id=${driveId}`);
     proxies.push(`https://lh3.googleusercontent.com/d/${driveId}`);
   }
-  // Only add proxy if not already a proxy URL
+  // Route through proxy — covers PocketBase CORS, hotlink blocks, and any CDN
   if (!original.includes('weserv.nl') && !original.includes('wsrv.nl')) {
     proxies.push(`https://images.weserv.nl/?url=${encodeURIComponent(original)}`);
     proxies.push(`https://wsrv.nl/?url=${encodeURIComponent(original)}`);
@@ -4134,7 +4149,6 @@ function renderHome() {
     });
   });
 
-  // ── Virtual scroll: render PAGE_SIZE items, load more on scroll ──
   _vsInit(vsItems);
 }
 
@@ -5568,7 +5582,6 @@ function clearHomeSearch() {
 function setHomeTypeFilter(type, btn) {
   homeTypeFilter = type;
   _vsLastFingerprint = '';
-  // Update button styles
   document.querySelectorAll('#home-type-bar .artist-filter-btn').forEach(b => {
     b.style.background = '#fff';
     b.style.color = '#6b7280';
@@ -8074,18 +8087,6 @@ function toggleBookmarkFromModal() {
   if (bkLabel) bkLabel.textContent = saved ? 'Saved ✓' : 'Add to My Recap';
   if (currentPage === 'myschedule') renderMySchedule();
 }
-
-// ── (Legacy stubs — kept so any remaining references don't crash) ──
-async function createSyncCode() {}
-function showEnterCodeUI() {}
-function copySyncCode() {}
-function forgetSyncCode() {}
-async function syncNow() {}
-function _showSyncHasCode() {}
-function selectScheduleUser() {}
-function switchScheduleUser() {}
-
-async function loadSyncCode() {}
 
 // ── Render My Recap page ───────────────────────────────────────
 let _recapActiveYear = 'all';
