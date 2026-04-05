@@ -1372,6 +1372,7 @@
        <button onclick="setWorksTab('interview')"      id="wt-interview"      class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Interviews</button>
        <button onclick="setWorksTab('bts')"            id="wt-bts"            class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Behind the Scenes</button>
        <button onclick="setWorksTab('otherworks')"     id="wt-otherworks"     class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">Other Works</button>
+       <button onclick="setWorksTab('awards')"          id="wt-awards"          class="works-tab" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.75rem;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">🏆 Awards</button>
       </div>
      </div>
 
@@ -1569,6 +1570,7 @@
          <option value="interview">Interviews</option>
          <option value="bts">Behind the Scenes</option>
          <option value="otherworks">Other Works</option>
+         <option value="awards">Awards</option>
         </select>
         <select id="admin-works-expired-filter" onchange="_adminWorksListFP='';renderAdminWorksList()" style="padding:5px 10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;color:#111;font-size:0.82rem;font-weight:600;cursor:pointer;outline:none;">
          <option value="all">All Status</option>
@@ -2264,7 +2266,7 @@
        </div>
        <div>
         <label class="form-label" style="font-weight:700;">Category <span style="color:#ec4899;">*</span></label>
-        <select class="form-input" id="wf-category" name="category" style="border:1px solid #111;background:#f9f9f9;">
+        <select class="form-input" id="wf-category" name="category" style="border:1px solid #111;background:#f9f9f9;" onchange="toggleAwardStatusField()">
          <option value="">— Select —</option>
          <option>Little Big World</option>
          <option>Series</option>
@@ -2275,6 +2277,7 @@
          <option>Interviews</option>
          <option>Behind the Scenes</option>
          <option>Other Works</option>
+         <option>Awards</option>
         </select>
        </div>
        <div>
@@ -2333,6 +2336,23 @@
        <div style="grid-column:1/-1;">
         <label class="form-label">Project / Event</label>
         <input class="form-input" id="wf-project" name="project" placeholder="e.g. Little Big World, Paris Fashion Week">
+       </div>
+       <!-- Award Status — shown only when category = Awards -->
+       <div style="grid-column:1/-1;" id="wf-award-status-wrap" style="display:none;">
+        <label class="form-label" style="font-weight:700;">
+         <svg width="13" height="13" fill="none" stroke="#b45309" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+         Award Status <span style="color:#ec4899;">*</span>
+        </label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+         <label id="wf-award-won-label" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;border-radius:10px;border:1px solid #fde68a;background:#fffbeb;flex:1;min-width:120px;transition:background 0.15s,border-color 0.15s;">
+          <input type="radio" name="wf-award-status" id="wf-award-won" value="won" style="width:15px;height:15px;accent-color:#b45309;cursor:pointer;flex-shrink:0;" onchange="updateAwardStatusStyle()">
+          <span style="font-size:0.88rem;font-weight:700;color:#b45309;">🏆 Won</span>
+         </label>
+         <label id="wf-award-nominated-label" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;border-radius:10px;border:1px solid #e5e7eb;background:#f9fafb;flex:1;min-width:120px;transition:background 0.15s,border-color 0.15s;">
+          <input type="radio" name="wf-award-status" id="wf-award-nominated" value="nominated" style="width:15px;height:15px;accent-color:#6b7280;cursor:pointer;flex-shrink:0;" onchange="updateAwardStatusStyle()">
+          <span style="font-size:0.88rem;font-weight:700;color:#6b7280;">🎗️ Nominated</span>
+         </label>
+        </div>
        </div>
       </div>
 
@@ -5714,6 +5734,7 @@ function openWorksPreviewPopup() {
     if (c.includes('interview')) return 'interview';
     if (c.includes('behind')||c.includes('bts')) return 'bts';
     if (c.includes('otherwork')||c.includes('other')) return 'otherworks';
+    if (c.includes('award')) return 'awards';
     return c;
   }
   const cat = _CC[_ck(data.category)] || { label: data.category||'—', color:'#475569', bg:'#f1f5f9', border:'#cbd5e1' };
@@ -6874,6 +6895,7 @@ const CATEGORY_CONFIG = {
   otherworks:     { label: 'Other Works',      icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', color: '#c2410c', bg: '#fff7ed', border: '#fed7aa' },
   bts:            { label: 'Behind the Scenes', icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>', color: '#9333ea', bg: '#fdf4ff', border: '#e9d5ff' },
   show:           { label: 'Show',             icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' },
+  awards:         { label: 'Awards',            icon: '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>', color: '#b45309', bg: '#fffbeb', border: '#fde68a' },
 };
 
 async function loadWorksFromSheets(force = false) {
@@ -6927,6 +6949,29 @@ function _ensureWorksBackendId(works) {
 // ═══════════════════════════════════════════════════════════════════
 let _editingWorkId = null;
 
+function toggleAwardStatusField() {
+  const cat = (document.getElementById('wf-category')?.value || '').toLowerCase();
+  const wrap = document.getElementById('wf-award-status-wrap');
+  if (!wrap) return;
+  const isAward = cat.includes('award');
+  wrap.style.display = isAward ? 'block' : 'none';
+}
+
+function updateAwardStatusStyle() {
+  const wonLabel = document.getElementById('wf-award-won-label');
+  const nomLabel = document.getElementById('wf-award-nominated-label');
+  const wonRadio = document.getElementById('wf-award-won');
+  const nomRadio = document.getElementById('wf-award-nominated');
+  if (!wonLabel || !nomLabel) return;
+  if (wonRadio && wonRadio.checked) {
+    wonLabel.style.background = '#fffbeb'; wonLabel.style.borderColor = '#b45309';
+    nomLabel.style.background = '#f9fafb'; nomLabel.style.borderColor = '#e5e7eb';
+  } else if (nomRadio && nomRadio.checked) {
+    nomLabel.style.background = '#f3f4f6'; nomLabel.style.borderColor = '#6b7280';
+    wonLabel.style.background = '#f9fafb'; wonLabel.style.borderColor = '#fde68a';
+  }
+}
+
 function openAddWorksModal() {
   _editingWorkId = null;
   document.getElementById('works-form-title').textContent = 'Add Work';
@@ -6975,6 +7020,10 @@ function _clearWorksForm() {
   ['wf-category','wf-type'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
+  document.querySelectorAll('input[name="wf-award-status"]').forEach(r => r.checked = false);
+  const wrap = document.getElementById('wf-award-status-wrap');
+  if (wrap) wrap.style.display = 'none';
+  updateAwardStatusStyle();
   document.querySelectorAll('.artist-check-w').forEach(c => c.checked = false);
   const _posReset = document.getElementById('wf-image-position'); if(_posReset) _posReset.value = '50% 50%';
 }
@@ -6998,6 +7047,10 @@ function _fillWorksForm(w) {
     if (_txt) { _txt.style.color = _isEnded ? '#334155' : '#6b7280'; _txt.textContent = (_isEnded && _hiddenDate.value) ? 'Contract Ended · ' + _hiddenDate.value : 'Contract Ended'; }
   }
   set('wf-description', w.description); set('wf-category', w.category); set('wf-type', w.type);
+  // Award status
+  toggleAwardStatusField();
+  document.querySelectorAll('input[name="wf-award-status"]').forEach(r => { r.checked = r.value === (w.award_status || ''); });
+  updateAwardStatusStyle();
   const _posEl = document.getElementById('wf-image-position'); if(_posEl) _posEl.value = w.image_position || '50% 50%';
   const artistArr = (w.artists||'').split(',').map(a=>a.trim());
   document.querySelectorAll('.artist-check-w').forEach(c => { c.checked = artistArr.includes(c.value); });
@@ -7011,7 +7064,8 @@ function _readWorksForm() {
     artists, brand: gv('wf-brand'), magazine: gv('wf-magazine'),
     type: gv('wf-type'), role: gv('wf-role'), project: gv('wf-project'),
     image: gv('wf-image'), image_position: (()=>{ const _p=document.getElementById('wf-image-position'); return _p?_p.value:'50% 50%'; })(), release_date: gv('wf-releaseDate'), contract_end: (()=>{const _cb=document.getElementById('wf-contractEnd');if(!_cb||!_cb.checked)return '';const _ex=document.getElementById('wf-contractEndDate');if(_ex&&_ex.value)return _ex.value;const _d=new Date();return _d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');})(), link: gv('wf-link'),
-    description: gv('wf-description')
+    description: gv('wf-description'),
+    award_status: (()=>{ const r=document.querySelector('input[name="wf-award-status"]:checked'); return r?r.value:''; })()
   };
 }
 
@@ -7269,7 +7323,7 @@ function renderAdminWorksList() {
   const _catQ = (document.getElementById('admin-works-cat-filter')?.value || 'all');
   const _expQ = (document.getElementById('admin-works-expired-filter')?.value || 'all');
   // map category filter value → partial match against w.category
-  const _catMap = {littlebigworld:'little big world',series:'series',music:'music',magazine:'magazine',presenter:'presenter',variety:'variety',interview:'interview',bts:'behind',otherworks:'other'};
+  const _catMap = {littlebigworld:'little big world',series:'series',music:'music',magazine:'magazine',presenter:'presenter',variety:'variety',interview:'interview',bts:'behind',otherworks:'other',awards:'awards'};
   const filtered = allWorks.filter(w => {
     if (selectedYear !== 'all' && (w.year||'') !== selectedYear) return false;
     if (_searchQ) {
@@ -7367,6 +7421,17 @@ function renderAdminWorksList() {
       brandEl.style.cssText = 'display:inline-flex;align-items:center;gap:3px;color:#b45309;';
       brandEl.textContent = w.brand;
       meta.appendChild(brandEl);
+    }
+    if (w.award_status === 'won') {
+      const awEl = document.createElement('span');
+      awEl.style.cssText = 'font-size:0.65rem;font-weight:800;color:#92400e;background:#fef3c7;border:1px solid #fbbf24;border-radius:4px;padding:1px 6px;';
+      awEl.textContent = '🏆 Won';
+      meta.appendChild(awEl);
+    } else if (w.award_status === 'nominated') {
+      const awEl = document.createElement('span');
+      awEl.style.cssText = 'font-size:0.65rem;font-weight:700;color:#374151;background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;';
+      awEl.textContent = '🎗️ Nominated';
+      meta.appendChild(awEl);
     }
 
     info.appendChild(titleEl);
@@ -7530,6 +7595,7 @@ function renderWorks() {
     if (c.includes('behind') || c.includes('bts')) return 'bts';
     if (c.includes('otherwork') || c.includes('other')) return 'otherworks';
     if (c.includes('ad'))        return 'ad';
+    if (c.includes('award')) return 'awards';
     return c;
   }
 
@@ -7651,6 +7717,8 @@ function renderWorks() {
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
           ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:4px 10px;white-space:nowrap;">${cat.label}</span>` : ''}
           ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:4px 10px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
+          ${w.award_status === 'won' ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:800;color:#92400e;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fbbf24;border-radius:6px;padding:4px 10px;white-space:nowrap;">🏆 Won</span>` : ''}
+          ${w.award_status === 'nominated' ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;color:#374151;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:4px 10px;white-space:nowrap;">🎗️ Nominated</span>` : ''}
         </div>
       </div>`;
     return card;
