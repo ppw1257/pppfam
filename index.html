@@ -2220,23 +2220,7 @@
        </div>
        <div>
         <label class="form-label">Type</label>
-        <input class="form-input" id="wf-type" name="type" list="wf-type-list" placeholder="— Optional — or type your own" autocomplete="off">
-        <datalist id="wf-type-list">
-         <option>Presenter</option>
-         <option>Friend of Brand</option>
-         <option>Brand Ambassador</option>
-         <option>Guest</option>
-         <option>Performance</option>
-         <option>Event</option>
-         <option>Fashion Show</option>
-         <option>Interview</option>
-         <option>Award Show</option>
-         <option>Model</option>
-         <option>Host</option>
-         <option>Special Project</option>
-         <option>Cameo</option>
-         <option>Behind the Scenes</option>
-        </datalist>
+        <input class="form-input" id="wf-type" name="type" placeholder="e.g. Kazz Awards 2024, Brand Ambassador" autocomplete="off">
        </div>
        <div>
         <label class="form-label">Role / Character</label>
@@ -2953,15 +2937,11 @@ let _pbRealtimeRetryCount = 0;
 const _PB_REALTIME_MAX_RETRY = 10;
 const _PB_REALTIME_RETRY_DELAYS = [1000, 2000, 3000, 5000, 8000, 10000, 15000, 20000, 30000, 60000];
 
-// ── Guard: set to true while admin is saving, prevents SSE from fetching stale data ──
-let _adminSaving = false;
-
 function _onPbRealtimeChange(collectionName) {
   // Debounce: if multiple collections change at once, wait 300ms then fetch once
   if (window._pbRealtimeDebounce) clearTimeout(window._pbRealtimeDebounce);
   window._pbRealtimeDebounce = setTimeout(function() {
-    // Block if admin just saved — optimistic update + background sync will handle it
-    if (_optimisticPending || _fetchingAll || _adminSaving) return;
+    if (_optimisticPending || _fetchingAll) return;
     _fetchingAll = false;
     _fetchAllData(true).then(function() {
       _vsLastFingerprint = ''; _calLastFP = ''; _worksLastFP = '';
@@ -6237,13 +6217,11 @@ async function handleEventFormSubmit() {
   const spin = document.getElementById('form-submit-spinner');
   btn.disabled = true; txt.style.display = 'none'; spin.style.display = 'inline';
   let success = false;
-  _adminSaving = true; // block SSE from re-fetching during optimistic window
   try {
     if (editingEventId) await updateEventInSheets(editingEventId, payload, editingEventRowNumber);
     else await createEventInSheets(payload);
     success = true;
   } catch(err) {
-    _adminSaving = false;
     console.error('Save error:', err);
     showToast('❌ Error: ' + (err.message || 'Failed to save'));
   }
@@ -6331,7 +6309,6 @@ async function handleEventFormSubmit() {
               Cache.set(LC.EVENTS, allEvents);
             }
             _optimisticPending = false;
-            _adminSaving = false;
             clearTimeout(_optSafetyTimer);
             _vsLastFingerprint = ''; _calLastFP = ''; _adminListFP = '';
             requestAnimationFrame(function() {
@@ -6345,12 +6322,10 @@ async function handleEventFormSubmit() {
         // New record or single-fetch failed: fall back to full fetch
         Cache.del(LC.TS_EV); _rateLimit.reset('events');
         await _fetchFreshFromAppsScript();
-        _adminSaving = false;
         clearTimeout(_optSafetyTimer);
       } catch(e) {
         clearTimeout(_optSafetyTimer);
         _optimisticPending = false;
-        _adminSaving = false;
         console.warn('[PPP] background sync failed:', e && e.message);
       }
     })();
