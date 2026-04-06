@@ -50,69 +50,11 @@
   </script>
   <style>
   :root {
-    /* ── Style B: Dark Nav + Solid Color Cards ── */
-    --color-pond:              #f97316;
-    --color-pond-bg:           #fff7ed;
-    --color-pond-border:       #fed7aa;
-    --color-pond-text:         #c2410c;
-    --color-pond-text-dark:    #7c2d12;
-
-    --color-phuwin:            #64748b;
-    --color-phuwin-bg:         #f1f5f9;
-    --color-phuwin-border:     #cbd5e1;
-    --color-phuwin-text:       #334155;
-    --color-phuwin-text-dark:  #1e293b;
-
-    --color-permpoon:          #22c55e;
-    --color-permpoon-bg:       #f0fdf4;
-    --color-permpoon-border:   #bbf7d0;
-    --color-permpoon-text:     #15803d;
-    --color-permpoon-text-dark:#14532d;
-
-    --color-pondphuwin:        #a855f7;
-    --color-pondphuwin-bg:     #faf5ff;
-    --color-pondphuwin-border: #e9d5ff;
-    --color-pondphuwin-text:   #7e22ce;
-    --color-pondphuwin-text-dark:#581c87;
-
-    --color-pondpermpoon:      #3b82f6;
-    --color-pondpermpoon-bg:   #eff6ff;
-    --color-pondpermpoon-border:#bfdbfe;
-    --color-pondpermpoon-text: #1d4ed8;
-    --color-pondpermpoon-text-dark:#1e3a8a;
-
-    --color-phuwinpermpoon:    #ec4899;
-    --color-phuwinpermpoon-bg: #fdf2f8;
-    --color-phuwinpermpoon-border:#fbcfe8;
-    --color-phuwinpermpoon-text:#be185d;
-    --color-phuwinpermpoon-text-dark:#831843;
-
-    --color-pondphuwinpermpoon:    #6366f1;
-    --color-pondphuwinpermpoon-bg: #eef2ff;
-    --color-pondphuwinpermpoon-border:#c7d2fe;
-    --color-pondphuwinpermpoon-text:#4338ca;
-    --color-pondphuwinpermpoon-text-dark:#312e81;
-
     --radius-card: 18px;
-    --color-accent: #111;
-    --accent-primary: #f97316;
-    --accent-gradient: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
-    /* Fluid spacing */
-    --page-pad-x: clamp(10px, 3vw, 2rem);
-    --page-pad-y: clamp(1rem, 2.5vw, 2rem);
-    --gap-cards:  clamp(8px, 1.5vw, 20px);
-    /* Fluid type scale */
-    --text-xs:   clamp(10px, 0.8vw, 12px);
-    --text-sm:   clamp(12px, 0.9vw, 14px);
-    --text-base: clamp(13px, 1vw,   16px);
-    --text-lg:   clamp(15px, 1.2vw, 18px);
-    --text-xl:   clamp(16px, 1.5vw, 22px);
-    --text-2xl:  clamp(18px, 2vw,   28px);
-    --text-3xl:  clamp(22px, 2.5vw, 36px);
   }
   * { font-family: 'K2D', sans-serif; -webkit-tap-highlight-color: transparent; }
   html { height: 100%; overflow: hidden; }
-  body { height: 100%; background: #ffffff; background-attachment: fixed; color: #2d2d2d; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
+  body { height: 100%; background: #ffffff; color: #2d2d2d; margin: 0; padding: 0; overflow: hidden; touch-action: manipulation; }
   #app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .page { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: env(safe-area-inset-bottom, 0px); contain: layout style; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
   .page.active {
@@ -131,12 +73,6 @@
   .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #e8e8e8; box-shadow: 0 2px 10px rgba(0,0,0,0.07); height: 100%; position: relative; transition: box-shadow 0.15s, transform 0.15s; content-visibility: auto; contain-intrinsic-size: 0 220px; }
   .event-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.13); transform: translateY(-3px); border-color: #e0e0e0; will-change: transform; }
 
-  .card-hover-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.55);border-radius:11px;display:flex;flex-direction:column;justify-content:center;padding:16px;opacity:0;pointer-events:none;z-index:5; }
-  .event-card:hover .card-hover-overlay { opacity:1; }
-  .card-hover-overlay .oh-title { font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4; }
-  .card-hover-overlay .oh-desc { font-size:0.68rem;color:rgba(255,255,255,0.7);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical; }
-  .card-hover-overlay .oh-cta { margin-top:10px;font-size:0.65rem;font-weight:700;color:#fff;opacity:0.6; }
-  @media (hover: none) { .card-hover-overlay { display:none !important; } }
   /* Timeline view */
   .timeline-wrap { display:flex;flex-direction:column;gap:0;position:relative;padding-left:56px; }
   .timeline-line { position:absolute;left:27px;top:0;bottom:0;width:2px;background:#f0f0f0;border-radius:99px; }
@@ -145,7 +81,7 @@
   .timeline-dow { font-size:0.58rem;font-weight:700;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase; }
   .timeline-circle { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1; }
   .timeline-circle span { font-size:0.82rem;font-weight:900;color:#fff; }
-  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;border:1px solid #efefef;border-left:3px solid var(--timeline-accent,#e5e7eb);transition:box-shadow 0.12s, transform 0.12s; }
+  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;border:1px solid #efefef;border-left:3px solid #e5e7eb;transition:box-shadow 0.12s, transform 0.12s; }
   .timeline-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); will-change: transform; }
   .timeline-card-top { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
   .timeline-card-title { font-size:0.85rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:4px; }
@@ -178,7 +114,6 @@
     object-position: top center;
     display: block;
     background: #f3f4f6;
-    decoding: async;
   }
   .card-img.img-loading { opacity: 0; transition: none; }
   .card-img.img-loaded  { opacity: 1; transition: opacity 0.35s ease; }
@@ -289,7 +224,6 @@
   .cal-date-chip.today { background:#111; }
   .cal-date-chip.today .cal-date-chip-dow { color:rgba(255,255,255,0.5); }
   .cal-date-chip.today .cal-date-chip-num { color:#fff; }
-  .cal-date-chip.has-event-chip { /* handled inline with accent color */ }
   .cal-date-chip-dow { font-size:0.65rem;font-weight:700;color:#9ca3af;letter-spacing:0.04em;text-transform:uppercase;width:28px;flex-shrink:0; }
   .cal-date-chip-num { font-size:0.9rem;font-weight:700;color:#111;flex-shrink:0; }
   /* card grid */
@@ -416,7 +350,6 @@
     animation: pageIn 0.18s ease forwards;
   }
   .bday-banner { display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:12px;font-size:0.82rem;position:relative;box-shadow:none;border:1px solid #f0f0f0; }
-  .bday-today { }
   @keyframes bday-pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
   /* ── Animated nav dots ── */
   @keyframes navDotPulse {
@@ -1396,7 +1329,7 @@
       <div id="trend-filter-bar" class="filter-bar" style="margin-bottom:6px;"></div>
       <div id="trend-year-bar" class="filter-bar" style="margin-bottom:6px;"></div>
      </div>
-     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:8px;"></div>
+     <div id="trend-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px;"></div>
      <div id="trend-empty" style="display:none;text-align:center;padding:4rem 1rem;color:#9ca3af;">
       <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 1rem;display:block;opacity:0.4;"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
       <p style="font-weight:600;color:#6b7280;">No trend data yet</p>
@@ -3468,53 +3401,44 @@ function renderTrend() {
 
   // ── Responsive card grid — set once, no duplicate CSS override ──
   if (!grid.dataset.styled) {
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:8px;';
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px;';
     grid.dataset.styled = '1';
   }
 
-  grid.innerHTML = filtered.map(t => {
-    const artistColor = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
-    const artistTextColor = { Pond:'#c2410c', Phuwin:'#334155', Permpoon:'#15803d' };
-    const artistBg = { Pond:'#fff7ed', Phuwin:'#f1f5f9', Permpoon:'#f0fdf4' };
-    const artistBorder = { Pond:'#fed7aa', Phuwin:'#cbd5e1', Permpoon:'#bbf7d0' };
+  const _tArtistColor = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
+  const _tNoImgGrad = { '#f97316':'linear-gradient(160deg,#431407,#7c2d12)', '#64748b':'linear-gradient(160deg,#0f172a,#1e293b)', '#22c55e':'linear-gradient(160deg,#052e16,#14532d)' };
+
+  const frag = document.createDocumentFragment();
+  filtered.forEach(t => {
     const artists = (t.artists||'').split(',').map(a=>a.trim()).filter(Boolean);
-    const dateStr = t.date ? new Date(t.date+'T00:00:00').toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'}) : '';
-    const isLink = !!t.link;
-    const isX = t.link && (t.link.includes('x.com')||t.link.includes('twitter.com'));
-    const isIG = t.link && t.link.includes('instagram.com');
+    const mainColor = artists.length ? (_tArtistColor[artists[0]]||'#64748b') : '#64748b';
+    const card = document.createElement('div');
+    card.style.cssText = 'border-radius:var(--radius-card);overflow:hidden;cursor:'+(t.link?'pointer':'default')+';position:relative;aspect-ratio:3/4;background:#111;box-shadow:0 2px 12px rgba(0,0,0,0.12);transition:box-shadow 0.18s,transform 0.18s;';
+    card.addEventListener('mouseenter', () => { card.style.boxShadow='0 10px 32px rgba(0,0,0,0.22)'; card.style.transform='translateY(-4px)'; });
+    card.addEventListener('mouseleave', () => { card.style.boxShadow='0 2px 12px rgba(0,0,0,0.12)'; card.style.transform=''; });
+    if (t.link) card.onclick = () => window.open(t.link, '_blank', 'noopener,noreferrer');
 
-    // Artist badges row
-    const badgesHtml = artists.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
-      ${artists.map(a => `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:0.6rem;font-weight:700;background:${artistBg[a]||'#f3f4f6'};color:${artistTextColor[a]||'#374151'};border:1px solid ${artistBorder[a]||'#e5e7eb'};"><span style="width:5px;height:5px;border-radius:50%;background:${artistColor[a]||'#6b7280'};display:inline-block;flex-shrink:0;"></span>${a}</span>`).join('')}
-      ${dateStr ? `<span style="display:inline-flex;align-items:center;font-size:0.65rem;color:#9ca3af;margin-left:auto;padding:2px 0;">${dateStr}</span>` : ''}
-    </div>` : (dateStr ? `<div style="margin-bottom:6px;"><span style="font-size:0.65rem;color:#9ca3af;">${dateStr}</span></div>` : '');
+    const imgFill = t.image
+      ? `<img src="${'https://images.weserv.nl/?url='+encodeURIComponent(t.image)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block;" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">`
+      : `<div style="position:absolute;inset:0;${_tNoImgGrad[mainColor]||'linear-gradient(160deg,#111,#374151)'};"></div>`;
 
-    // Source link chip
-    const sourceBadge = t.link ? `<div style="display:flex;align-items:center;gap:4px;margin-top:10px;padding:5px 8px;border-radius:7px;background:#f9fafb;border:1px solid #f0f0f0;">
-      ${isX ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="#111"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>` : isIG ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="#e1306c"/></svg>` : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>`}
-      <span style="font-size:0.68rem;font-weight:600;color:#374151;">View original post</span>
-      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" style="margin-left:auto;"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    </div>` : '';
+    const artistPills = artists.map(a => {
+      const bg = _tArtistColor[a]||mainColor;
+      return `<span style="display:inline-flex;align-items:center;font-size:0.6rem;font-weight:800;padding:2px 9px;border-radius:99px;background:${bg};color:#fff;">${a}</span>`;
+    }).join(' ');
 
-    // Main color for accent
-    const mainColor = artists.length ? (artistColor[artists[0]]||'#e5e7eb') : '#e5e7eb';
-
-    // Trend card — same style as home page, image shown at full size, no crop
-    const cardClick = isLink
-      ? `onclick="window.open('${escHtml(t.link)}','_blank')" style="cursor:pointer;"`
-      : `style="cursor:default;"`;
-    return `<div class="event-card" ${cardClick}>
-      ${t.image
-        ? `<div style="width:100%;flex-shrink:0;overflow:hidden;border-radius:var(--radius-card) var(--radius-card) 0 0;background:#f8f9fa;">
-             <img src="${t.image ? `https://images.weserv.nl/?url=${encodeURIComponent(t.image)}` : ''}" style="width:100%;height:auto;display:block;" loading="lazy" onerror="_onImgError(this)">
-           </div>`
-        : `<div style="height:4px;background:${mainColor};flex-shrink:0;"></div>`}
-      <div style="padding:0.45rem 0.55rem;display:flex;flex-direction:column;flex:1;">
-        ${badgesHtml}
-        ${t.caption ? `<p style="font-size:0.7rem;font-weight:700;line-height:1.35;color:#111;margin:0;word-break:break-word;">${escHtml(t.caption)}</p>` : ''}
+    card.innerHTML = `
+      ${imgFill}
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.45) 55%,rgba(0,0,0,0.05) 100%);pointer-events:none;"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 14px 15px;">
+        ${artistPills ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${artistPills}</div>` : ''}
+        ${t.caption ? `<div style="font-size:0.82rem;font-weight:900;color:#fff;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;text-shadow:0 1px 10px rgba(0,0,0,0.95);">${escHtml(t.caption)}</div>` : ''}
       </div>
-    </div>`;
-  }).join('');
+    `;
+    frag.appendChild(card);
+  });
+  grid.innerHTML = '';
+  grid.appendChild(frag);
 }
 
 const _renderTrendDebounced = debounce(renderTrend, 80);
@@ -4110,8 +4034,7 @@ function renderHome() {
     grid.innerHTML = '';
     grid.appendChild(buildTimelineView(events));
     debounceLucide();
-    _observeLazyImages(grid);
-    return;
+      return;
   }
 
   // ── Build flat item list for virtual infinite scroll ──
@@ -4154,7 +4077,6 @@ function _buildListItem(ev) {
     : `<div style="width:68px;height:68px;border-radius:12px;background:${color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true"></div>`;
   const item = document.createElement('div');
   item.className = 'list-card';
-  const ab4 = getArtistBg(ev.artists);
   item.style.cssText = `background:#fff;border-radius:18px;border:1px solid #f0f0f0;box-shadow:0 1px 6px rgba(0,0,0,0.04);border-left:3px solid ${color};padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;contain:layout style;`;
   item.onclick = () => openDetailModal(ev.__backendId);
   item.innerHTML = `${imgHtml}<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">${dots}${badge}</div><div style="font-size:0.88rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(ev.title)}</div><div style="font-size:0.72rem;color:#9ca3af;">${meta}</div></div>`;
@@ -4239,36 +4161,6 @@ function _vsInit(groups) {
   startCardCountdowns();
 }
 
-function _observeLazyImages(root) {}
-
-function onPastMonthChange(val) {
-  window._pastMonthFilter = val;
-  scheduleRender();
-}
-
-function togglePastEvents() {
-  window._pastEventsOpen = !window._pastEventsOpen;
-  const body   = document.getElementById('past-events-body');
-  const icon   = document.getElementById('past-toggle-icon');
-  const btn    = document.getElementById('past-toggle-btn');
-  const select = document.getElementById('past-month-select');
-  const wrap   = btn ? btn.closest('div') : null;
-  if (!body) return;
-  body.style.display   = window._pastEventsOpen ? 'block' : 'none';
-  if (icon)   icon.style.transform   = window._pastEventsOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-  if (wrap)   wrap.style.marginBottom = window._pastEventsOpen ? '0.75rem' : '0';
-  if (select) select.style.display   = window._pastEventsOpen ? 'block' : 'none';
-  if (window._pastEventsOpen) {
-    const pg = document.getElementById('past-events-grid');
-    if (pg && pg.children.length === 0 && window._pastFiltered) {
-      window._pastFiltered.forEach(ev => {
-        const card = createCard(ev);
-        if (card.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) pg.appendChild(card);
-      });
-      debounceLucide();
-    }
-  }
-}
 
 // ═══════════════════════════════════════════════════════════════════
 // CARD BUILDER
@@ -4535,10 +4427,8 @@ function createCard(ev) {
   if (!ev.title || !ev.title.trim()) return document.createDocumentFragment();
   const color = getArtistColor(ev.artists);
   const ab = getArtistBg(ev.artists);
-  const isNext = _nextEventId && ev.__backendId === _nextEventId;
   const card = document.createElement('div');
-  card.className = 'event-card' + (isNext ? ' event-card--next' : '');
-  if (isNext) card.style.setProperty('--next-color', color);
+  card.className = 'event-card';
   // no colored border
   card.dataset.eventId = ev.__backendId;
   card.setAttribute('role', 'button');
@@ -4884,16 +4774,7 @@ function isDateToday(month, day) {
   const todayStr = _todayInBKK();
   const parts = todayStr.split('-').map(Number);
   return parts[1] === month && parts[2] === day;
-}
-function getSpecialOnDate(month, day) {
-  return [
-    ...allBirthdays.filter(b => b.birthday_month === month && b.birthday_day === day)
-      .map(b => ({ name: b.artist_name, month: b.birthday_month, day: b.birthday_day, color: b.color || '#6b7280', type: 'birthday', __backendId: b.__backendId })),
-    ...allAnniversaries.filter(a => a.anniversary_month === month && a.anniversary_day === day)
-      .map(a => ({ label: a.anniversary_name, month: a.anniversary_month, day: a.anniversary_day, color: a.color || '#a855f7', type: 'anniversary', startYear: a.anniversary_year, __backendId: a.__backendId }))
-  ];
-}
-function makeBannerHtml(item, days) {
+}function makeBannerHtml(item, days) {
   const isToday = days === 0 || isDateToday(item.month, item.day);
   const isBday = item.type === 'birthday';
   const icon = isToday ? '🎉' : (isBday ? '🎂' : '🥂');
@@ -5141,25 +5022,6 @@ function renderCalendar() {
   debounceLucide();
 }
 
-function buildMonthEvents() {
-  const year = calYear, month = calMonth;
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const monthStr = `${year}-${String(month+1).padStart(2,'0')}`;
-  const monthEvents = {};
-  const filteredEvs = calFilter === 'all' ? allEvents : allEvents.filter(ev => ev.artists && ev.artists.split(',').map(a=>a.trim()).includes(calFilter));
-  filteredEvs.forEach(ev => {
-    if (!ev.dateStart) return;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const ds = `${monthStr}-${String(d).padStart(2,'0')}`;
-      if (ds >= ev.dateStart && ds <= (ev.dateEnd || ev.dateStart)) {
-        if (!monthEvents[ds]) monthEvents[ds] = [];
-        if (!monthEvents[ds].find(e => e.__backendId === ev.__backendId)) monthEvents[ds].push(ev);
-      }
-    }
-  });
-  return monthEvents;
-}
-
 function renderCalendarCardGrid(monthEvents) {
   const grid = document.getElementById('cal-card-grid');
   const noEv = document.getElementById('cal-no-events');
@@ -5236,8 +5098,7 @@ function renderCalendarCardGrid(monthEvents) {
     // Countdown for this event
     const calDays = daysUntilEvent(ev.dateStart);
     const calIsToday = calDays === 0 && !isEventPast(ev);
-    const calIsNext = _nextEventId && ev.__backendId === _nextEventId;
-    // Countdown removed from calendar cards
+      // Countdown removed from calendar cards
     let calCountdownHtml = '';
     // Image or gradient placeholder
     const gradients = {
@@ -5332,10 +5193,7 @@ function nextMonth() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} calSel
 // FILTER HANDLERS — debounced renders
 // ═══════════════════════════════════════════════════════════════════
 
-let _searchDebounce = null;
 
-let _countdownTarget = null;
-let _countdownTimer  = null;
 function _parseEventTarget(dateStr, timeStr) {
   // Extract time "HH:MM" and timezone "GMT+7" from timeStr like "18:00 GMT+7"
   const raw = (timeStr || '').split('/')[0].trim();
@@ -6561,7 +6419,6 @@ function buildTimelineView(events) {
   return wrap;
 }
 
-function syncBentoHeight() { /* no-op: flex + aspect-ratio handles height */ }
 
 function bentoNextClick() {
   const el = _dom('bento-next');
@@ -6910,8 +6767,6 @@ function deleteWork(backendId, title) {
   const btnWrap = row.querySelector('div:last-child');
   if (!btnWrap) return;
 
-  // Clone original nodes (with listeners intact) so Cancel can restore them
-  const originalNodes = Array.from(btnWrap.childNodes).map(n => n.cloneNode(true));
 
   function _restoreBtnWrap() {
     btnWrap.innerHTML = '';
@@ -7347,8 +7202,6 @@ function renderWorks() {
     return c;
   }
 
-  const _currentYear = String(new Date().getFullYear());
-  const _effectiveYear = _worksYear; // use as-is, no force
 
   let filtered = allWorks;
   // Filter by year only when: specific year selected (not all)
@@ -7487,9 +7340,9 @@ function renderWorks() {
     const catBadgeHtml = _badgeText ? buildTypePill(_badgeText, 'sm') : '';
 
     const artistLineOverlay = artistArr.map(a => {
-      const dot = artistColors[a] || '#94a3b8';
-      return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.68rem;font-weight:700;color:#fff;"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
-    }).join(`<span style="color:rgba(255,255,255,0.35);font-size:0.6rem;">·</span>`);
+      const bg = artistColors[a] || '#64748b';
+      return `<span style="display:inline-flex;align-items:center;font-size:0.6rem;font-weight:800;padding:2px 9px;border-radius:99px;background:${bg};color:#fff;">${a}</span>`;
+    }).join(' ');
 
     const _yearBadge = w.year
       ? `<div style="position:absolute;top:9px;right:9px;z-index:5;pointer-events:none;background:#000;color:#fff;border-radius:99px;padding:3px 10px;font-size:0.65rem;font-weight:800;letter-spacing:0.04em;">${escHtml(w.year)}</div>`
@@ -7504,8 +7357,8 @@ function renderWorks() {
       ${_typeBadgeTop}
       <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.80) 0%,rgba(0,0,0,0.25) 55%,rgba(0,0,0,0) 100%);pointer-events:none;"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;">
-        <div style="font-size:0.82rem;font-weight:700;color:#fff;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:5px;">${escHtml(w.title)}</div>
-        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">${artistLineOverlay}</div>
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLineOverlay}</div>
+        <div style="font-size:0.82rem;font-weight:700;color:#fff;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${escHtml(w.title)}</div>
       </div>
     `;
     return card;
@@ -7583,7 +7436,6 @@ function renderWorks() {
 
 // Debounced resize → re-render calendar
 window.addEventListener('resize', () => {
-  syncBentoHeight();
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => {
     if (document.getElementById('page-calendar')?.classList.contains('active')) renderCalendar();
