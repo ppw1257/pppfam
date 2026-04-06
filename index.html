@@ -6713,16 +6713,48 @@ async function handleWorksFormSubmit() {
       debounceLucide();
     });
 
-    // Sync background — clear timestamp only, keep optimistic
+    // ── Smart background sync: fetch only the saved record, not everything ──
     _fetchingAll = false;
-    Cache.del(LC.TS_EV); Cache.del(LC.TS_WK);
-    _rateLimit.reset('works');
-    const _wOptTimer = setTimeout(function(){ _optimisticPending = false; }, 30000);
-    _fetchFreshFromAppsScript().catch(function(e){
-      clearTimeout(_wOptTimer);
-      _optimisticPending = false;
-      console.warn('[PPP] works sync failed:', e && e.message);
-    });
+    const _wSyncId2 = _wSavedId || null;
+    const _wOptTimer = setTimeout(function(){ if (_optimisticPending) _optimisticPending = false; }, 30000);
+
+    (async function() {
+      try {
+        if (_wSyncId2) {
+          // Edit: fetch only this one works record
+          const _wTok = await pbGetToken();
+          const _wRes = await fetch(`${PB_URL}/api/collections/works/records/${_wSyncId2}`, {
+            headers: { 'Authorization': _wTok }
+          });
+          if (_wRes.ok) {
+            const _wRec = await _wRes.json();
+            const _wProcessed = Object.assign({ __backendId: _wRec.id }, _wRec, { image: _pbFileUrl(_wRec, _wRec.image || '') });
+            const _wi2 = allWorks.findIndex(function(w){ return String(w.__backendId||w.id) === String(_wSyncId2); });
+            if (_wi2 !== -1) allWorks[_wi2] = _wProcessed; else allWorks.unshift(_wProcessed);
+            _memCache.set('works', allWorks);
+            Cache.set(LC.WORKS, allWorks);
+            _optimisticPending = false;
+            clearTimeout(_wOptTimer);
+            _worksLastFP = ''; _adminWorksListFP = '';
+            requestAnimationFrame(function(){
+              renderWorks();
+              if (isAdmin) renderAdminWorksList();
+              debounceLucide();
+            });
+            return; // done — skip full fetch
+          }
+        }
+        // New record or single-fetch failed: fall back to full fetch
+        Cache.del(LC.TS_EV); Cache.del(LC.TS_WK);
+        _rateLimit.reset('works');
+        await _fetchFreshFromAppsScript();
+        clearTimeout(_wOptTimer);
+      } catch(e) {
+        clearTimeout(_wOptTimer);
+        _optimisticPending = false;
+        console.warn('[PPP] works sync failed:', e && e.message);
+      }
+    })();
     _currentAdminTab = '';
     switchAdminTab('works');
   } catch(err) {
