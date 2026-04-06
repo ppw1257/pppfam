@@ -772,14 +772,10 @@
     min-width: 0;
   }
   @media (min-width: 480px) {
-    .cards-grid {
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)) !important;
-    }
+    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)) !important; }
   }
   @media (min-width: 768px) {
-    .cards-grid {
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)) !important;
-    }
+    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)) !important; }
   }
 
   /* ── CSS containment: paint-only on cards, layout+style on page-level containers ── */
@@ -2338,8 +2334,7 @@
 
  </div><!-- /#app -->
   <div id="toast"></div>
-  <!-- Perf indicator (hidden by default, visible in ?debug mode) -->
-  <div id="perf-badge" style="display:none;position:fixed;bottom:4rem;right:1rem;background:rgba(0,0,0,0.75);color:#0f0;font-family:monospace;font-size:0.65rem;padding:5px 8px;border-radius:6px;z-index:9999;pointer-events:none;"></div>
+
 
   <script>
 // ═══════════════════════════════════════════════════════════════════
@@ -2506,7 +2501,6 @@ function fmtDateRange(dateStart, dateEnd) {
 }
 let editingEventId  = null;
 let _optimisticPending = false; // true while optimistic event is awaiting server confirm
-let editingEventRowNumber = null;
 let deleteConfirmIds = new Set();
 let panelUnlocked   = false;
 let apiLoaded       = false;
@@ -2838,7 +2832,7 @@ async function _fetchAllData(force = false) {
     }
     _scheduleEventStartTimers();
   } catch(e) {
-    console.warn('[PPP] PocketBase fetch failed:', e.message);
+
     showConnectionError();
   } finally {
     _fetchingAll = false;
@@ -2909,7 +2903,7 @@ async function updateEventInSheets(id, data) {
   const d = await res.json();
   if (!d.id) throw new Error(d.message || 'Update failed');
 }
-async function deleteEventInSheets(id, rowNumber) {
+async function deleteEventInSheets(id) {
   if (!id) return { status: 'not_found' };
   const token = await pbGetToken();
   const res = await fetch(`${PB_URL}/api/collections/events/records/${id}`, {
@@ -2975,7 +2969,7 @@ function _onPbRealtimeChange(collectionName) {
       _refreshAllPages();
       renderBirthdayBanners();
     }).catch(function(e) {
-      if (e && e.message !== 'AbortError') console.warn('[PPP Realtime]', e.message || e);
+      if (e && e.message !== 'AbortError')
     });
   }, 300);
 }
@@ -3008,9 +3002,9 @@ function _initPbRealtime() {
         });
         window._pbRealtimeActive = true;
         _pbRealtimeRetryCount = 0; // reset retry count on successful connect
-        console.log('[PPP Realtime] Connected ✓ — live updates active');
+
       } catch(err) {
-        console.warn('[PPP Realtime] Subscribe failed:', err.message);
+
       }
     });
 
@@ -3031,10 +3025,10 @@ function _initPbRealtime() {
       const delay = base + jitter;
       _pbRealtimeRetryCount++;
       if (_pbRealtimeRetryCount <= _PB_REALTIME_MAX_RETRY) {
-        console.warn('[PPP Realtime] Disconnected — reconnecting in ' + (delay/1000).toFixed(1) + 's...');
+
         setTimeout(_initPbRealtime, delay);
       } else {
-        console.warn('[PPP Realtime] Max retries reached — falling back to polling only');
+
       }
     };
 
@@ -3044,7 +3038,7 @@ function _initPbRealtime() {
     window._pbRealtimeActive = false;
     const delay = _PB_REALTIME_RETRY_DELAYS[Math.min(_pbRealtimeRetryCount, _PB_REALTIME_RETRY_DELAYS.length - 1)];
     _pbRealtimeRetryCount++;
-    console.warn('[PPP Realtime] Init failed, retry in ' + (delay/1000) + 's:', err.message);
+
     setTimeout(_initPbRealtime, delay);
   }
 }
@@ -3096,7 +3090,7 @@ function scheduleAutoRefresh() {
     if (document.hidden) return;
     if (_optimisticPending) return;
     if (!_fetchingAll) {
-      _fetchAllData(true).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e); });
+      _fetchAllData(true).catch(function(){});
     }
   }, 15 * 60 * 1000); // 15 min — SSE is primary; polling is safety net only
 
@@ -3141,7 +3135,7 @@ function _scheduleMidnightTimer() {
     scheduleRender();
     renderBirthdayBanners();
     _fetchingAll = false;
-    _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
+    _fetchAllData(true).catch(function(){});
     _scheduleMidnightTimer();
   }, msUntilMidnight + 50); // +50ms buffer to ensure past midnight
 }
@@ -3292,7 +3286,7 @@ async function _fetchFreshFromAppsScript() {
     renderBirthdayBanners();
   } catch(e) {
     _optimisticPending = false;
-    console.warn('_fetchFreshFromPocketBase failed:', e.message);
+
   }
 }
 
@@ -3578,7 +3572,7 @@ async function handleTrendFormSubmit() {
     renderTrend();
     renderAdminTrendList();
     showToast('❌ ' + (err.message || 'Error'));
-    console.error('[trend]', err);
+
   } finally {
     btn.disabled = false; txt.style.display = 'inline'; spin.style.display = 'none';
   }
@@ -3614,7 +3608,7 @@ async function loadTrendsFromSheets(force = false) {
       renderTrend();
       renderAdminTrendList();
     }
-  } catch(e) { console.warn('[trend] load failed:', e.message); }
+  } catch(e) {}
 }
 
 // ── Status helpers ────────────────────────────────────────────────
@@ -3696,7 +3690,7 @@ async function retryConnection() {
   Cache.clearAll();
   _fetchingAll = false;
   showSkeletons();
-  await _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
+  await _fetchAllData(true).catch(function(){});
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -4356,7 +4350,7 @@ function startCardCountdowns() {
       if (stillUpcoming.length === 0) {
         Cache.del(LC.TS_EV);
         _memCache.del('events');
-        _fetchAllData(true).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
+        _fetchAllData(true).catch(function(){});
       }
       if (!window._cdRenderPending) {
         window._cdRenderPending = true;
@@ -4698,7 +4692,7 @@ function copyPill(el, text) {
       el.style.background = origBg;
       el.style.color = origColor;
     }, 1200);
-  }).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
+  }).catch(function(){});
 }
 
 function closeDetailModal() {
@@ -5761,7 +5755,7 @@ async function confirmDelete(key) {
   });
 
   try {
-    const result = await deleteEventInSheets(ev.__backendId || ev.__rawId, ev.__rowNumber);
+    const result = await deleteEventInSheets(ev.__backendId || ev.__rawId);
     showToast(result.status === 'not_found' ? 'Removed. (already deleted from Sheet)' : 'Deleted ✓');
     _fetchingAll = false;
     _fetchFreshFromAppsScript().catch(function(){});
@@ -6021,7 +6015,7 @@ function navigate(page) {
 // ═══════════════════════════════════════════════════════════════════
 function openAddModal() {
   if (allEvents.length >= 999) { showToast('Limit reached.'); return; }
-  editingEventId = null; editingEventRowNumber = null;
+  editingEventId = null;
   document.getElementById('form-modal-title').textContent = 'Add Event';
   document.getElementById('form-submit-text').textContent = 'Save Event';
   document.getElementById('form-submit-btn').disabled = false;
@@ -6036,8 +6030,7 @@ function openAddModal() {
 function openEditModal(key) {
   const ev = findEventByKey(key); if (!ev) return;
   editingEventId = ev.__backendId || null;
-  editingEventRowNumber = ev.__rowNumber || null;
-  document.getElementById('form-modal-title').textContent = 'Edit Event';
+    document.getElementById('form-modal-title').textContent = 'Edit Event';
   document.getElementById('form-submit-text').textContent = 'Update Event';
   document.getElementById('form-submit-btn').disabled = false;
   document.getElementById('form-submit-text').style.display = 'inline';
@@ -6051,7 +6044,7 @@ function closeEventFormModal() {
   _dom('event-form-modal').style.display = 'none';
   document.body.style.overflow = '';
   document.documentElement.style.overflow = '';
-  editingEventId = null; editingEventRowNumber = null;
+  editingEventId = null;
 }
 function clearForm() {
   const f=document.getElementById('event-form');
@@ -6244,11 +6237,11 @@ async function handleEventFormSubmit() {
   btn.disabled = true; txt.style.display = 'none'; spin.style.display = 'inline';
   let success = false;
   try {
-    if (editingEventId) await updateEventInSheets(editingEventId, payload, editingEventRowNumber);
+    if (editingEventId) await updateEventInSheets(editingEventId, payload);
     else await createEventInSheets(payload);
     success = true;
   } catch(err) {
-    console.error('Save error:', err);
+
     showToast('❌ Error: ' + (err.message || 'Failed to save'));
   }
   btn.disabled = false; txt.style.display = 'inline'; spin.style.display = 'none';
@@ -6269,7 +6262,6 @@ async function handleEventFormSubmit() {
     const _optId = _savedId || ('opt_' + Date.now()); // temporary id for new add
     const optimisticEvent = Object.assign({
       __backendId: _optId,
-      __rowNumber: editingEventRowNumber || 0,
       __rawId: _savedId || '',
       __isOptimistic: true, // mark as optimistic
       _isPast: payload.dateStart ? payload.dateStart < _todayInBKK() : false,
@@ -6352,7 +6344,7 @@ async function handleEventFormSubmit() {
       } catch(e) {
         clearTimeout(_optSafetyTimer);
         _optimisticPending = false;
-        console.warn('[PPP] background sync failed:', e && e.message);
+
       }
     })();
   }
@@ -6469,7 +6461,7 @@ try {
       ])
     });
   }
-} catch(e) { console.warn('elementSdk not available:', e); }
+} catch(e) {}
 
 // ═══════════════════════════════════════════════════════════════════
 // WORKS PAGE
@@ -6535,7 +6527,7 @@ async function loadWorksFromSheets(force = false) {
       if (newWkFP !== prevWkFP) { _worksLastFP = ''; if (currentPage === 'works' || currentPage === 'admin') scheduleRender(); }
     }
   } catch(e) {
-    console.warn('Works load (PocketBase) failed:', e.message);
+
   } finally { _fetchingWorks = false; }
 }
 
@@ -6738,13 +6730,13 @@ async function handleWorksFormSubmit() {
     _fetchFreshFromAppsScript().catch(function(e){
       clearTimeout(_wOptTimer);
       _optimisticPending = false;
-      console.warn('[PPP] works sync failed:', e && e.message);
+
     });
     _currentAdminTab = '';
     switchAdminTab('works');
   } catch(err) {
     showToast('❌ Error: ' + (err.message || 'Failed to save work'));
-    console.error('[handleWorksFormSubmit]', err);
+
   } finally {
     btn.disabled=false; txt.style.display='inline'; spin.style.display='none';
   }
@@ -6819,7 +6811,7 @@ function deleteWork(backendId, title) {
     } catch(err) {
       _restoreBtnWrap();
       showToast('❌ Error: ' + (err.message || 'Failed to delete'));
-      console.error('[deleteWork]', err);
+
     }
   });
 }
@@ -7475,7 +7467,7 @@ document.addEventListener('visibilitychange', () => {
     _fetchAllData(true).then(function() {
       _refreshAllPages();
       renderBirthdayBanners();
-    }).catch(function(e) { if(e && e.message !== 'AbortError') console.warn('[PPP]', e.message || e);
+    }).catch(function(e) { if(e && e.message !== 'AbortError')
       });
   }
 });
@@ -7532,7 +7524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (addWorkBtn) addWorkBtn.addEventListener('click', function() { openAddWorksModal(); });
 
   const pwField = document.getElementById('login-pw-field');
-  if (pwField) pwField.addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin().catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); }); });
+  if (pwField) pwField.addEventListener('keydown', e => { if(e.key==='Enter') doAdminLogin().catch(function(){}); });
   document.addEventListener('keydown', function(e) {
     // Ctrl+K or Cmd+K → open search
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -7556,7 +7548,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ── STEP 3: Fetch fresh data — real-time: force fetch every time ──
-  const fetchData = (force = false) => _fetchAllData(force).catch(e => { if(e && e.message !== "AbortError") console.warn("[PPP]", e.message || e); });
+  const fetchData = (force = false) => _fetchAllData(force).catch(function(){});
   // Reset flags to prevent deadlock if flags carried over from previous session
   _fetchingAll = false;
   _fetchingEvents = false;
@@ -7633,37 +7625,6 @@ function _fastHydrateFromCache() {
   return hit;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// PERFORMANCE MONITOR (shows stats in ?debug mode only)
-// ═══════════════════════════════════════════════════════════════════
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  if (!params.has('debug')) return;  // exit immediately if no ?debug — zero side effects
-  const badge = _dom('perf-badge');
-  if (!badge) return;
-  badge.style.display = 'block';
-  const t0 = performance.now();
-  let renderCount = 0;
-  const origSchedule = scheduleRender;
-  // override scheduleRender in debug mode only
-  window.scheduleRender = function() { renderCount++; origSchedule(); };
-  // setInterval in debug mode only — does not run in production
-  const _debugTimer = setInterval(() => {
-    const mem = performance.memory ? (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + 'MB' : 'n/a';
-    const cacheAge = Date.now() - Cache.getTS(LC.TS_EV);
-    const cacheMin = (cacheAge / 60000).toFixed(1);
-    badge.textContent = [
-      `events: ${allEvents.length}`,
-      `cache: ${cacheMin}m ago`,
-      `dom: ${document.querySelectorAll('.event-card,.cal-ev-card').length} cards`,
-      `renders: ${renderCount}`,
-      `mem: ${mem}`,
-      `uptime: ${((performance.now()-t0)/1000).toFixed(0)}s`
-    ].join(' | ');
-  }, 2000);
-  // clear on unload
-  window.addEventListener('pagehide', () => clearInterval(_debugTimer));
-})();
 
 // ═══════════════════════════════════════════════════════════════════
 // GLOBAL SEARCH
@@ -8044,8 +8005,6 @@ function applyCardSize(val) {
   const styleId = 'card-size-override';
   let el = document.getElementById(styleId);
   if (!el) { el = document.createElement('style'); el.id = styleId; document.head.appendChild(el); }
-  // Mobile (<480px): always 2 columns regardless of slider
-  // Larger screens: use slider minPx
   el.textContent = `
     @media (min-width: 480px) {
       .cards-grid, #trend-grid {
