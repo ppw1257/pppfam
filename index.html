@@ -3645,7 +3645,7 @@ function showSkeletons() {
   grid.style.flexDirection = 'column';
   const wrap = document.createElement('div');
   wrap.className = 'cards-grid';
-  wrap.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;align-items:stretch;';
+  wrap.style.cssText = '';
   // Build skeleton template once
   if (!window._skelTemplate) {
     const t = document.createElement('div');
@@ -4108,7 +4108,6 @@ function _vsInit(groups) {
       } else {
         gridEl = document.createElement('div');
         gridEl.className = 'cards-grid';
-        gridEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;align-items:stretch;';
       }
       gw.appendChild(gridEl);
       frag.appendChild(gw);
