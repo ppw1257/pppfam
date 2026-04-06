@@ -1082,10 +1082,10 @@
    <nav id="main-nav">
     <div class="nav-inner">
      <div class="nav-logo" onclick="navigate('home')" style="display:flex;align-items:center;gap:8px;">
-      <div style="display:flex;gap:3px;flex-shrink:0;">
-        <div class="nav-dot-1" style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div>
-        <div class="nav-dot-2" style="width:7px;height:7px;border-radius:50%;background:#94a3b8;"></div>
-        <div class="nav-dot-3" style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+       <span class="nav-dot-1" style="width:8px;height:8px;border-radius:50%;background:#f97316;display:inline-block;"></span>
+       <span class="nav-dot-2" style="width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block;"></span>
+       <span class="nav-dot-3" style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
       </div>
       <span id="nav-site-title">PPP Family</span>
      </div>
@@ -4498,6 +4498,13 @@ function getTypeStyle(type) {
     'reality show':        { bg:'#0369a1', color:'#fff' },
     'talk show':           { bg:'#1d4ed8', color:'#fff' },
     'special':             { bg:'#7c3aed', color:'#fff' },
+    'brand presenter':     { bg:'#0369a1', color:'#fff' },
+    'presenter':           { bg:'#0369a1', color:'#fff' },
+    'other works':         { bg:'#be123c', color:'#fff' },
+    'little big world':    { bg:'#b45309', color:'#fff' },
+    'behind the scenes':   { bg:'#374151', color:'#fff' },
+    'live house':          { bg:'#dc2626', color:'#fff', dot:'#fca5a5' },
+    'music & mv':          { bg:'#5b21b6', color:'#fff', dot:'#c4b5fd' },
   };
   return map[t] || { bg:'#374155', color:'#fff' };
 }
@@ -7704,7 +7711,7 @@ function renderWorks() {
   // Responsive grid cols CSS — awards tab uses narrower columns for portrait aspect ratio
   const gridCols = _worksTab === 'awards'
     ? `display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(8px,1.5vw,14px);`
-    : `display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:clamp(10px,1.5vw,18px);`;
+    : `display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:clamp(8px,1.5vw,14px);`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
@@ -7730,65 +7737,72 @@ function renderWorks() {
       ? `<div style="position:absolute;top:0;left:0;z-index:4;pointer-events:none;overflow:hidden;width:88px;height:88px;border-radius:10px 0 0 0;"><div style="position:absolute;top:20px;left:-22px;width:100px;background:linear-gradient(135deg,#475569,#334155);color:#fff;font-size:0.52rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;text-align:center;padding:5px 0;transform:rotate(-45deg);transform-origin:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);">EXPIRED</div></div>`
       : '';
 
-    // ── Awards tab: Style C — full image overlay ──
+    // ── Awards tab: Style H — grouped by event name ──
+    // (card element returned per-item; grouping is done after all cards built)
     if (_worksTab === 'awards') {
-      const card = document.createElement('div');
-      card.style.cssText = `border-radius:16px;overflow:hidden;cursor:${w.link?'pointer':'default'};position:relative;aspect-ratio:3/4;background:#1a1a1a;box-shadow:0 2px 12px rgba(0,0,0,0.10);transition:box-shadow 0.18s,transform 0.18s;`;
-      card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 10px 32px rgba(0,0,0,0.18)'; card.style.transform = 'translateY(-4px)'; });
-      card.addEventListener('mouseleave', () => { card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.10)'; card.style.transform = ''; });
-      if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
+      const row = document.createElement('div');
+      row.dataset.awardItem = '1';
+      row.dataset.awardEvent = w.type || 'อื่นๆ';
+      row.dataset.awardYear = w.year || '';
+      row.style.cssText = `display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;transition:background 0.12s;cursor:${w.link?'pointer':'default'};`;
+      row.addEventListener('mouseenter', () => { row.style.background = '#f9fafb'; });
+      row.addEventListener('mouseleave', () => { row.style.background = ''; });
+      if (w.link) row.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
 
-      const awardStatusHtml = w.award_status === 'nominated'
-        ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#f1f5f9;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:99px;padding:3px 10px;white-space:nowrap;">🎗️ Nominated</span>`
-        : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:800;color:#92400e;background:#fef3c7;border:1px solid #fbbf24;border-radius:99px;padding:3px 10px;white-space:nowrap;">🏆 Winner</span>`;
+      const dotsHtml = artistArr.map(a => `<span style="width:7px;height:7px;border-radius:50%;background:${artistColors[a]||'#94a3b8'};display:inline-block;flex-shrink:0;"></span>`).join('');
+      const statusIcon = w.award_status === 'nominated' ? '🎗️' : '🏆';
+      const statusColor = w.award_status === 'nominated' ? '#6b7280' : '#92400e';
+      const statusBg    = w.award_status === 'nominated' ? '#f3f4f6' : '#fef3c7';
+      const statusBorder= w.award_status === 'nominated' ? '#d1d5db' : '#fbbf24';
+      const statusLabel = w.award_status === 'nominated' ? 'Nominated' : 'Winner';
 
-      const artistLineOverlay = artistArr.map(a => {
-        const dot = artistColors[a] || '#94a3b8';
-        return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.68rem;font-weight:700;color:#fff;"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
-      }).join(`<span style="color:rgba(255,255,255,0.35);font-size:0.6rem;">·</span>`);
-
-      const imgHtml = w.image
-        ? `<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}">`
-        : `<div style="position:absolute;inset:0;background:${grad};display:flex;align-items:center;justify-content:center;font-size:3rem;">${cat.icon ? cat.icon.replace('width="11"','width="48"').replace('height="11"','height="48"') : '🏆'}</div>`;
-
-      card.innerHTML = `
-        ${imgHtml}
-        ${expiredBadge}
-        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.3) 50%,rgba(0,0,0,0) 100%);pointer-events:none;"></div>
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 14px 14px;">
-          ${awardStatusHtml ? `<div style="margin-bottom:6px;">${awardStatusHtml}</div>` : ''}
-          <div style="font-size:0.82rem;font-weight:700;color:#fff;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;margin-bottom:6px;">${escHtml(w.title)}</div>
-          <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">${artistLineOverlay}${w.year ? `<span style="color:rgba(255,255,255,0.45);font-size:0.65rem;">· ${w.year}</span>` : ''}</div>
+      row.innerHTML = `
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.82rem;font-weight:600;color:#111;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${escHtml(w.title)}</div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;">
+            ${dotsHtml}
+            <span style="font-size:0.68rem;color:#9ca3af;">${artistArr.join(' · ')}${w.year ? ' · ' + w.year : ''}</span>
+          </div>
         </div>
+        <span style="display:inline-flex;align-items:center;gap:3px;font-size:0.65rem;font-weight:700;color:${statusColor};background:${statusBg};border:1px solid ${statusBorder};border-radius:99px;padding:3px 9px;white-space:nowrap;flex-shrink:0;">${statusIcon} ${statusLabel}</span>
       `;
-      return card;
+      return row;
     }
 
-    // ── Default card (all other tabs) ──
-    const thumb = w.image
-      ? `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;overflow:hidden;background:#f3f4f6;flex-shrink:0;position:relative;">${expiredBadge}<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);opacity:0.65;':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}"></div>`
-      : `<div style="width:100%;aspect-ratio:16/9;border-radius:10px 10px 0 0;background:${grad};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;${isExpired?'opacity:0.5;':''}">${expiredBadge}${cat.icon ? cat.icon.replace('width="11"','width="32"').replace('height="11"','height="32"') : ''}</div>`;
+    // ── Default card (all other tabs) — full image overlay style ──
     const card = document.createElement('div');
-    card.style.cssText = `background:${isExpired?'#f9fafb':'#fff'};border-radius:16px;border:1px solid ${isExpired?'#e5e7eb':'#efefef'};box-shadow:0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'});overflow:hidden;cursor:pointer;display:grid;grid-template-rows:auto 1fr;transition:box-shadow 0.18s,transform 0.18s;${isExpired?'opacity:0.6;':''}`;
-    card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 8px 28px rgba(0,0,0,0.12)'; card.style.transform = 'translateY(-4px)'; });
-    card.addEventListener('mouseleave', () => { card.style.boxShadow = `0 2px 12px rgba(0,0,0,${isExpired?'0.03':'0.07'})`; card.style.transform = ''; });
+    card.style.cssText = `border-radius:16px;overflow:hidden;cursor:${w.link?'pointer':'default'};position:relative;aspect-ratio:16/9;background:#1a1a1a;box-shadow:0 2px 12px rgba(0,0,0,0.10);transition:box-shadow 0.18s,transform 0.18s;${isExpired?'opacity:0.6;':''}`;
+    card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 10px 32px rgba(0,0,0,0.18)'; card.style.transform = 'translateY(-4px)'; });
+    card.addEventListener('mouseleave', () => { card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.10)'; card.style.transform = ''; });
+    if (w.link) card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
 
-    if (w.link) {
-      card.onclick = () => window.open(w.link, '_blank', 'noopener,noreferrer');
-    } else {
-      card.style.cursor = 'default';
-    }
-    card.innerHTML = `${thumb}
-      <div style="padding:0.9rem 1rem;display:flex;flex-direction:column;flex:1;">
-        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLine}</div>
-        <div style="font-size:0.88rem;font-weight:700;color:${isExpired?'#9ca3af':'#111'};line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:8px;">${escHtml(w.title)}</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-          ${_showCatBadge ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':cat.color};background:${isExpired?'#f3f4f6':cat.bg};border:1px solid ${isExpired?'#e5e7eb':cat.border};border-radius:6px;padding:4px 10px;white-space:nowrap;">${cat.label}</span>` : ''}
-          ${w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.72rem;font-weight:700;color:${isExpired?'#9ca3af':'#5b21b6'};background:${isExpired?'#f3f4f6':'#ede9fe'};border:1px solid ${isExpired?'#e5e7eb':'#c4b5fd'};border-radius:6px;padding:4px 10px;white-space:nowrap;">${escHtml(w.type)}</span>` : ''}
-          ${w.award_status === 'won' ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:800;color:#92400e;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fbbf24;border-radius:6px;padding:4px 10px;white-space:nowrap;">🏆 Winner</span>` : ''}
-          ${w.award_status === 'nominated' ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;color:#374151;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;padding:4px 10px;white-space:nowrap;">🎗️ Nominated</span>` : ''}
-        </div>
-      </div>`;
+    const imgHtml = w.image
+      ? `<img src="${_fixImgSrc(w.image)}" alt="${escHtml(w.title)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${w.image_position||'top center'};display:block;${isExpired?'filter:grayscale(70%);':''}" loading="lazy" onerror="_onImgError(this)" onload="if(!this.dataset.fp){this.dataset.fp=1;_facePos(this)}">`
+      : `<div style="position:absolute;inset:0;background:${grad};display:flex;align-items:center;justify-content:center;font-size:2.5rem;">${cat.icon ? cat.icon.replace('width="11"','width="40"').replace('height="11"','height="40"') : ''}</div>`;
+
+    const catBadgeHtml = _showCatBadge
+      ? `<span style="display:inline-flex;align-items:center;font-size:0.62rem;font-weight:700;color:#fff;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:3px 8px;white-space:nowrap;">${cat.label}</span>`
+      : w.type ? `<span style="display:inline-flex;align-items:center;font-size:0.62rem;font-weight:700;color:#fff;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:3px 8px;white-space:nowrap;">${escHtml(w.type)}</span>` : '';
+
+    const artistLineOverlay = artistArr.map(a => {
+      const dot = artistColors[a] || '#94a3b8';
+      return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.68rem;font-weight:700;color:#fff;"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
+    }).join(`<span style="color:rgba(255,255,255,0.35);font-size:0.6rem;">·</span>`);
+
+    const _yearBadge = w.year
+      ? `<div style="position:absolute;top:9px;right:9px;z-index:5;pointer-events:none;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);color:#fff;border-radius:99px;padding:3px 10px;font-size:0.65rem;font-weight:800;letter-spacing:0.04em;">${escHtml(w.year)}</div>`
+      : '';
+    card.innerHTML = `
+      ${imgHtml}
+      ${expiredBadge}
+      ${_yearBadge}
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.80) 0%,rgba(0,0,0,0.25) 55%,rgba(0,0,0,0) 100%);pointer-events:none;"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;">
+        ${catBadgeHtml ? `<div style="margin-bottom:5px;">${catBadgeHtml}</div>` : ''}
+        <div style="font-size:0.82rem;font-weight:700;color:#fff;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:5px;">${escHtml(w.title)}</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">${artistLineOverlay}</div>
+      </div>
+    `;
     return card;
   }
 
@@ -7810,24 +7824,46 @@ function renderWorks() {
   }
 
   // Has filter tab or artist → flat grid no divider (year already on card)
-  const flatGrid = document.createElement('div');
-  flatGrid.style.cssText = gridCols;
-  flatGrid.className = 'works-year-grid';
-  filtered.forEach(w => {
-      const card = buildCard(w);
-      if (_worksTab !== 'awards') {
-        const thumb = card.querySelector('div[style*="aspect-ratio"]');
-        if (thumb) {
-          thumb.style.position = 'relative';
-          const badge = document.createElement('span');
-          badge.textContent = w.year || '';
-          badge.style.cssText = 'position:absolute;top:6px;right:6px;font-size:0.6rem;font-weight:800;background:#111;color:#fff;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;z-index:2;pointer-events:none;';
-          thumb.appendChild(badge);
-        }
-      }
-      flatGrid.appendChild(card);
-  });
-  _wFrag.appendChild(flatGrid);
+  if (_worksTab === 'awards') {
+    // ── Awards: Style H — grouped by event (type field) ──
+    const eventMap = {};
+    const eventOrder = [];
+    filtered.forEach(w => {
+      const key = (w.type && w.type.trim()) ? w.type.trim() : 'อื่นๆ';
+      if (!eventMap[key]) { eventMap[key] = []; eventOrder.push(key); }
+      eventMap[key].push(w);
+    });
+    const awardsWrap = document.createElement('div');
+    awardsWrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+    eventOrder.forEach(eventName => {
+      const items = eventMap[eventName];
+      const count = items.length;
+      const section = document.createElement('div');
+      section.style.cssText = 'border-radius:12px;overflow:hidden;';
+      const header = document.createElement('div');
+      header.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f3f4f6;border-radius:12px 12px 0 0;';
+      header.innerHTML = `<span style="font-size:16px;line-height:1;">🏆</span><span style="font-size:0.82rem;font-weight:600;color:#111;flex:1;">${escHtml(eventName)}</span><span style="font-size:0.7rem;padding:2px 9px;border-radius:99px;background:#fff;color:#6b7280;border:1px solid #e5e7eb;">${count} รางวัล</span>`;
+      section.appendChild(header);
+      const itemsWrap = document.createElement('div');
+      itemsWrap.style.cssText = 'border:1px solid #f0f0f0;border-top:none;border-radius:0 0 12px 12px;overflow:hidden;background:#fff;';
+      items.forEach((w, idx) => {
+        const row = buildCard(w);
+        if (idx < items.length - 1) row.style.borderBottom = '1px solid #f3f4f6';
+        itemsWrap.appendChild(row);
+      });
+      section.appendChild(itemsWrap);
+      awardsWrap.appendChild(section);
+    });
+    _wFrag.appendChild(awardsWrap);
+  } else {
+    const flatGrid = document.createElement('div');
+    flatGrid.style.cssText = gridCols;
+    flatGrid.className = 'works-year-grid';
+    filtered.forEach(w => {
+        flatGrid.appendChild(buildCard(w));
+    });
+    _wFrag.appendChild(flatGrid);
+  }
 
   // Swap into DOM once
   accordion.style.display = 'block';
