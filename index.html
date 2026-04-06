@@ -918,7 +918,7 @@
 
   /* ══ Works grid: large 16:9 cards ══ */
   #works-grid, #works-loading, .works-year-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
     gap: clamp(10px, 1.5vw, 18px) !important;
   }
 
@@ -7276,7 +7276,7 @@ function renderWorks() {
   // Responsive grid cols CSS — awards tab uses narrower columns for portrait aspect ratio
   const gridCols = _worksTab === 'awards'
     ? `display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(8px,1.5vw,14px);`
-    : `display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:clamp(8px,1.5vw,14px);`;
+    : `display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(8px,1.5vw,14px);`;
 
   const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
   const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
@@ -7944,7 +7944,7 @@ function _renderMyScheduleList(list, empty) {
       const mTabs = [{ key:'all', label:'All months' }, ...availMonths.map(m => ({ key:String(m), label:MONTH_NAMES[m] }))];
       monthBar.innerHTML = mTabs.map(t => {
         const a = _recapActiveMonth === t.key;
-        return `<button onclick="_recapSetMonth('${t.key}')" style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:99px;border:1.5px solid ${a?'#ec4899':'#e5e7eb'};background:${a?'#fdf2f8':'#fff'};color:${a?'#ec4899':'#9ca3af'};font-size:0.75rem;font-weight:${a?700:500};cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s;">${t.label}</button>`;
+        return `<button onclick="_recapSetMonth('${t.key}')" style="padding:5px 14px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;border:1px solid ${a?'#a855f7':'#f0f0f0'};background:${a?'#f5f3ff':'#fff'};color:${a?'#7e22ce':'#6b7280'};">${t.label}</button>`;
       }).join('');
       monthBar.style.display = '';
     } else {
@@ -8050,7 +8050,7 @@ function applyCardSize(val) {
   const sizeMap = {
     1: { minPx: 120, imgH: '100%', bodyPad: '10px 10px', titleSize: '0.68rem', metaSize: '0.56rem', gap: '6px'  },
     2: { minPx: 150, imgH: '100%', bodyPad: '12px 12px', titleSize: '0.74rem', metaSize: '0.60rem', gap: '8px'  },
-    3: { minPx: 180, imgH: '100%', bodyPad: '14px 14px', titleSize: '0.80rem', metaSize: '0.65rem', gap: '12px' },
+    3: { minPx: 160, imgH: '100%', bodyPad: '14px 14px', titleSize: '0.80rem', metaSize: '0.65rem', gap: '12px' },
     4: { minPx: 220, imgH: '100%', bodyPad: '14px 14px', titleSize: '0.86rem', metaSize: '0.68rem', gap: '14px' },
     5: { minPx: 280, imgH: '100%', bodyPad: '16px 16px', titleSize: '0.92rem', metaSize: '0.72rem', gap: '16px' },
   };
