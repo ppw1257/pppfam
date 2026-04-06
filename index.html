@@ -33,6 +33,8 @@
   <!-- Load font as blocking to prevent FOUT (font flash) -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=K2D:wght@400;600;700;800&display=swap"></noscript>
+  <!-- Hero image preload hint — updated dynamically by JS when bento loads -->
+  <link rel="preload" as="image" id="hero-preload-hint" href="">
   <!-- Non-blocking scripts -->
   <script src="/_sdk/element_sdk.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" defer></script>
@@ -126,8 +128,8 @@
   .nav-link { cursor: pointer; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.75rem; border-radius: 8px; color: #9ca3af; letter-spacing: 0em; transition: color 0.1s, background 0.1s; }
   .nav-link:hover { color: #111; background: #f5f5f5; }
   .nav-link.active { color: #111; background: transparent; border-radius: 8px; font-weight: 700; box-shadow: none; }
-  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #d8d8d8; box-shadow: 0 1px 8px rgba(0,0,0,0.05); height: 100%; position: relative; transition: box-shadow 0.12s, transform 0.12s; }
-  .event-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-3px); border-color: #e8e8e8; }
+  .event-card { background: #fff; border-radius: var(--radius-card); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; border: 1px solid #e8e8e8; box-shadow: 0 2px 10px rgba(0,0,0,0.07); height: 100%; position: relative; transition: box-shadow 0.15s, transform 0.15s; content-visibility: auto; contain-intrinsic-size: 0 220px; }
+  .event-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.13); transform: translateY(-3px); border-color: #e0e0e0; will-change: transform; }
   .next-card-label {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
@@ -151,14 +153,14 @@
   .timeline-dow { font-size:0.58rem;font-weight:700;color:#9ca3af;letter-spacing:0.05em;text-transform:uppercase; }
   .timeline-circle { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1; }
   .timeline-circle span { font-size:0.82rem;font-weight:900;color:#fff; }
-  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;border:1px solid #efefef;border-left:3px solid var(--timeline-accent,#e5e7eb);transition:box-shadow 0.12s, transform 0.12s;will-change:transform; }
-  .timeline-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); }
+  .timeline-card { flex:1;background:#fff;border-radius:var(--radius-card);padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);cursor:pointer;border:1px solid #efefef;border-left:3px solid var(--timeline-accent,#e5e7eb);transition:box-shadow 0.12s, transform 0.12s; }
+  .timeline-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); will-change: transform; }
   .timeline-card-top { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
   .timeline-card-title { font-size:0.85rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:4px; }
   .timeline-card-meta { font-size:0.68rem;color:#9ca3af;display:flex;gap:8px;flex-wrap:wrap; }
   /* list view */
-  .list-card { background:#fff;border-radius:var(--radius-card);border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:box-shadow 0.12s, transform 0.12s;will-change:transform; }
-  .list-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); }
+  .list-card { background:#fff;border-radius:var(--radius-card);border:1px solid #efefef;box-shadow:0 2px 12px rgba(0,0,0,0.07);display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:box-shadow 0.12s, transform 0.12s; }
+  .list-card:hover { box-shadow:0 8px 28px rgba(0,0,0,0.12); transform: translateY(-3px); will-change: transform; }
   .list-card-img { width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f3f4f6; }
   .list-card-body { flex:1;min-width:0; }
   .list-card-title { font-size:0.85rem;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px; }
@@ -378,7 +380,7 @@
     box-shadow: 0 2px 8px rgba(22,163,74,0.4);
     font-weight: 700;
   }
-  .detail-hero { width: 100%; max-height: 520px; object-fit: cover; object-position: top center; background: transparent; display: block; border-radius: 0; }
+  .detail-hero { width: 100%; height: auto; display: block; border-radius: 0; }
   .link-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 99px; border: 1px solid #e5e7eb; font-size: 0.82rem; font-weight: 600; color: #374151; text-decoration: none; transition: border-color 0.15s, background 0.15s; }
   .link-btn:hover { background: #f7f7f5; border-color: #c0c0bc; }
   footer { background: transparent; border-top: none; margin-top: auto; flex-shrink: 0; }
@@ -386,7 +388,7 @@
   @keyframes blink-pulse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
   @media (max-width: 640px) {
     .cal-day { height: 80px; padding: 4px; }
-    .detail-hero { height: 320px; object-fit: cover; object-position: top center; }
+    .detail-hero { width: 100%; height: auto; }
   }
   /* ── Fluid card grid — responsive breakpoints handled by auto-fill below ── */
 
@@ -828,11 +830,12 @@
   /* ── Fluid page container — defined in Page container block below ── */
 
   /* ── Images always fluid ── */
-  .card-img, .cal-ev-card-img, .detail-hero {
+  .card-img, .cal-ev-card-img {
     width: 100%;
     object-fit: cover;
     display: block;
   }
+  .detail-hero { display: block; }
   /* card-img-wrap controls height; img fills it */
   .card-img        { height: 100%; }
   .cal-ev-card-img { height: clamp(120px, 14vw, 200px); }
@@ -1101,7 +1104,7 @@
 
    <!-- HOME PAGE -->
    <div class="page active" id="page-home">
-    <div style="width:100%;padding:1.5rem 1rem;width:100%;box-sizing:border-box;overflow-x:hidden;background:#fff;">
+    <div style="width:100%;padding:1.5rem 1rem;box-sizing:border-box;overflow-x:hidden;background:#fff;">
      <div id="bday-banners" style="display:none;flex-direction:column;gap:8px;margin-bottom:1.5rem;"></div>
 
      <!-- HERO -->
@@ -1184,7 +1187,7 @@
 
    <!-- CALENDAR PAGE -->
    <div class="page" id="page-calendar">
-    <div style="width:100%;padding:1.5rem 1rem;width:100%;box-sizing:border-box;background:#fff;">
+    <div style="width:100%;padding:1.5rem 1rem;box-sizing:border-box;background:#fff;">
 
      <!-- Header -->
      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.25rem;">
@@ -1691,7 +1694,7 @@
     </div>
     <div style="padding:1.25rem;">
      <div id="detail-artist-badge" style="margin-bottom:0.6rem;"></div>
-     <h2 id="detail-title" style="font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.6rem;line-height:1.3;"></h2>
+     <h2 id="detail-title" style="font-size:1.65rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.7rem;line-height:1.25;"></h2>
      <div id="detail-meta" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem;"></div>
      <div id="detail-desc-wrap" style="display:none;margin-bottom:1.25rem;">
       <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.4rem;" >DESCRIPTION</p>
@@ -2592,6 +2595,15 @@ let deleteConfirmIds = new Set();
 let panelUnlocked   = false;
 let apiLoaded       = false;
 
+// ── UTILITY: debounce ────────────────────────────────────────────
+function debounce(fn, ms) {
+  let t;
+  return function(...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
 // ── PERFORMANCE: Memoized helpers (called 1000x+ with same args) ─
 const _fmtDateCache = new Map();
 const _artistColorCache = new Map();
@@ -2951,12 +2963,6 @@ async function _fetchAllData(force = false) {
   }
 }
 
-// loadEventsFromSheets removed — using _fetchAllData(true) instead
-
-// loadBirthdaysFromSheets removed — using _fetchAllData(true) instead
-
-// loadAnniversariesFromSheets removed — using _fetchAllData(true) instead
-
 // ── Admin write operations (PocketBase direct) ───────────────────
 // ── PocketBase token — derived from admin session only, never hardcoded ──
 // Flow: admin types password → stored in sessionStorage → used here to auth with PocketBase
@@ -3085,16 +3091,7 @@ function _initPbRealtime() {
   if (window._pbRealtimeActive) return;
 
   try {
-    // Subscribe to all important collections via PocketBase SSE
-    const _collections = ['events', 'works', 'trends', 'birthdays', 'anniversaries'];
-
-    _collections.forEach(function(col) {
-      const _sseUrl = PB_URL + '/api/realtime';
-      // Use EventSource directly (lightweight, no PocketBase JS SDK needed)
-      // PocketBase SSE format: subscribe via POST then listen
-    });
-
-    // Simplest and most stable approach: use fetch + EventSource via PocketBase REST
+    // Use fetch + EventSource via PocketBase REST
     const _evtSource = new EventSource(
       PB_URL + '/api/realtime',
       { withCredentials: false }
@@ -3538,16 +3535,18 @@ function renderTrend() {
   }).join('');
 }
 
+const _renderTrendDebounced = debounce(renderTrend, 80);
+
 function setTrendFilter(v) {
   _trendFilter = v;
   _trendLastFP = '';
-  renderTrend();
+  _renderTrendDebounced();
 }
 
 function setTrendYearFilter(y) {
   _trendYearFilter = y;
   _trendLastFP = '';
-  renderTrend();
+  _renderTrendDebounced();
 }
 
 // ── Admin: render list ─────────────────────────────────────────────
@@ -3769,7 +3768,7 @@ function showSkeletons() {
   grid.style.flexDirection = 'column';
   const wrap = document.createElement('div');
   wrap.className = 'cards-grid';
-  wrap.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;align-items:stretch;';
+  wrap.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;align-items:stretch;';
   // Build skeleton template once
   if (!window._skelTemplate) {
     const t = document.createElement('div');
@@ -4066,8 +4065,12 @@ function renderHome() {
       const heroSrc = next.heroImage || next.image;
       const heroPos = next.heroImage ? (next.heroImagePos || next.imagePos || 'top center') : (next.imagePos || 'top center');
       if (heroSrc) {
-        el('bento-next-bg').style.backgroundImage = `url('${_fixImgSrc(heroSrc)}')`;
+        const fixedSrc = _fixImgSrc(heroSrc);
+        el('bento-next-bg').style.backgroundImage = `url('${fixedSrc}')`;
         el('bento-next-bg').style.backgroundPosition = heroPos;
+        // Update preload hint so browser prioritises the hero image
+        const preloadHint = document.getElementById('hero-preload-hint');
+        if (preloadHint && fixedSrc) preloadHint.href = fixedSrc;
       }
     }
     // Always start bento live countdown for next event (hides itself when expired)
@@ -4240,7 +4243,7 @@ function _vsInit(groups) {
       } else {
         gridEl = document.createElement('div');
         gridEl.className = 'cards-grid';
-        gridEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;align-items:stretch;';
+        gridEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;align-items:stretch;';
       }
       gw.appendChild(gridEl);
       frag.appendChild(gw);
@@ -4705,88 +4708,64 @@ function createCard(ev) {
   card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetailModal(ev.__backendId); } };
   const hasHtml = v => !!v && /<[a-z][\s\S]*>/i.test(v);
 
-  const nextBadge = ''; // NEXT badge removed
+  const _imgPos = ev.imagePos || 'top center';
+  const noImgGrad = ({'#f97316':'linear-gradient(160deg,#431407,#7c2d12)','#64748b':'linear-gradient(160deg,#0f172a,#1e293b)','#22c55e':'linear-gradient(160deg,#052e16,#14532d)','#a855f7':'linear-gradient(160deg,#2e1065,#4c1d95)','#3b82f6':'linear-gradient(160deg,#0c1a4e,#1e3a8a)','#ec4899':'linear-gradient(160deg,#500724,#831843)'})[color] || 'linear-gradient(160deg,#111,#374151)';
+  const imgFill = ev.image
+    ? `<img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${_imgPos};display:block;" class="card-img img-loading" loading="lazy" decoding="async" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">`
+    : `<div style="position:absolute;inset:0;${noImgGrad};display:flex;align-items:center;justify-content:center;"><svg width="36" height="36" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
-  const _typeOverlayEarly = ev.type ? `<div style="position:absolute;top:10px;left:10px;z-index:4;pointer-events:none;">${buildTypePill(ev.type,'sm')}</div>` : '';
-  const _imgPosEarly = ev.imagePos || 'top center';
-  const imgHtml = ev.image
-    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" style="object-position:${_imgPosEarly}" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${_typeOverlayEarly}</div>`
-    : `<div style="height:4px;background:${color};flex-shrink:0;"></div>`;
-
-  const artistColors = { Pond:'#f97316', Phuwin:'#6b7280', Permpoon:'#22c55e' };
-  const artistTextColors = { Pond:'#ea580c', Phuwin:'#4b5563', Permpoon:'#16a34a' };
-  let artistBadge = '';
-  if (ev.artists) {
-    const artistArr = ev.artists.split(',').map(a => a.trim()).filter(Boolean);
-    const parts = artistArr.map((a, i) => {
-      const dot = artistColors[a] || color;
-      const txt = artistTextColors[a] || color;
-      const divider = i > 0 ? `<span style="width:1px;height:10px;background:#e5e7eb;display:inline-block;flex-shrink:0;"></span>` : '';
-      return `${divider}<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.62rem;font-weight:700;color:${txt};"><span style="width:5px;height:5px;border-radius:50%;background:${dot};display:inline-block;flex-shrink:0;"></span>${a}</span>`;
-    }).join('');
-    artistBadge = `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${parts}</div>`;
-  }
-
-  let dtRow = '';
-  if (ev.dateStart) {
-    const dateLabel = fmtDateRange(ev.dateStart, ev.dateEnd);
-    // ── Date: inline icon + colored text, no background ──
-    const datePill = `<span style="display:inline-flex;align-items:center;gap:4px;color:${color};font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;"><svg width="11" height="11" fill="none" stroke="${color}" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escHtml(dateLabel)}</span>`;
-    let timePill = '';
-    if (ev.startTime) {
-      const _evTz = ev.timezone || '';
-      const allTimes = ev.startTime.split('/').map(s => fmtTime(s.trim(), _evTz)).filter(Boolean).join(' / ');
-      const timeText = allTimes + (ev.endTime ? ' – ' + fmtTime(ev.endTime, _evTz) : '');
-      // ── Time: inline icon + text, separator between date and time ──
-      timePill = `<span style="color:#d1d5db;margin:0 2px;">|</span><span style="display:inline-flex;align-items:center;gap:4px;color:#111;font-size:0.72rem;font-weight:600;white-space:nowrap;flex-shrink:0;"><svg width="11" height="11" fill="none" stroke="#111" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(timeText)}</span>`;
-    }
-    dtRow = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;margin-bottom:5px;">${datePill}${timePill}</div>`;
-  }
-
-  // Rule 3: location — truncate long text, auto font size, never overflow
+  // Location data
   const lp = [ev.location, ev.city, ev.country].filter(x => x && x.trim() && !/^GMT[+-]?\d*/i.test(x.trim()) && !hasHtml(x));
-  const locText = lp.join(', ');
-  // ── Location: inline icon + text, no background ──
-  const locRow = lp.length
-    ? `<div style="margin-bottom:5px;display:flex;align-items:flex-start;gap:4px;"><svg width="11" height="11" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="font-size:0.7rem;font-weight:500;color:#374151;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35;">${escHtml(locText)}</span></div>`
-    : '';
-
-  const typePill = buildTypePill(ev.type, 'sm');
-  const tvPill = (ev.tv && !hasHtml(ev.tv))
-    ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.65rem;font-weight:700;background:#fff7ed;color:#c2410c;border-radius:5px;padding:3px 8px;border:1px solid #fed7aa;"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>${escHtml(ev.tv)}</span>`
-    : '';
-  // typePill moved to image overlay (bottom-left); only tvPill stays in pillsRow
-  const pillsRow = tvPill ? `<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:5px;">${tvPill}</div>` : '';
-  // type overlay badge on image (bottom-left corner)
-  const typeImgOverlay = (ev.image && typePill)
-    ? `<div style="position:absolute;top:10px;left:10px;z-index:4;pointer-events:none;">${typePill}</div>`
-    : '';
-  const noteRow = (ev.note && !hasHtml(ev.note))
-    ? `<div style="font-size:0.72rem;font-weight:600;color:#6b7280;margin-bottom:5px;display:flex;align-items:flex-start;gap:5px;padding:4px 8px;border-radius:8px;background:#f9fafb;line-height:1.4;"><svg width="11" height="11" fill="none" stroke="#9ca3af" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(ev.note)}</div>`
-    : '';
-  const descRow = (ev.description && !hasHtml(ev.description))
-    ? `<div style="font-size:0.7rem;color:#9ca3af;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:4px;">${escHtml(ev.description)}</div>`
-    : '';
 
   const socialHtml = buildSocialIcons(ev);
-  const shareBtn = ``;
-  const hoverOverlay = `<div class="card-hover-overlay"><div class="oh-title">${escHtml(ev.title)}</div>${ev.description && !hasHtml(ev.description) ? `<div class="oh-desc">${escHtml(ev.description)}</div>` : ''}<div style="margin-top:10px;display:flex;gap:6px;align-items:center;"><div class="oh-cta view-details" style="margin-top:0;font-weight:700;opacity:0.9;cursor:pointer;font-size:0.72rem;letter-spacing:0.03em;">${'View details →'}</div></div></div>`;
-  const _imgPos = ev.imagePos || 'top center';
-  const imgSection = ev.image
-    ? `<div class="card-img-wrap"><img src="${_fixImgSrc(ev.image)}" alt="${escHtml(ev.title)}" class="card-img img-loading" loading="lazy" decoding="async" style="object-position:${_imgPos}" onload="this.classList.remove('img-loading');this.classList.add('img-loaded')" onerror="_onImgError(this)">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}</div>`
-    : `<div class="card-img-wrap" style="background:${ab};position:relative;">${buildDateBadge(ev, color)}${buildCountdownImgBadge(ev)}${typeImgOverlay}<svg width="40" height="40" fill="none" stroke="${color}" stroke-width="1.2" viewBox="0 0 24 24" style="opacity:0.2;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
-  const noImgBadge = '';
-  card.style.flexDirection = '';
-  card.innerHTML = `${nextBadge}${imgSection}${hoverOverlay}
-    <div style="padding:0.65rem 0.75rem;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;position:relative;">
-      ${noImgBadge}
-      ${artistBadge}
-      <h3 style="font-weight:700;font-size:0.78rem;letter-spacing:-0.01em;margin-bottom:4px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:#111;">${escHtml(ev.title)}</h3>
-      ${dtRow}${locRow}${pillsRow}${noteRow}${descRow}
-      <div style="flex:1;"></div>
-      ${socialHtml ? `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;" onclick="event.stopPropagation()">${socialHtml}</div>` : ''}
-    </div>`;
+  // Artist line — solid colored pills
+  const artistPillColors = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
+  const artistLineOverlay = ev.artists
+    ? ev.artists.split(',').map(a => a.trim()).filter(Boolean).map(a => {
+        const bg = artistPillColors[a] || color;
+        return `<span style="display:inline-flex;align-items:center;font-size:0.6rem;font-weight:800;padding:2px 9px;border-radius:99px;letter-spacing:0.03em;background:${bg};color:#fff;">${a}</span>`;
+      }).join(' ')
+    : '';
+
+  // Location — 2 lines, bigger font
+  const locLine = lp.length
+    ? `<div style="display:flex;align-items:flex-start;gap:5px;margin-top:5px;"><svg width="11" height="11" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="font-size:0.75rem;font-weight:800;color:#fff;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 6px rgba(0,0,0,0.9),0 2px 12px rgba(0,0,0,0.7);">${escHtml(lp.slice(0,2).join(', '))}</span></div>`
+    : '';
+
+  // Card style — portrait aspect ratio, exactly like Awards
+  card.style.cssText = `border-radius:var(--radius-card);overflow:hidden;cursor:pointer;position:relative;aspect-ratio:3/4;background:#111;box-shadow:0 2px 12px rgba(0,0,0,0.12);transition:box-shadow 0.18s,transform 0.18s;`;
+  card.addEventListener('mouseenter', () => { card.style.boxShadow = '0 10px 32px rgba(0,0,0,0.22)'; card.style.transform = 'translateY(-4px)'; });
+  card.addEventListener('mouseleave', () => { card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.12)'; card.style.transform = ''; });
+
+  // Top overlays: type pill (left) and date badge (right)
+  const _typeBadgeOverlay = ev.type
+    ? `<div style="position:absolute;top:10px;left:10px;z-index:5;pointer-events:none;">${buildTypePill(ev.type,'sm')}</div>`
+    : '';
+  const _dateBadgeOverlay = ev.dateStart ? (() => {
+    const _d = new Date(ev.dateStart + 'T00:00:00');
+    const _dow = _d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    if (ev.dateEnd && ev.dateEnd !== ev.dateStart) {
+      const _d2 = new Date(ev.dateEnd + 'T00:00:00');
+      const _dow2 = _d2.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+      return `<div style="position:absolute;top:10px;right:10px;z-index:5;pointer-events:none;background:${color};color:#fff;border-radius:10px;padding:5px 9px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.4);"><div style="font-size:0.55rem;font-weight:800;letter-spacing:0.05em;text-shadow:0 1px 3px rgba(0,0,0,0.4);">${_dow} ${_d.getDate()} – ${_dow2} ${_d2.getDate()}</div></div>`;
+    }
+    return `<div style="position:absolute;top:10px;right:10px;z-index:5;pointer-events:none;background:${color};color:#fff;border-radius:10px;padding:5px 10px;text-align:center;min-width:42px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"><div style="font-size:0.6rem;font-weight:800;letter-spacing:0.07em;text-shadow:0 1px 3px rgba(0,0,0,0.3);">${_dow}</div><div style="font-size:1.2rem;font-weight:900;line-height:1.1;text-shadow:0 1px 4px rgba(0,0,0,0.3);">${_d.getDate()}</div></div>`;
+  })() : '';
+
+  card.innerHTML = `
+    ${imgFill}
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.45) 55%,rgba(0,0,0,0.05) 100%);pointer-events:none;"></div>
+    ${_typeBadgeOverlay}
+    ${_dateBadgeOverlay}
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 14px 15px;">
+      ${artistLineOverlay ? `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px;">${artistLineOverlay}</div>` : ''}
+      <div style="font-size:0.88rem;font-weight:900;color:#fff;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;text-shadow:0 1px 10px rgba(0,0,0,0.95),0 2px 20px rgba(0,0,0,0.8),0 0 40px rgba(0,0,0,0.5);">${escHtml(ev.title)}</div>
+      ${ev.startTime ? (() => { const _evTz = ev.timezone||''; const allTimes = ev.startTime.split('/').map(s=>fmtTime(s.trim(),_evTz)).filter(Boolean).join(' / '); const timeText = allTimes+(ev.endTime?' – '+fmtTime(ev.endTime,_evTz):''); return `<div style="display:flex;align-items:center;gap:4px;margin-top:4px;"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span style="font-size:0.7rem;font-weight:800;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.9),0 2px 12px rgba(0,0,0,0.7);">${escHtml(timeText)}</span></div>`; })() : ''}
+      ${locLine}
+      ${socialHtml ? `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:6px;" onclick="event.stopPropagation()">${socialHtml}</div>` : ''}
+    </div>
+  `;
   return card;
 }
 
@@ -4819,15 +4798,15 @@ function openDetailModal(id) {
     const d = new Date(ev.dateStart + 'T00:00:00');
     const dateLabel = fmtDateRange(ev.dateStart, ev.dateEnd);
     const timeHtml = ev.startTime
-      ? `<span style="width:1px;height:14px;background:#e5e7eb;margin:0 10px;flex-shrink:0;display:inline-block;"></span><span style="display:flex;align-items:center;gap:5px;font-size:0.88rem;font-weight:700;color:#111;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(fmtTime(ev.startTime, ev.timezone||''))}${ev.endTime?' – '+escHtml(fmtTime(ev.endTime, ev.timezone||'')):''}</span>`
+      ? `<span style="width:1px;height:16px;background:#e5e7eb;margin:0 12px;flex-shrink:0;display:inline-block;"></span><span style="display:flex;align-items:center;gap:6px;font-size:1.05rem;font-weight:800;color:#111;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escHtml(fmtTime(ev.startTime, ev.timezone||''))}${ev.endTime?' – '+escHtml(fmtTime(ev.endTime, ev.timezone||'')):''}</span>`
       : '';
-    metaRows.push(`<div style="display:flex;align-items:center;margin-bottom:2px;"><span style="display:flex;align-items:center;gap:5px;font-size:0.88rem;font-weight:700;color:${color};"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escHtml(dateLabel)}</span>${timeHtml}</div>`);
+    metaRows.push(`<div style="display:flex;align-items:center;margin-bottom:4px;"><span style="display:flex;align-items:center;gap:6px;font-size:1.05rem;font-weight:800;color:${color};"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${escHtml(dateLabel)}</span>${timeHtml}</div>`);
   }
-  if (lp.length) metaRows.push(`<div style="display:flex;align-items:center;gap:6px;font-size:0.88rem;color:#374151;margin-top:4px;"><svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${lp.join(', ')}</span></div>`);
+  if (lp.length) metaRows.push(`<div style="display:flex;align-items:center;gap:7px;font-size:1rem;font-weight:700;color:#111;margin-top:6px;"><svg width="16" height="16" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${lp.join(', ')}</span></div>`);
   const typePillHtml = buildTypePill(ev.type, 'lg');
-  const tvPillHtml = ev.tv ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.75rem;font-weight:700;background:#fff7ed;color:#c2410c;border-radius:6px;padding:4px 10px;border:1px solid #fed7aa;"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>${escHtml(ev.tv)}</span>` : '';
-  if (typePillHtml || tvPillHtml) metaRows.push(`<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px;">${tvPillHtml}${typePillHtml}</div>`);
-  if (ev.note && !hasHtmlD(ev.note)) metaRows.push(`<div style="font-size:0.85rem;font-weight:700;color:#374151;margin-top:8px;display:flex;align-items:flex-start;gap:6px;background:#fafafa;border-left:3px solid #374151;padding:6px 10px;border-radius:0 6px 6px 0;line-height:1.5;"><svg width="13" height="13" fill="none" stroke="#374151" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(ev.note)}</div>`);
+  const tvPillHtml = ev.tv ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.85rem;font-weight:700;background:#fff7ed;color:#c2410c;border-radius:6px;padding:5px 12px;border:1px solid #fed7aa;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>${escHtml(ev.tv)}</span>` : '';
+  if (typePillHtml || tvPillHtml) metaRows.push(`<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;">${tvPillHtml}${typePillHtml}</div>`);
+  if (ev.note && !hasHtmlD(ev.note)) metaRows.push(`<div style="font-size:0.95rem;font-weight:700;color:#374151;margin-top:10px;display:flex;align-items:flex-start;gap:7px;background:#fafafa;border-left:3px solid #374151;padding:8px 12px;border-radius:0 6px 6px 0;line-height:1.5;"><svg width="14" height="14" fill="none" stroke="#374151" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escHtml(ev.note)}</div>`);
 
   document.getElementById('detail-meta').innerHTML = metaRows.join('');
 
@@ -8358,11 +8337,11 @@ function applyCardSize(val) {
   val = parseInt(val);
   // Map slider 1–5 → layout config
   const sizeMap = {
-    1: { minPx: 120, imgH: '80px',   bodyPad: '6px 8px',   titleSize: '0.68rem', metaSize: '0.56rem', gap: '6px'  },
-    2: { minPx: 170, imgH: '120px',  bodyPad: '8px 10px',  titleSize: '0.74rem', metaSize: '0.60rem', gap: '8px'  },
-    3: { minPx: 230, imgH: '165px',  bodyPad: '10px 12px', titleSize: '0.80rem', metaSize: '0.66rem', gap: '12px' },
-    4: { minPx: 310, imgH: '220px',  bodyPad: '12px 14px', titleSize: '0.88rem', metaSize: '0.70rem', gap: '14px' },
-    5: { minPx: 400, imgH: '280px',  bodyPad: '14px 16px', titleSize: '0.95rem', metaSize: '0.74rem', gap: '16px' },
+    1: { minPx: 120, imgH: '100%', bodyPad: '10px 10px', titleSize: '0.68rem', metaSize: '0.56rem', gap: '6px'  },
+    2: { minPx: 150, imgH: '100%', bodyPad: '12px 12px', titleSize: '0.74rem', metaSize: '0.60rem', gap: '8px'  },
+    3: { minPx: 180, imgH: '100%', bodyPad: '14px 14px', titleSize: '0.80rem', metaSize: '0.65rem', gap: '12px' },
+    4: { minPx: 220, imgH: '100%', bodyPad: '14px 14px', titleSize: '0.86rem', metaSize: '0.68rem', gap: '14px' },
+    5: { minPx: 280, imgH: '100%', bodyPad: '16px 16px', titleSize: '0.92rem', metaSize: '0.72rem', gap: '16px' },
   };
   const cfg = sizeMap[val] || sizeMap[3];
 
@@ -8373,20 +8352,6 @@ function applyCardSize(val) {
     .cards-grid, #trend-grid {
       grid-template-columns: repeat(auto-fill, minmax(min(100%, ${cfg.minPx}px), 1fr)) !important;
       gap: ${cfg.gap} !important;
-    }
-    .card-img-wrap {
-      height: ${cfg.imgH} !important;
-    }
-    .event-card > div:last-child {
-      padding: ${cfg.bodyPad} !important;
-    }
-    .event-card h3 {
-      font-size: ${cfg.titleSize} !important;
-    }
-    .event-card [style*="font-size:0.72rem"][style*="color:#6b7280"],
-    .event-card [style*="font-size:0.70rem"],
-    .event-card [style*="font-size:0.68rem"] {
-      font-size: ${cfg.metaSize} !important;
     }
   `;
 
