@@ -90,9 +90,6 @@
 
 /* Reminder button */
 .ppp-reminder-btn {
-  position: relative;
-  z-index: 10;
-  pointer-events: auto !important;
   display:inline-flex; align-items:center; gap:5px;
   padding:5px 12px; border-radius:99px;
   border:1px solid #e5e7eb; font-size:.72rem; font-weight:700;
@@ -643,29 +640,29 @@ document.body.style.overflow='hidden';const activePage=document.querySelector('.
 /* --- inject Share + Remind buttons directly --- */
 const _detailModalBody=document.querySelector('#detail-modal .modal-box > div:last-child');
 if(_detailModalBody){
-  /* Share button — always remove old and re-inject so onclick points to current event id */
-  const _oldSb=_detailModalBody.querySelector('[data-ppp-share]');
-  if(_oldSb)_oldSb.remove();
-  const _sb=document.createElement('button');
-  _sb.setAttribute('data-ppp-share',id);
-  _sb.className='link-btn';
-  _sb.style.cssText='cursor:pointer;margin-top:8px;margin-right:8px;display:inline-flex;align-items:center;gap:7px;position:relative;z-index:10;pointer-events:auto;';
-  _sb.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share event card';
-  _sb.onclick=(e)=>{e.stopPropagation();if(window.pppOpenShare)pppOpenShare(id);};
-  const _hw=document.getElementById('detail-hashtags-wrap');
-  const _kw=document.getElementById('detail-keywords-wrap');
-  const _anc=_kw||_hw;
-  if(_anc&&_anc.parentNode===_detailModalBody){_anc.after(_sb);}else{_detailModalBody.appendChild(_sb);}
-  /* Remind button — always remove old and re-inject so onclick points to current event id */
-  const _oldRb=_detailModalBody.querySelector('.ppp-reminder-btn');
-  if(_oldRb)_oldRb.remove();
-  const _rb=document.createElement('button');
-  _rb.className='ppp-reminder-btn';
-  _rb.style.cssText='margin-top:8px;display:inline-flex;align-items:center;gap:6px;position:relative;z-index:10;pointer-events:auto;';
-  if(window._pppSetRemBtn&&window._pppReminders!==undefined){_pppSetRemBtn(_rb,!!_pppReminders[id],id);}else{_rb.textContent='🔔 Remind me';}
-  _rb.onclick=(e)=>{e.stopPropagation();if(window.pppToggleReminder)pppToggleReminder(id,_rb);};
-  const _cw=document.getElementById('detail-cal-wrap');
-  if(_cw){_cw.style.display='block';_cw.appendChild(_rb);}else{_detailModalBody.appendChild(_rb);}
+  /* Share button */
+  if(!_detailModalBody.querySelector('[data-ppp-share]')){
+    const _sb=document.createElement('button');
+    _sb.setAttribute('data-ppp-share',id);
+    _sb.className='link-btn';
+    _sb.style.cssText='cursor:pointer;margin-top:8px;margin-right:8px;display:inline-flex;align-items:center;gap:7px;';
+    _sb.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share event card';
+    _sb.onclick=(e)=>{e.stopPropagation();if(window.pppOpenShare)pppOpenShare(id);};
+    const _hw=document.getElementById('detail-hashtags-wrap');
+    const _kw=document.getElementById('detail-keywords-wrap');
+    const _anc=_kw||_hw;
+    if(_anc&&_anc.parentNode===_detailModalBody){_anc.after(_sb);}else{_detailModalBody.appendChild(_sb);}
+  }
+  /* Remind button */
+  if(!_detailModalBody.querySelector('.ppp-reminder-btn')){
+    const _rb=document.createElement('button');
+    _rb.className='ppp-reminder-btn';
+    _rb.style.cssText='margin-top:8px;display:inline-flex;align-items:center;gap:6px;';
+    if(window._pppSetRemBtn&&window._pppReminders!==undefined){_pppSetRemBtn(_rb,!!_pppReminders[id],id);}else{_rb.textContent='🔔 Remind me';}
+    _rb.onclick=(e)=>{e.stopPropagation();if(window.pppToggleReminder)pppToggleReminder(id,_rb);};
+    const _cw=document.getElementById('detail-cal-wrap');
+    if(_cw){_cw.style.display='block';_cw.appendChild(_rb);}else{_detailModalBody.appendChild(_rb);}
+  }
 }
 }
 function copyPill(el,text){if(!navigator.clipboard)return;navigator.clipboard.writeText(text).then(()=>{const orig=el.textContent;const origBg=el.style.background;const origColor=el.style.color;el.textContent='Copied!';el.style.background='#111';el.style.color='#fff';setTimeout(()=>{el.textContent=orig;el.style.background=origBg;el.style.color=origColor;},1200);}).catch(e=>{if(e&&e.message!=="AbortError")console.warn("[PPP]",e.message||e);});}
@@ -1140,7 +1137,7 @@ _update();_bentoCountdownTimer=setInterval(_update,1000);}</script>
     <!-- actions -->
     <div style="display:flex;gap:8px;">
       <button onclick="pppCopyText()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;color:#374151;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Copy text</button>
-      <button onclick="pppCloseShare();showToast('Screenshot แล้วแชร์ได้เลยนะคะ!')" style="flex:1;padding:10px;border:none;border-radius:10px;background:#111;color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Screenshot &amp; share</button>
+      <button onclick="pppWebShare()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#111;color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Share 🔗</button>
     </div>
   </div>
 </div>
@@ -1358,6 +1355,42 @@ function pppCopyText() {
   }
 }
 
+async function pppWebShare() {
+  const ev = (window.allEvents || []).find(e => e.__backendId === _pppShareId);
+  if (!ev) return;
+  const onChips = Object.entries(_pppChipState).filter(([,v]) => v.on).map(([k]) => k);
+  const hashLine = onChips.filter(k => k.startsWith('#')).join(' ');
+  const kwLine   = onChips.filter(k => !k.startsWith('#')).join(' · ');
+  const parts = [
+    `🎉 ${ev.title}`,
+    `📅 ${ev.dateStart || ''}${ev.startTime ? ' · ' + ev.startTime.slice(0,5) + ' น.' : ''}`,
+    ev.location || ev.city ? `📍 ${[ev.location, ev.city, ev.country].filter(Boolean).join(', ')}` : '',
+    kwLine ? `🔑 ${kwLine}` : '',
+    '',
+    hashLine || `#PPPFamily`,
+  ].filter(s => s !== null);
+  const text = parts.join('\n');
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: ev.title, text: text });
+      _pppToast('แชร์เรียบร้อยค่ะ 🎉');
+    } catch(e) {
+      if (e.name !== 'AbortError') {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(() => _pppToast('Copied แล้ว วางแชร์ได้เลยค่ะ 📋'));
+        }
+      }
+    }
+  } else {
+    // fallback for desktop/unsupported browsers
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => _pppToast('Copied แล้ว วางแชร์ได้เลยค่ะ 📋'));
+    } else {
+      _pppToast('Screenshot แล้วแชร์ได้เลยนะคะ!');
+    }
+  }
+}
+
 /* ══════════════════════════════════════════════════════
    EVENT REMINDER (all users)
    ══════════════════════════════════════════════════════ */
@@ -1389,21 +1422,28 @@ async function pppToggleReminder(eventId, btn) {
   }
   const ev = (window.allEvents || []).find(e => e.__backendId === eventId);
   if (!ev) return;
-  let perm = 'default';
+  let perm = 'denied';
   if (typeof Notification !== 'undefined') {
     perm = Notification.permission;
-    if (perm === 'default') perm = await Notification.requestPermission();
+    if (perm === 'default') {
+      try { perm = await Notification.requestPermission(); } catch(e) { perm = 'denied'; }
+    }
   }
   _pppReminders[eventId] = { title:ev.title, date:ev.dateStart, time:ev.startTime, perm };
   _pppSaveRem();
   _pppSetRemBtn(btn, true, eventId);
-  perm === 'granted'
-    ? _pppToast('ตั้ง reminder แล้ว! แจ้งเตือนก่อน 1 วัน และ 1 ชั่วโมง 🔔')
-    : _pppToast('บันทึกไว้แล้วค่ะ จะเตือนเมื่อเปิดเว็บในวันนั้น');
+  if (perm === 'granted') {
+    _pppToast('ตั้ง reminder แล้วค่ะ 🔔 จะแจ้งเตือนก่อน 1 วัน และ 1 ชั่วโมง');
+  } else {
+    // Show a clear message that it will remind on page open instead
+    const evDate = ev.dateStart ? new Date(ev.dateStart).toLocaleDateString('th-TH', {day:'numeric', month:'short'}) : '';
+    _pppToast(`บันทึกแล้วค่ะ 📌 จะเตือนตอนเปิดเว็บวันที่ ${evDate}`);
+  }
   if (!window._pppCheckTimer) {
     window._pppCheckTimer = setInterval(_pppCheckRem, 60000);
-    _pppCheckRem();
   }
+  // Always check immediately after setting a reminder
+  _pppCheckRem();
 }
 
 function _pppCheckRem() {
@@ -1412,15 +1452,25 @@ function _pppCheckRem() {
     if (!r.date) return;
     const target = new Date(r.date + 'T' + (r.time || '00:00') + ':00');
     const ms = target - now;
+    // Clean up past events (more than 2 hours past)
+    if (ms < -7200000) {
+      delete _pppReminders[id];
+      _pppSaveRem();
+      return;
+    }
     const fk = 'ppp_fired_' + id;
     let fired = {};
     try { fired = JSON.parse(localStorage.getItem(fk) || '{}'); } catch(e) {}
-    if (ms > 0 && ms <= 86460000 && !fired['1d']) {
-      _pppFireNotif(r.title, 'พรุ่งนี้มีงานนะคะ เตรียมตัวให้พร้อม! 🎉', id);
+    // 1 day before (within 25 hours)
+    if (ms > 0 && ms <= 90000000 && !fired['1d']) {
+      const hoursLeft = Math.round(ms / 3600000);
+      const dayMsg = hoursLeft > 2 ? `พรุ่งนี้มีงาน "${r.title}" เตรียมตัวให้พร้อมนะคะ! 🎉` : `อีก ${hoursLeft} ชั่วโมง "${r.title}" จะเริ่มแล้วค่ะ!`;
+      _pppFireNotif(r.title, dayMsg, id);
       fired['1d'] = true; try { localStorage.setItem(fk, JSON.stringify(fired)); } catch(e) {}
     }
+    // 1 hour before
     if (ms > 0 && ms <= 3660000 && !fired['1h']) {
-      _pppFireNotif(r.title, `อีก 1 ชั่วโมงเริ่มแล้ว!${r.time ? ' เริ่ม ' + r.time.slice(0,5) + ' น.' : ''}`, id);
+      _pppFireNotif(r.title, `อีก 1 ชั่วโมงเริ่มแล้ว!${r.time ? ' เริ่ม ' + r.time.slice(0,5) + ' น.' : ''} 🔔`, id);
       fired['1h'] = true; try { localStorage.setItem(fk, JSON.stringify(fired)); } catch(e) {}
     }
   });
@@ -1455,8 +1505,9 @@ function _pppInjectCardRemBtn(eventId) {
   if (window.allEvents && window.allEvents.length) {
     window.allEvents.filter(e => !e._isPast).forEach(e => setTimeout(() => _pppInjectCardRemBtn(e.__backendId), 350));
     if (Object.keys(_pppReminders).length) {
-      window._pppCheckTimer = setInterval(_pppCheckRem, 60000);
+      // Run immediately on page open to catch any pending reminders
       _pppCheckRem();
+      window._pppCheckTimer = setInterval(_pppCheckRem, 60000);
     }
   } else { setTimeout(_pppWait, 800); }
 })();
