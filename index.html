@@ -1119,6 +1119,8 @@ _update();_bentoCountdownTimer=setInterval(_update,1000);}</script>
 /* ══════════════════════════════════════════════════════
    PPP Share Card (Admin only) + Event Reminder
    ══════════════════════════════════════════════════════ */
+/* Save reference to original openDetailModal — must run after it is defined */
+window._pppOrigDetail = window.openDetailModal;
 
 const _pppAC = { Pond:'#f97316', Phuwin:'#64748b', Permpoon:'#22c55e' };
 
@@ -1400,10 +1402,10 @@ function _pppFireNotif(title, body, id) {
   _pppToast('🔔 ' + title + ' — ' + body, 4000);
 }
 
-/* inject share btn (admin only) + reminder btn (all users) into detail modal */
-const _origOpenDetailPPP = window.openDetailModal;
+/* inject share btn + reminder btn into detail modal */
 window.openDetailModal = function(id) {
-  if (_origOpenDetailPPP) _origOpenDetailPPP(id);
+  /* call original — use _pppOrigDetail which is set after all scripts load */
+  if (window._pppOrigDetail) window._pppOrigDetail(id);
   setTimeout(() => {
     /* find a reliable container — use detail-meta parent or fall back to modal body */
     const modalBody = document.querySelector('#detail-modal .modal-box > div:last-child');
