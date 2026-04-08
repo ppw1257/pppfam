@@ -1170,7 +1170,7 @@ let _pppThemeIdx  = null; // month 1-12
 let _pppChipState = {};   // chipText -> bool (shown on card)
 
 function pppOpenShare(eventId) {
-  if (!isAdmin && !isLoggedIn()) return; // allow admin or logged-in users
+  // share open for all users
   const ev = (window.allEvents || []).find(e => e.__backendId === eventId);
   if (!ev) return;
   _pppShareId = eventId;
@@ -1411,8 +1411,8 @@ window.openDetailModal = function(id) {
     const modalBody = document.querySelector('#detail-modal .modal-box > div:last-child');
     if (!modalBody) return;
 
-    /* --- Share button (admin only) --- */
-    if ((isAdmin || isLoggedIn()) && !modalBody.querySelector('[data-ppp-share]')) {
+    /* --- Share button (all users) --- */
+    if (!modalBody.querySelector('[data-ppp-share]')) {
       const shareBtn = document.createElement('button');
       shareBtn.setAttribute('data-ppp-share', id);
       shareBtn.className = 'link-btn';
