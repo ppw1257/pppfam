@@ -636,7 +636,35 @@ const ticketWrap=document.getElementById('detail-ticket-wrap');const ticketBtns=
 const mapWrap=document.getElementById('detail-map-wrap');if(ev.map&&ev.map.trim()){mapWrap.style.display='block';const _mapRaw=ev.map.trim();const _iframeMatch=_mapRaw.match(/<iframe[^>]*>[\s\S]*?<\/iframe>|<iframe[^>]*\/>/i);if(_iframeMatch){const _safe=_iframeMatch[0].replace(/width="[^"]*"/gi,'width="100%"').replace(/height="[^"]*"/gi,'height="300"').replace(/onclick\s*=/gi,'data-onclick=').replace(/onload\s*=/gi,'data-onload=').replace(/onerror\s*=/gi,'data-onerror=').replace(/javascript:/gi,'');document.getElementById('detail-map').innerHTML=_safe;}else{mapWrap.style.display='none';}}else mapWrap.style.display='none';const hashWrap=document.getElementById('detail-hashtags-wrap');const hashContainer=document.getElementById('detail-hashtags');if(ev.hashtags&&ev.hashtags.trim()){const tags=ev.hashtags.trim().split(/[,，]+/).map(s=>s.trim()).filter(Boolean);hashContainer.innerHTML=tags.map(tag=>{const display=tag.startsWith('#')?tag:'#'+tag;return`<span style="display:inline-flex;align-items:center;font-size:0.8rem;font-weight:800;color:#5b21b6;background:#ede9fe;border:1px solid #c4b5fd;border-radius:99px;padding:5px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;" onclick="copyPill(this,'${display}')" title="Copy">${escHtml(display)}</span>`;}).join('');hashWrap.style.display='block';}else{hashWrap.style.display='none';}
 const kwWrap=document.getElementById('detail-keywords-wrap');const kwContainer=document.getElementById('detail-keywords');if(ev.keywords&&ev.keywords.trim()){const kws=ev.keywords.trim().split(/[,，]+/).map(s=>s.trim()).filter(Boolean);kwContainer.innerHTML=kws.map(kw=>{return`<span style="display:inline-flex;align-items:center;font-size:0.8rem;font-weight:800;color:#075985;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:99px;padding:5px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;" onclick="copyPill(this,'${escHtml(kw)}')" title="Copy">${escHtml(kw).toUpperCase()}</span>`;}).join('');kwWrap.style.display='block';}else{kwWrap.style.display='none';}
 _dom('detail-modal').style.display='flex';window._currentDetailId=id;const modalBox=document.querySelector('#detail-modal .modal-box');if(modalBox){modalBox.scrollTop=0;modalBox.style.borderTop=`4px solid ${color}`;}
-document.body.style.overflow='hidden';const activePage=document.querySelector('.page.active');if(activePage)activePage.dataset.scrollY=activePage.scrollTop;const shareBtn2=document.getElementById('detail-share-btn');if(shareBtn2)shareBtn2.style.display='flex';debounceLucide();}
+document.body.style.overflow='hidden';const activePage=document.querySelector('.page.active');if(activePage)activePage.dataset.scrollY=activePage.scrollTop;const shareBtn2=document.getElementById('detail-share-btn');if(shareBtn2)shareBtn2.style.display='flex';debounceLucide();
+/* --- inject Share + Remind buttons directly --- */
+const _detailModalBody=document.querySelector('#detail-modal .modal-box > div:last-child');
+if(_detailModalBody){
+  /* Share button */
+  if(!_detailModalBody.querySelector('[data-ppp-share]')){
+    const _sb=document.createElement('button');
+    _sb.setAttribute('data-ppp-share',id);
+    _sb.className='link-btn';
+    _sb.style.cssText='cursor:pointer;margin-top:8px;margin-right:8px;display:inline-flex;align-items:center;gap:7px;';
+    _sb.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share event card';
+    _sb.onclick=(e)=>{e.stopPropagation();if(window.pppOpenShare)pppOpenShare(id);};
+    const _hw=document.getElementById('detail-hashtags-wrap');
+    const _kw=document.getElementById('detail-keywords-wrap');
+    const _anc=_kw||_hw;
+    if(_anc&&_anc.parentNode===_detailModalBody){_anc.after(_sb);}else{_detailModalBody.appendChild(_sb);}
+  }
+  /* Remind button */
+  if(!_detailModalBody.querySelector('.ppp-reminder-btn')){
+    const _rb=document.createElement('button');
+    _rb.className='ppp-reminder-btn';
+    _rb.style.cssText='margin-top:8px;display:inline-flex;align-items:center;gap:6px;';
+    if(window._pppSetRemBtn&&window._pppReminders!==undefined){_pppSetRemBtn(_rb,!!_pppReminders[id],id);}else{_rb.textContent='🔔 Remind me';}
+    _rb.onclick=(e)=>{e.stopPropagation();if(window.pppToggleReminder)pppToggleReminder(id,_rb);};
+    const _cw=document.getElementById('detail-cal-wrap');
+    if(_cw){_cw.style.display='block';_cw.appendChild(_rb);}else{_detailModalBody.appendChild(_rb);}
+  }
+}
+}
 function copyPill(el,text){if(!navigator.clipboard)return;navigator.clipboard.writeText(text).then(()=>{const orig=el.textContent;const origBg=el.style.background;const origColor=el.style.color;el.textContent='Copied!';el.style.background='#111';el.style.color='#fff';setTimeout(()=>{el.textContent=orig;el.style.background=origBg;el.style.color=origColor;},1200);}).catch(e=>{if(e&&e.message!=="AbortError")console.warn("[PPP]",e.message||e);});}
 function closeDetailModal(){const modal=_dom('detail-modal');if(modal){modal.style.display='none';const mapDiv=document.getElementById('detail-map');if(mapDiv)mapDiv.innerHTML='';}
 document.body.style.overflow='';const activePage=document.querySelector('.page.active');if(activePage&&activePage.dataset.scrollY!==undefined){activePage.scrollTop=parseFloat(activePage.dataset.scrollY)||0;}}
@@ -1170,7 +1198,7 @@ let _pppThemeIdx  = null; // month 1-12
 let _pppChipState = {};   // chipText -> bool (shown on card)
 
 function pppOpenShare(eventId) {
-  // share open for all users
+  // open for all users
   const ev = (window.allEvents || []).find(e => e.__backendId === eventId);
   if (!ev) return;
   _pppShareId = eventId;
@@ -1402,57 +1430,6 @@ function _pppFireNotif(title, body, id) {
   _pppToast('🔔 ' + title + ' — ' + body, 4000);
 }
 
-/* inject share btn + reminder btn into detail modal */
-window.openDetailModal = function(id) {
-  /* call original — use _pppOrigDetail which is set after all scripts load */
-  if (window._pppOrigDetail) window._pppOrigDetail(id);
-
-  function _injectBtns(attempt) {
-    const modalBody = document.querySelector('#detail-modal .modal-box > div:last-child');
-    /* retry up to 4 times if DOM not ready yet (slow mobile) */
-    if (!modalBody) {
-      if ((attempt||0) < 4) setTimeout(() => _injectBtns((attempt||0)+1), 200);
-      return;
-    }
-
-    /* --- Share button (all users) --- */
-    if (!modalBody.querySelector('[data-ppp-share]')) {
-      const shareBtn = document.createElement('button');
-      shareBtn.setAttribute('data-ppp-share', id);
-      shareBtn.className = 'link-btn';
-      shareBtn.style.cssText = 'cursor:pointer;margin-top:8px;margin-right:8px;display:inline-flex;align-items:center;gap:7px;';
-      shareBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share event card`;
-      shareBtn.onclick = (e) => { e.stopPropagation(); pppOpenShare(id); };
-      const hashWrap = document.getElementById('detail-hashtags-wrap');
-      const kwWrap   = document.getElementById('detail-keywords-wrap');
-      const anchor   = kwWrap || hashWrap;
-      if (anchor && anchor.parentNode === modalBody) {
-        anchor.after(shareBtn);
-      } else {
-        modalBody.appendChild(shareBtn);
-      }
-    }
-
-    /* --- Reminder button (all users) --- */
-    if (!modalBody.querySelector('.ppp-reminder-btn')) {
-      const remBtn = document.createElement('button');
-      remBtn.className = 'ppp-reminder-btn';
-      remBtn.style.cssText = 'margin-top:8px;display:inline-flex;align-items:center;gap:6px;';
-      _pppSetRemBtn(remBtn, !!_pppReminders[id], id);
-      remBtn.onclick = (e) => { e.stopPropagation(); pppToggleReminder(id, remBtn); };
-      const calWrap = document.getElementById('detail-cal-wrap');
-      if (calWrap) {
-        calWrap.style.display = 'block';
-        calWrap.appendChild(remBtn);
-      } else {
-        modalBody.appendChild(remBtn);
-      }
-    }
-  }
-
-  /* 300ms on first try — enough for mobile render, retry if not ready */
-  setTimeout(() => _injectBtns(0), 300);
-};
 
 /* inject reminder btn onto event cards */
 function _pppInjectCardRemBtn(eventId) {
