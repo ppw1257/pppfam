@@ -1406,10 +1406,14 @@ function _pppFireNotif(title, body, id) {
 window.openDetailModal = function(id) {
   /* call original — use _pppOrigDetail which is set after all scripts load */
   if (window._pppOrigDetail) window._pppOrigDetail(id);
-  setTimeout(() => {
-    /* find a reliable container — use detail-meta parent or fall back to modal body */
+
+  function _injectBtns(attempt) {
     const modalBody = document.querySelector('#detail-modal .modal-box > div:last-child');
-    if (!modalBody) return;
+    /* retry up to 4 times if DOM not ready yet (slow mobile) */
+    if (!modalBody) {
+      if ((attempt||0) < 4) setTimeout(() => _injectBtns((attempt||0)+1), 200);
+      return;
+    }
 
     /* --- Share button (all users) --- */
     if (!modalBody.querySelector('[data-ppp-share]')) {
@@ -1419,7 +1423,6 @@ window.openDetailModal = function(id) {
       shareBtn.style.cssText = 'cursor:pointer;margin-top:8px;margin-right:8px;display:inline-flex;align-items:center;gap:7px;';
       shareBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share event card`;
       shareBtn.onclick = (e) => { e.stopPropagation(); pppOpenShare(id); };
-      /* inject after hashtags/keywords section, or append */
       const hashWrap = document.getElementById('detail-hashtags-wrap');
       const kwWrap   = document.getElementById('detail-keywords-wrap');
       const anchor   = kwWrap || hashWrap;
@@ -1439,13 +1442,16 @@ window.openDetailModal = function(id) {
       remBtn.onclick = (e) => { e.stopPropagation(); pppToggleReminder(id, remBtn); };
       const calWrap = document.getElementById('detail-cal-wrap');
       if (calWrap) {
-        calWrap.style.display = 'block'; // make sure it's visible
+        calWrap.style.display = 'block';
         calWrap.appendChild(remBtn);
       } else {
         modalBody.appendChild(remBtn);
       }
     }
-  }, 120);
+  }
+
+  /* 300ms on first try — enough for mobile render, retry if not ready */
+  setTimeout(() => _injectBtns(0), 300);
 };
 
 /* inject reminder btn onto event cards */
