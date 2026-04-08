@@ -117,6 +117,283 @@
     bottom:0; left:0; right:0; max-width:100%;
   }
 }
+
+/* ===== MINIMAL MODERN OVERRIDE ===== */
+:root {
+  --font-main: 'K2D', sans-serif;
+  --c-bg: #fafafa;
+  --c-surface: #ffffff;
+  --c-border: #ebebeb;
+  --c-text: #111111;
+  --c-muted: #9ca3af;
+  --c-accent-pond: #f97316;
+  --c-accent-phuwin: #475569;
+  --c-accent-permpoon: #16a34a;
+  --radius: 14px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.09);
+}
+
+/* body bg ให้นุ่มกว่าขาวล้วน */
+body { background: var(--c-bg) !important; }
+
+/* Nav — ultra-thin minimal */
+#main-nav {
+  background: rgba(250,250,250,0.94) !important;
+  border-bottom: 1px solid var(--c-border) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+#nav-site-title {
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  font-size: 0.92rem !important;
+}
+.nav-link {
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  border-radius: 6px !important;
+  color: var(--c-muted) !important;
+}
+.nav-link.active {
+  color: var(--c-text) !important;
+  font-weight: 700 !important;
+  background: rgba(0,0,0,0.06) !important;
+}
+.nav-link:hover { background: rgba(0,0,0,0.05) !important; color: var(--c-text) !important; }
+
+/* Event cards — minimal */
+.event-card {
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--c-border) !important;
+}
+.event-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Timeline cards */
+.timeline-card {
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--c-border) !important;
+}
+.timeline-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* List cards */
+.list-card {
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.list-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Cal event cards */
+.cal-ev-card {
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.cal-ev-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Modal */
+.modal-box {
+  border-radius: 20px !important;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.14) !important;
+}
+
+/* Section headers */
+.section-header {
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+}
+.month-group-header-label {
+  letter-spacing: -0.02em !important;
+  font-weight: 800 !important;
+}
+
+/* Bento hero cards */
+#bento-next, #bento-ev2 {
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* ======================================================
+   HASHTAGS — ตัวใหญ่ (UPPERCASE) + style ใหม่
+   ====================================================== */
+#detail-hashtags-wrap > div {
+  background: #f8f6ff !important;
+  border: 1px solid #ddd6fe !important;
+  border-radius: 14px !important;
+  padding: 1rem 1.1rem !important;
+}
+#detail-hashtags-wrap p {
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  color: #6d28d9 !important;
+  text-transform: uppercase !important;
+  margin-bottom: 0.7rem !important;
+}
+#detail-hashtags span {
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  padding: 5px 14px !important;
+  border-radius: 99px !important;
+  background: #ede9fe !important;
+  color: #5b21b6 !important;
+  border: 1px solid #c4b5fd !important;
+  cursor: pointer !important;
+}
+#detail-hashtags span:hover {
+  background: #5b21b6 !important;
+  color: #fff !important;
+}
+
+/* ======================================================
+   KEYWORDS — ตัวใหญ่ (UPPERCASE) + style ใหม่
+   ====================================================== */
+#detail-keywords-wrap > div {
+  background: #eff8ff !important;
+  border: 1px solid #bae6fd !important;
+  border-radius: 14px !important;
+  padding: 1rem 1.1rem !important;
+}
+#detail-keywords-wrap p {
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  color: #0369a1 !important;
+  text-transform: uppercase !important;
+  margin-bottom: 0.7rem !important;
+}
+#detail-keywords span {
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  padding: 5px 14px !important;
+  border-radius: 99px !important;
+  background: #e0f2fe !important;
+  color: #075985 !important;
+  border: 1px solid #7dd3fc !important;
+  cursor: pointer !important;
+}
+#detail-keywords span:hover {
+  background: #075985 !important;
+  color: #fff !important;
+}
+
+/* ======================================================
+   PPP CHIP (share card)
+   ====================================================== */
+.ppp-chip {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+}
+.ppp-chip-hash {
+  background: #ede9fe !important;
+  color: #5b21b6 !important;
+  border: 1px solid #c4b5fd !important;
+}
+.ppp-chip-kw {
+  background: #e0f2fe !important;
+  color: #075985 !important;
+  border: 1px solid #7dd3fc !important;
+}
+
+/* ======================================================
+   FILTER PILLS / BUTTONS — cleaner
+   ====================================================== */
+.filter-bar button,
+.filter-bar .artist-filter-btn,
+.filter-bar .cal-filter-btn {
+  border-radius: 99px !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  transition: all 0.12s !important;
+}
+
+/* Month group header count badge */
+.month-group-header-count {
+  background: #111 !important;
+  color: #fff !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.04em !important;
+  border-radius: 99px !important;
+  padding: 2px 10px !important;
+}
+
+/* Buttons */
+.btn-primary {
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+}
+.btn-secondary {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+
+/* Calendar stat cards */
+#cal-left {
+  border-radius: var(--radius) !important;
+  box-shadow: none !important;
+}
+
+/* Artist stat boxes */
+#page-calendar .artist-stat-permpoon,
+#page-calendar [id^="cs-"] {
+  border-radius: 12px !important;
+}
+
+/* Footer */
+footer > div {
+  font-size: 0.62rem !important;
+  color: #c4c4bc !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* Toast */
+#toast {
+  border-radius: 12px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18) !important;
+}
+
+/* Search */
+#search-box {
+  border-radius: 18px !important;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.22) !important;
+}
+#search-input-wrap {
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+#search-input {
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+}
+
+/* Scrollbar — ultra thin */
+::-webkit-scrollbar { width: 4px !important; }
+::-webkit-scrollbar-thumb { background: #e0e0dc !important; border-radius: 99px !important; }
+/* ===== END MINIMAL MODERN OVERRIDE ===== */
+
 </style>
 </head> <body> <div id="app"> <nav id="main-nav"> <div class="nav-inner"> <div class="nav-logo" onclick="navigate('home')" style="display:flex;align-items:center;gap:8px;"> <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;"> <span class="nav-dot-1" style="width:8px;height:8px;border-radius:50%;background:#f97316;display:inline-block;"></span> <span class="nav-dot-2" style="width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block;"></span> <span class="nav-dot-3" style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span> </div> <span id="nav-site-title">PPP Family</span> </div> <div class="nav-links-wrap" id="nav-links"> <span class="nav-link active" data-page="home" onclick="navigate('home')"><i data-lucide="home" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label" >Home</span></span> <span class="nav-link" data-page="calendar" onclick="navigate('calendar')"><i data-lucide="calendar" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Calendar</span></span> <span class="nav-link" data-page="works" onclick="navigate('works')"><i data-lucide="star" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Works</span></span> <span class="nav-link" data-page="trend" onclick="navigate('trend')"><i data-lucide="trending-up" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Trend</span></span> <span class="nav-link" data-page="myschedule" onclick="navigate('myschedule')" id="nav-myschedule-link"><i data-lucide="heart" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">My Recap</span></span> <span class="nav-link" data-page="admin" id="nav-admin-link" style="display:none;" onclick="navigate('admin')"><i data-lucide="settings" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:3px;"></i><span class="nav-label">Admin</span></span> </div> </div> </nav> <!-- HOME PAGE --> <div class="page active" id="page-home"> <div style="width:100%;padding:1.5rem 1rem;box-sizing:border-box;overflow-x:hidden;background:#fff;"> <div id="bday-banners" style="display:none;flex-direction:column;gap:8px;margin-bottom:1.5rem;"></div> <!-- HERO --> <div id="bento-grid"> <!-- Event 1 --> <div id="bento-next" style="background:#1a1a1a;border-radius:16px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;padding:18px 20px;" onclick="bentoNextClick()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')bentoNextClick()"> <div id="bento-next-bg" style="position:absolute;inset:0;background-size:cover;background-position:top center;opacity:0.5;border-radius:16px;"></div> <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0.04) 100%);border-radius:16px;"></div> <div style="position:absolute;top:18px;left:20px;"> <div style="display:flex;align-items:center;gap:6px;"> <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;border-radius:50%;background:#f97316;"></div><div style="width:5px;height:5px;border-radius:50%;background:#6b7280;"></div><div style="width:5px;height:5px;border-radius:50%;background:#22c55e;"></div></div> <span style="font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.06em;" id="bento-upcoming-label">UPCOMING</span> </div> </div> <div style="position:relative;"> <div id="bento-next-label" style="margin-bottom:6px;"><span style="background:#f97316;color:#fff;padding:3px 10px;border-radius:99px;font-size:0.6rem;font-weight:900;letter-spacing:0.07em;display:inline-block;">NEXT EVENT</span></div> <div id="bento-next-title" style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:5px;">Loading...</div> <div id="bento-next-meta" style="font-size:0.62rem;color:rgba(255,255,255,0.4);margin-bottom:4px;"></div> <div id="bento-countdown-wrap" style="display:none;"> <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-d">--</span><span class="bento-cd-label">DAYS</span></div> <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-h">--</span><span class="bento-cd-label">HRS</span></div> <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-m">--</span><span class="bento-cd-label">MIN</span></div> <div class="bento-cd-box"><span class="bento-cd-num" id="bcd-s">--</span><span class="bento-cd-label">SEC</span></div> </div> </div> </div> <!-- Event 2 --> <div id="bento-ev2" style="background:#1a1a1a;border-radius:16px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;padding:18px 20px;" onclick="bentoNextClick2()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')bentoNextClick2()"> <div id="bento-next2-bg" style="position:absolute;inset:0;background-size:cover;background-position:top center;opacity:0.5;border-radius:16px;"></div> <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0.04) 100%);border-radius:16px;"></div> <div style="position:relative;"> <div id="bento-next2-label" style="font-size:0.6rem;font-weight:800;letter-spacing:0.08em;margin-bottom:6px;display:none;"></div> <div id="bento-next2-title" style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:5px;display:none;"></div> <div id="bento-next2-meta" style="font-size:0.62rem;color:rgba(255,255,255,0.4);display:none;margin-bottom:4px;"></div> </div> </div> </div> <!-- ARTIST STAT PILLS --> <div id="home-artist-pills" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;margin-top:0.5rem;"> <!-- Pond pill --> <div style="display:inline-flex;align-items:center;gap:6px;background:#f97316;color:#fff;border-radius:99px;padding:5px 14px;font-size:0.78rem;font-weight:700;letter-spacing:0.02em;"> <span>Pond</span> <span style="opacity:0.75;">·</span> <span id="home-pill-pond-total">-</span> </div> <!-- Phuwin pill --> <div style="display:inline-flex;align-items:center;gap:6px;background:#4b5563;color:#fff;border-radius:99px;padding:5px 14px;font-size:0.78rem;font-weight:700;letter-spacing:0.02em;"> <span>Phuwin</span> <span style="opacity:0.75;">·</span> <span id="home-pill-phuwin-total">-</span> </div> <!-- Permpoon pill --> <div style="display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:#fff;border-radius:99px;padding:5px 14px;font-size:0.78rem;font-weight:700;letter-spacing:0.02em;"> <span>Permpoon</span> <span style="opacity:0.75;">·</span> <span id="home-pill-permpoon-total">-</span> </div> </div> <div id="events-grid"></div> <div id="no-events" style="display:none;padding:3rem 1rem;"> <div style="background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:48px 20px;text-align:center;max-width:400px;margin:auto;"> <div style="width:56px;height:56px;border-radius:16px;background:#f5f3ff;border:1px solid #e9d5ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"> <i data-lucide="calendar-x" style="width:24px;height:24px;color:#a855f7;stroke-width:1.8;"></i> </div> <p style="font-size:1rem;font-weight:700;color:#111;margin-bottom:6px;" >No upcoming events</p> <p style="font-size:0.82rem;color:#9ca3af;margin-bottom:16px;" >Stay tuned for updates from Pond · Phuwin · Permpoon</p> <div style="display:flex;justify-content:center;gap:6px;"> <div style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div> <div style="width:7px;height:7px;border-radius:50%;background:#6b7280;"></div> <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div> </div> </div> </div> </div> <footer><div style="width:100%;padding:0.5rem 1rem;text-align:center;font-size:0.65rem;color:#d1d5db;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;gap:8px;"><div style="display:flex;gap:3px;"><div style="width:4px;height:4px;border-radius:50%;background:#f97316;"></div><div style="width:4px;height:4px;border-radius:50%;background:#6b7280;"></div><div style="width:4px;height:4px;border-radius:50%;background:#22c55e;"></div></div>© 2026 made with <span class="blink-heart">💚</span></div></footer> </div> <!-- CALENDAR PAGE --> <div class="page" id="page-calendar"> <div style="width:100%;padding:1.5rem 1rem;box-sizing:border-box;background:#fff;"> <!-- Header --> <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.25rem;"> <div> <h2 style="font-size:1.9rem;font-weight:800;letter-spacing:-0.04em;line-height:1.2;margin-bottom:4px;color:#111;" id="cal-section-title">Calendar</h2> <p style="color:#9ca3af;font-size:0.85rem;"></p> </div> </div> <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:1rem;align-items:stretch;"> <!-- Box 1: Stats + Artist --> <div style="background:#fff;border-radius:14px;border:1px solid #ebebeb;padding:14px 20px;box-sizing:border-box;display:flex;flex-direction:column;"> <!-- Row 1: Total + Past/Remaining/% --> <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:12px;border-bottom:1px solid #f3f4f6;margin-bottom:12px;"> <div style="display:flex;align-items:baseline;gap:8px;"> <div id="cal-stat-total" style="font-size:2rem;font-weight:700;color:#111;line-height:1;letter-spacing:-0.03em;">-</div> <div id="cal-stat-year-label" style="display:none;"></div> </div> <div style="display:flex;gap:20px;align-items:center;"> <div style="text-align:center;"> <div id="cal-stat-upcoming" style="font-size:1.2rem;font-weight:800;color:#ea6a0a;line-height:1;">-</div> <div style="font-size:0.55rem;color:#6b7280;margin-top:3px;font-weight:700;letter-spacing:0.06em;">Remaining</div> </div> <div style="width:1px;height:24px;background:#e5e7eb;"></div> <div style="text-align:center;"> <div id="cal-stat-past" style="font-size:1.2rem;font-weight:800;color:#374151;line-height:1;">-</div> <div style="font-size:0.55rem;color:#6b7280;margin-top:3px;font-weight:700;letter-spacing:0.06em;">Past</div> </div> <div style="width:1px;height:24px;background:#e5e7eb;"></div> <div style="text-align:center;"> <div id="cal-stat-pct" style="font-size:1.2rem;font-weight:800;color:#7c3aed;line-height:1;">-</div> <div style="font-size:0.55rem;color:#6b7280;margin-top:3px;font-weight:700;letter-spacing:0.06em;">%</div> </div> <div id="cal-stat-years" style="display:none;">-</div> </div> </div> <!-- Row 2: Pond / Phuwin / Permpoon --> <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;flex:1;align-content:stretch;"> <div style="background:#fff7ed;border:0.5px solid #fed7aa;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;"> <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;"> <div style="width:7px;height:7px;border-radius:50%;background:#f97316;"></div> <span style="font-size:0.6rem;font-weight:700;color:#7c2d12;letter-spacing:0.08em;">POND</span> </div> <div id="cs-pond-total" style="font-size:1.4rem;font-weight:800;color:#c2410c;line-height:1;">-</div> <div class="artist-stat-donerow" style="margin-left:auto;display:flex;align-items:center;gap:8px;"> <div style="font-size:0.62rem;color:#7c2d12;font-weight:700;" id="cs-pond-left-label">Left <strong id="cs-pond-up" style="color:#c2410c;">-</strong></div> <div style="width:1px;height:12px;background:#fed7aa;"></div> <div style="font-size:0.62rem;color:#7c2d12;font-weight:700;" id="cs-pond-done-label">Done <strong id="cs-pond-past" style="color:#7c2d12;">-</strong></div> </div> </div> <div style="background:#f9fafb;border:0.5px solid #e5e7eb;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;"> <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;"> <div style="width:7px;height:7px;border-radius:50%;background:#6b7280;"></div> <span style="font-size:0.6rem;font-weight:700;color:#374151;letter-spacing:0.08em;">PHUWIN</span> </div> <div id="cs-phuwin-total" style="font-size:1.4rem;font-weight:800;color:#1f2937;line-height:1;">-</div> <div class="artist-stat-donerow" style="margin-left:auto;display:flex;align-items:center;gap:8px;"> <div style="font-size:0.62rem;color:#1f2937;font-weight:700;" id="cs-phuwin-left-label">Left <strong id="cs-phuwin-up" style="color:#111;">-</strong></div> <div style="width:1px;height:12px;background:#d1d5db;"></div> <div style="font-size:0.62rem;color:#1f2937;font-weight:700;" id="cs-phuwin-done-label">Done <strong id="cs-phuwin-past" style="color:#111;">-</strong></div> </div> </div> <div class="artist-stat-permpoon" style="background:#f0fdf4;border:0.5px solid #bbf7d0;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;"> <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;"> <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div> <span style="font-size:0.6rem;font-weight:700;color:#14532d;letter-spacing:0.08em;">PERMPOON</span> </div> <div id="cs-permpoon-total" style="font-size:1.4rem;font-weight:800;color:#15803d;line-height:1;">-</div> <div class="artist-stat-donerow" style="margin-left:auto;display:flex;align-items:center;gap:8px;"> <div style="font-size:0.62rem;color:#14532d;font-weight:700;" id="cs-permpoon-left-label">Left <strong id="cs-permpoon-up" style="color:#15803d;">-</strong></div> <div style="width:1px;height:12px;background:#bbf7d0;"></div> <div style="font-size:0.62rem;color:#14532d;font-weight:700;" id="cs-permpoon-done-label">Done <strong id="cs-permpoon-past" style="color:#14532d;">-</strong></div> </div> </div> </div> </div> </div><!-- end grid row --> <div id="cal-layout" style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;"> <!-- Left: mini calendar --> <div id="cal-left" style="background:#fff;border-radius:14px;border:1px solid #ebebeb;padding:16px;flex-shrink:0;position:relative;"> <!-- filter pills --> <div class="filter-bar" style="margin-bottom:12px;"> <button class="cal-filter-btn" data-artist="all" onclick="filterCalendar('all')"
           style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;border:1px solid #111;background:#111;color:#fff;font-size:0.72rem;font-weight:700;cursor:pointer;">✦ All</button> <button class="cal-filter-btn" data-artist="Pond" onclick="filterCalendar('Pond')"
@@ -137,7 +414,7 @@
 </button> </div> <div id="bday-form-wrap" style="display:none;background:#f9fafb;border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid #e5e7eb;"> <p style="font-weight:700;font-size:0.85rem;margin-bottom:1rem;">Add Artist Birthday</p> <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;"> <div style="grid-column:1/-1;"> <label class="form-label">Artist Name</label> <input class="form-input" id="bday-artist-name" placeholder="e.g. Pond"> </div> <div> <label class="form-label">Month (1–12)</label> <input class="form-input" id="bday-month" type="number" min="1" max="12" placeholder="12"> </div> <div> <label class="form-label">Day (1–31)</label> <input class="form-input" id="bday-day" type="number" min="1" max="31" placeholder="7"> </div> <div style="grid-column:3/-1;"> <label class="form-label">Color</label> <div style="display:flex;align-items:center;gap:8px;"> <input type="color" id="bday-color" value="#6b7280" style="width:40px;height:36px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;padding:2px;"> <span style="font-size:0.78rem;color:#9ca3af;">Banner color</span> </div> </div> </div> <div style="display:flex;gap:8px;justify-content:flex-end;"> <button class="btn-secondary" style="font-size:0.82rem;" onclick="closeBdayForm()">Cancel</button> <button class="btn-primary" style="font-size:0.82rem;" onclick="saveBirthday()">Save</button> </div> </div> <div id="bday-admin-list"></div> </div> <!-- TAB: Anniversary --> <div id="admin-tab-anniv" class="admin-tab-panel" style="display:none;"> <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;"> <p style="font-size:0.78rem;color:#9ca3af;">Anniversaries, debuts, special dates</p> <button class="btn-primary" style="font-size:0.82rem;padding:6px 12px;" onclick="openAnnivForm()"> <i data-lucide="plus" style="width:13px;height:13px;display:inline;vertical-align:-2px;margin-right:3px;"></i>Add Anniversary
 </button> </div> <div id="anniv-form-wrap" style="display:none;background:#f9fafb;border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid #e5e7eb;"> <p style="font-weight:700;font-size:0.85rem;margin-bottom:1rem;">Add New Anniversary</p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;"> <div style="grid-column:1/-1;"> <label class="form-label">Name</label> <input class="form-input" id="anniv-label" placeholder="e.g. PondPhuwin Anniversary"> </div> <div> <label class="form-label">Month (1–12)</label> <input class="form-input" id="anniv-month" type="number" min="1" max="12"> </div> <div> <label class="form-label">Day (1–31)</label> <input class="form-input" id="anniv-day" type="number" min="1" max="31"> </div> <div> <label class="form-label"><span>Start Year</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label> <input class="form-input" id="anniv-year" type="number" min="2000" max="2099"> </div> <div> <label class="form-label">Banner Color</label> <input type="color" id="anniv-color" value="#a855f7" style="width:40px;height:36px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;padding:2px;"> </div> </div> <div style="display:flex;gap:8px;justify-content:flex-end;"> <button class="btn-secondary" style="font-size:0.82rem;" onclick="closeAnnivForm()">Cancel</button> <button class="btn-primary" style="font-size:0.82rem;" onclick="saveAnniversary()">Save</button> </div> </div> <div id="anniv-list"></div> </div> </div> </div> </div> </div> <!-- DETAIL MODAL --> <div class="modal-backdrop" id="detail-modal" style="display:none;" onclick="closeDetailModalBackdrop(event)"> <div class="modal-box" onclick="event.stopPropagation()" style="max-width:860px;width:100%;background:#fff;border-radius:20px;overflow-y:auto;overflow-x:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);"> <div style="position:relative;line-height:0;"> <div id="detail-img-wrap"></div> <button onclick="closeDetailModal()" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);border:none;border-radius:99px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;"> <i data-lucide="x" style="width:16px;height:16px;color:#fff;stroke-width:2.5;"></i> </button> </div> <div style="padding:1.25rem;"> <div id="detail-artist-badge" style="margin-bottom:0.6rem;"></div> <h2 id="detail-title" style="font-size:1.65rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.7rem;line-height:1.25;"></h2> <div id="detail-meta" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem;"></div> <div id="detail-desc-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.4rem;" >DESCRIPTION</p> <p id="detail-desc" style="font-size:0.88rem;line-height:1.6;color:#374151;"></p> </div> <div id="detail-links-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.75rem;" >LINKS</p> <div id="detail-links" style="display:flex;flex-wrap:wrap;gap:8px;"></div> </div> <div id="detail-cal-wrap" style="margin-bottom:1.25rem;"> <div style="display:flex;align-items:center;margin-bottom:0.6rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin:0;">ADD TO CALENDAR</p> </div> <div id="detail-cal-btns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;"></div> </div> <div id="detail-ticket-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#f97316;letter-spacing:0.08em;margin-bottom:0.75rem;"> <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
        TICKETS
-</p> <div id="detail-ticket-btns" style="display:flex;flex-wrap:wrap;gap:8px;"></div> </div> <div id="detail-map-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.75rem;" >MAP</p> <div id="detail-map" class="map-embed-wrap"></div> </div> <div id="detail-hashtags-wrap" style="display:none;margin-bottom:0.75rem;"> <div style="background:#fff;border:0.5px solid #AFA9EC;border-radius:12px;padding:0.85rem 1rem;"> <p style="font-size:0.72rem;font-weight:700;color:#534AB7;letter-spacing:0.08em;margin-bottom:0.6rem;">HASHTAGS</p> <div id="detail-hashtags" style="display:flex;flex-wrap:wrap;gap:6px;"></div> </div> </div> <div id="detail-keywords-wrap" style="display:none;margin-bottom:0.5rem;"> <div style="background:#fff;border:0.5px solid #85B7EB;border-radius:12px;padding:0.85rem 1rem;"> <p style="font-size:0.72rem;font-weight:700;color:#185FA5;letter-spacing:0.08em;margin-bottom:0.6rem;">KEYWORDS</p> <div id="detail-keywords" style="display:flex;flex-wrap:wrap;gap:6px;"></div> </div> </div> </div> </div> </div> <!-- EVENT FORM MODAL --> <div class="modal-backdrop" id="event-form-modal" style="display:none;"> <div class="modal-box" onclick="event.stopPropagation()" style="max-width:900px;"> <div style="padding:1.5rem 1.5rem 0;"> <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;"> <h3 id="form-modal-title" style="font-weight:700;font-size:1.1rem;"></h3> <button onclick="closeEventFormModal()" style="background:none;border:none;cursor:pointer;padding:4px;"> <i data-lucide="x" style="width:20px;height:20px;stroke-width:2.5;"></i> </button> </div> </div> <div style="padding:0 1.5rem 1.5rem;"> <form id="event-form" novalidate> <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;">Main Info</p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;"> <div style="grid-column:1/-1;"> <label class="form-label" for="ev-title" style="font-weight:700;">Event Name <span style="color:#ec4899;">*</span></label> <input class="form-input" id="ev-title" name="title" placeholder="e.g. Pond Concert Night" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true"> </div> <div style="grid-column:1/-1;"> <label class="form-label" style="margin-bottom:0.5rem;font-weight:700;">Artist(s) <span style="color:#ec4899;">*</span></label> <div style="display:flex;flex-wrap:wrap;gap:8px;"> <input type="checkbox" class="artist-check" id="ac-pond" value="Pond"> <label class="artist-check-label" for="ac-pond">Pond</label> <input type="checkbox" class="artist-check" id="ac-phuwin" value="Phuwin"> <label class="artist-check-label" for="ac-phuwin">Phuwin</label> <input type="checkbox" class="artist-check" id="ac-permpoon" value="Permpoon"> <label class="artist-check-label" for="ac-permpoon">Permpoon</label> </div> </div> <div> <label class="form-label" for="ev-dateStart" style="font-weight:700;">Date Start <span style="color:#ec4899;">*</span></label> <input class="form-input" id="ev-dateStart" name="dateStart" type="date" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true"> </div> <div> <label class="form-label" style="font-weight:700;color:#9ca3af;"><span>Status</span> <span style="font-weight:400;font-size:0.78rem;">(auto)</span></label> <div style="padding:0.6rem 0.95rem;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;font-size:0.82rem;color:#6b7280;display:flex;align-items:center;gap:6px;"> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span>Past if date &lt; today · Upcoming if date ≥ today</span> </div> </div> <div> <label class="form-label" for="ev-startTime" style="font-weight:700;">Start Time <span style="color:#ec4899;">*</span></label> <div style="display:flex;align-items:center;gap:8px;"> <input class="form-input" id="ev-startTime" name="startTime" type="time" style="border:1px solid #111;background:#f9f9f9;font-weight:600;flex:1;"> <select id="ev-startTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;"> <option value="GMT+7" selected>— Thailand (GMT+7)</option> <option value="GMT-12">GMT-12</option> <option value="GMT-11">GMT-11</option> <option value="GMT-10">GMT-10</option> <option value="GMT-9:30">GMT-9:30</option> <option value="GMT-9">GMT-9</option> <option value="GMT-8">GMT-8</option> <option value="GMT-7">GMT-7</option> <option value="GMT-6">GMT-6</option> <option value="GMT-5">GMT-5</option> <option value="GMT-4">GMT-4</option> <option value="GMT-3:30">GMT-3:30</option> <option value="GMT-3">GMT-3</option> <option value="GMT-2">GMT-2</option> <option value="GMT-1">GMT-1</option> <option value="GMT+0">GMT+0</option> <option value="GMT+1">GMT+1</option> <option value="GMT+2">GMT+2</option> <option value="GMT+3">GMT+3</option> <option value="GMT+3:30">GMT+3:30</option> <option value="GMT+4">GMT+4</option> <option value="GMT+4:30">GMT+4:30</option> <option value="GMT+5">GMT+5</option> <option value="GMT+5:30">GMT+5:30</option> <option value="GMT+5:45">GMT+5:45</option> <option value="GMT+6">GMT+6</option> <option value="GMT+6:30">GMT+6:30</option> <option value="GMT+8">GMT+8</option> <option value="GMT+8:45">GMT+8:45</option> <option value="GMT+9">GMT+9</option> <option value="GMT+9:30">GMT+9:30</option> <option value="GMT+10">GMT+10</option> <option value="GMT+10:30">GMT+10:30</option> <option value="GMT+11">GMT+11</option> <option value="GMT+12">GMT+12</option> <option value="GMT+12:45">GMT+12:45</option> <option value="GMT+13">GMT+13</option> <option value="GMT+14">GMT+14</option> </select> </div> <div style="font-size:0.72rem;color:#9ca3af;margin-top:4px;">Optional — fill in or leave blank</div> </div> <div> <label class="form-label" for="ev-endTime"><span>End Time</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label> <div style="display:flex;align-items:center;gap:8px;"> <input class="form-input" id="ev-endTime" name="endTime" type="time" style="flex:1;"> <select id="ev-endTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;"> <option value="GMT+7" selected>— Thailand (GMT+7)</option> <option value="GMT-12">GMT-12</option> <option value="GMT-11">GMT-11</option> <option value="GMT-10">GMT-10</option> <option value="GMT-9:30">GMT-9:30</option> <option value="GMT-9">GMT-9</option> <option value="GMT-8">GMT-8</option> <option value="GMT-7">GMT-7</option> <option value="GMT-6">GMT-6</option> <option value="GMT-5">GMT-5</option> <option value="GMT-4">GMT-4</option> <option value="GMT-3:30">GMT-3:30</option> <option value="GMT-3">GMT-3</option> <option value="GMT-2">GMT-2</option> <option value="GMT-1">GMT-1</option> <option value="GMT+0">GMT+0</option> <option value="GMT+1">GMT+1</option> <option value="GMT+2">GMT+2</option> <option value="GMT+3">GMT+3</option> <option value="GMT+3:30">GMT+3:30</option> <option value="GMT+4">GMT+4</option> <option value="GMT+4:30">GMT+4:30</option> <option value="GMT+5">GMT+5</option> <option value="GMT+5:30">GMT+5:30</option> <option value="GMT+5:45">GMT+5:45</option> <option value="GMT+6">GMT+6</option> <option value="GMT+6:30">GMT+6:30</option> <option value="GMT+8">GMT+8</option> <option value="GMT+8:45">GMT+8:45</option> <option value="GMT+9">GMT+9</option> <option value="GMT+9:30">GMT+9:30</option> <option value="GMT+10">GMT+10</option> <option value="GMT+10:30">GMT+10:30</option> <option value="GMT+11">GMT+11</option> <option value="GMT+12">GMT+12</option> <option value="GMT+12:45">GMT+12:45</option> <option value="GMT+13">GMT+13</option> <option value="GMT+14">GMT+14</option> </select> </div> </div> </div> <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;"> <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;"><span>Details</span> <span style="font-weight:400;text-transform:none;font-size:0.68rem;">(optional)</span></p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;"> <div style="grid-column:1/-1;"> <label class="form-label" for="ev-image"><span>Image URL</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label> <input class="form-input" id="ev-image" name="image" placeholder="https://...jpg" oninput="previewAdminImg('ev-image','prev-image','pan-image')"> <div id="prev-image" style="display:none;margin-top:8px;"> <div style="font-size:0.72rem;color:#6b7280;margin-bottom:5px;display:flex;align-items:center;gap:5px;"> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
+</p> <div id="detail-ticket-btns" style="display:flex;flex-wrap:wrap;gap:8px;"></div> </div> <div id="detail-map-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.75rem;" >MAP</p> <div id="detail-map" class="map-embed-wrap"></div> </div> <div id="detail-hashtags-wrap" style="display:none;margin-bottom:0.75rem;"> <div style="background:#fff;border:0.5px solid #AFA9EC;border-radius:12px;padding:0.85rem 1rem;"> <p style="font-size:0.65rem;font-weight:800;color:#6d28d9;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.7rem;">HASHTAGS</p> <div id="detail-hashtags" style="display:flex;flex-wrap:wrap;gap:6px;"></div> </div> </div> <div id="detail-keywords-wrap" style="display:none;margin-bottom:0.5rem;"> <div style="background:#fff;border:0.5px solid #85B7EB;border-radius:12px;padding:0.85rem 1rem;"> <p style="font-size:0.65rem;font-weight:800;color:#0369a1;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.7rem;">KEYWORDS</p> <div id="detail-keywords" style="display:flex;flex-wrap:wrap;gap:6px;"></div> </div> </div> </div> </div> </div> <!-- EVENT FORM MODAL --> <div class="modal-backdrop" id="event-form-modal" style="display:none;"> <div class="modal-box" onclick="event.stopPropagation()" style="max-width:900px;"> <div style="padding:1.5rem 1.5rem 0;"> <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;"> <h3 id="form-modal-title" style="font-weight:700;font-size:1.1rem;"></h3> <button onclick="closeEventFormModal()" style="background:none;border:none;cursor:pointer;padding:4px;"> <i data-lucide="x" style="width:20px;height:20px;stroke-width:2.5;"></i> </button> </div> </div> <div style="padding:0 1.5rem 1.5rem;"> <form id="event-form" novalidate> <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;">Main Info</p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;"> <div style="grid-column:1/-1;"> <label class="form-label" for="ev-title" style="font-weight:700;">Event Name <span style="color:#ec4899;">*</span></label> <input class="form-input" id="ev-title" name="title" placeholder="e.g. Pond Concert Night" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true"> </div> <div style="grid-column:1/-1;"> <label class="form-label" style="margin-bottom:0.5rem;font-weight:700;">Artist(s) <span style="color:#ec4899;">*</span></label> <div style="display:flex;flex-wrap:wrap;gap:8px;"> <input type="checkbox" class="artist-check" id="ac-pond" value="Pond"> <label class="artist-check-label" for="ac-pond">Pond</label> <input type="checkbox" class="artist-check" id="ac-phuwin" value="Phuwin"> <label class="artist-check-label" for="ac-phuwin">Phuwin</label> <input type="checkbox" class="artist-check" id="ac-permpoon" value="Permpoon"> <label class="artist-check-label" for="ac-permpoon">Permpoon</label> </div> </div> <div> <label class="form-label" for="ev-dateStart" style="font-weight:700;">Date Start <span style="color:#ec4899;">*</span></label> <input class="form-input" id="ev-dateStart" name="dateStart" type="date" style="border:1px solid #111;background:#f9f9f9;font-weight:600;" aria-required="true"> </div> <div> <label class="form-label" style="font-weight:700;color:#9ca3af;"><span>Status</span> <span style="font-weight:400;font-size:0.78rem;">(auto)</span></label> <div style="padding:0.6rem 0.95rem;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;font-size:0.82rem;color:#6b7280;display:flex;align-items:center;gap:6px;"> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span>Past if date &lt; today · Upcoming if date ≥ today</span> </div> </div> <div> <label class="form-label" for="ev-startTime" style="font-weight:700;">Start Time <span style="color:#ec4899;">*</span></label> <div style="display:flex;align-items:center;gap:8px;"> <input class="form-input" id="ev-startTime" name="startTime" type="time" style="border:1px solid #111;background:#f9f9f9;font-weight:600;flex:1;"> <select id="ev-startTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;"> <option value="GMT+7" selected>— Thailand (GMT+7)</option> <option value="GMT-12">GMT-12</option> <option value="GMT-11">GMT-11</option> <option value="GMT-10">GMT-10</option> <option value="GMT-9:30">GMT-9:30</option> <option value="GMT-9">GMT-9</option> <option value="GMT-8">GMT-8</option> <option value="GMT-7">GMT-7</option> <option value="GMT-6">GMT-6</option> <option value="GMT-5">GMT-5</option> <option value="GMT-4">GMT-4</option> <option value="GMT-3:30">GMT-3:30</option> <option value="GMT-3">GMT-3</option> <option value="GMT-2">GMT-2</option> <option value="GMT-1">GMT-1</option> <option value="GMT+0">GMT+0</option> <option value="GMT+1">GMT+1</option> <option value="GMT+2">GMT+2</option> <option value="GMT+3">GMT+3</option> <option value="GMT+3:30">GMT+3:30</option> <option value="GMT+4">GMT+4</option> <option value="GMT+4:30">GMT+4:30</option> <option value="GMT+5">GMT+5</option> <option value="GMT+5:30">GMT+5:30</option> <option value="GMT+5:45">GMT+5:45</option> <option value="GMT+6">GMT+6</option> <option value="GMT+6:30">GMT+6:30</option> <option value="GMT+8">GMT+8</option> <option value="GMT+8:45">GMT+8:45</option> <option value="GMT+9">GMT+9</option> <option value="GMT+9:30">GMT+9:30</option> <option value="GMT+10">GMT+10</option> <option value="GMT+10:30">GMT+10:30</option> <option value="GMT+11">GMT+11</option> <option value="GMT+12">GMT+12</option> <option value="GMT+12:45">GMT+12:45</option> <option value="GMT+13">GMT+13</option> <option value="GMT+14">GMT+14</option> </select> </div> <div style="font-size:0.72rem;color:#9ca3af;margin-top:4px;">Optional — fill in or leave blank</div> </div> <div> <label class="form-label" for="ev-endTime"><span>End Time</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label> <div style="display:flex;align-items:center;gap:8px;"> <input class="form-input" id="ev-endTime" name="endTime" type="time" style="flex:1;"> <select id="ev-endTimezone" style="padding:0.65rem 0.75rem;border:1px solid #e5e7eb;border-radius:10px;font-size:0.88rem;color:#374151;background:#f9fafb;cursor:pointer;outline:none;"> <option value="GMT+7" selected>— Thailand (GMT+7)</option> <option value="GMT-12">GMT-12</option> <option value="GMT-11">GMT-11</option> <option value="GMT-10">GMT-10</option> <option value="GMT-9:30">GMT-9:30</option> <option value="GMT-9">GMT-9</option> <option value="GMT-8">GMT-8</option> <option value="GMT-7">GMT-7</option> <option value="GMT-6">GMT-6</option> <option value="GMT-5">GMT-5</option> <option value="GMT-4">GMT-4</option> <option value="GMT-3:30">GMT-3:30</option> <option value="GMT-3">GMT-3</option> <option value="GMT-2">GMT-2</option> <option value="GMT-1">GMT-1</option> <option value="GMT+0">GMT+0</option> <option value="GMT+1">GMT+1</option> <option value="GMT+2">GMT+2</option> <option value="GMT+3">GMT+3</option> <option value="GMT+3:30">GMT+3:30</option> <option value="GMT+4">GMT+4</option> <option value="GMT+4:30">GMT+4:30</option> <option value="GMT+5">GMT+5</option> <option value="GMT+5:30">GMT+5:30</option> <option value="GMT+5:45">GMT+5:45</option> <option value="GMT+6">GMT+6</option> <option value="GMT+6:30">GMT+6:30</option> <option value="GMT+8">GMT+8</option> <option value="GMT+8:45">GMT+8:45</option> <option value="GMT+9">GMT+9</option> <option value="GMT+9:30">GMT+9:30</option> <option value="GMT+10">GMT+10</option> <option value="GMT+10:30">GMT+10:30</option> <option value="GMT+11">GMT+11</option> <option value="GMT+12">GMT+12</option> <option value="GMT+12:45">GMT+12:45</option> <option value="GMT+13">GMT+13</option> <option value="GMT+14">GMT+14</option> </select> </div> </div> </div> <hr style="border:none;border-top:1px dashed #e5e7eb;margin:0.25rem 0 0.85rem;"> <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:0.75rem;"><span>Details</span> <span style="font-weight:400;text-transform:none;font-size:0.68rem;">(optional)</span></p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;"> <div style="grid-column:1/-1;"> <label class="form-label" for="ev-image"><span>Image URL</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label> <input class="form-input" id="ev-image" name="image" placeholder="https://...jpg" oninput="previewAdminImg('ev-image','prev-image','pan-image')"> <div id="prev-image" style="display:none;margin-top:8px;"> <div style="font-size:0.72rem;color:#6b7280;margin-bottom:5px;display:flex;align-items:center;gap:5px;"> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
            Drag image to set position
 </div> <div id="pan-image" class="img-pan-wrap" style="border-radius:10px;overflow:hidden;height:160px;border:1px solid #e5e7eb;cursor:grab;position:relative;user-select:none;background:#f3f4f6;"> <img class="img-pan-img" style="position:absolute;width:auto;height:auto;min-width:100%;min-height:100%;max-width:none;display:block;" alt="preview"> </div> <input type="hidden" id="ev-image-pos" name="imagePos" value="50% 0%"> <div style="margin-top:4px;font-size:0.68rem;color:#9ca3af;">Position: <span id="pan-image-pos-label">50% 0%</span></div> </div> </div> <div style="grid-column:1/-1;"> <label class="form-label" for="ev-heroImage"><span>Hero Image URL</span> <span style="font-weight:400;color:#9ca3af;">(Artist portrait — used in Hero banner instead of the main image)</span></label> <input class="form-input" id="ev-heroImage" name="heroImage" placeholder="https://...jpg" oninput="previewAdminImg('ev-heroImage','prev-heroImage','pan-heroImage')"> <div id="prev-heroImage" style="display:none;margin-top:8px;"> <div style="font-size:0.72rem;color:#6b7280;margin-bottom:5px;display:flex;align-items:center;gap:5px;"> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
            Drag image to set position
@@ -356,8 +633,8 @@ const ticketWrap=document.getElementById('detail-ticket-wrap');const ticketBtns=
         <span style="font-size:1rem;">${t.icon}</span>${t.label}
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="opacity:0.7;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </button>`).join('');}else{ticketWrap.style.display='none';}
-const mapWrap=document.getElementById('detail-map-wrap');if(ev.map&&ev.map.trim()){mapWrap.style.display='block';const _mapRaw=ev.map.trim();const _iframeMatch=_mapRaw.match(/<iframe[^>]*>[\s\S]*?<\/iframe>|<iframe[^>]*\/>/i);if(_iframeMatch){const _safe=_iframeMatch[0].replace(/width="[^"]*"/gi,'width="100%"').replace(/height="[^"]*"/gi,'height="300"').replace(/onclick\s*=/gi,'data-onclick=').replace(/onload\s*=/gi,'data-onload=').replace(/onerror\s*=/gi,'data-onerror=').replace(/javascript:/gi,'');document.getElementById('detail-map').innerHTML=_safe;}else{mapWrap.style.display='none';}}else mapWrap.style.display='none';const hashWrap=document.getElementById('detail-hashtags-wrap');const hashContainer=document.getElementById('detail-hashtags');if(ev.hashtags&&ev.hashtags.trim()){const tags=ev.hashtags.trim().split(/[,，]+/).map(s=>s.trim()).filter(Boolean);hashContainer.innerHTML=tags.map(tag=>{const display=tag.startsWith('#')?tag:'#'+tag;return`<span style="display:inline-flex;align-items:center;font-size:0.78rem;font-weight:700;color:#534AB7;background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:99px;padding:4px 12px;cursor:pointer;" onclick="copyPill(this,'${display}')" title="Copy">${escHtml(display)}</span>`;}).join('');hashWrap.style.display='block';}else{hashWrap.style.display='none';}
-const kwWrap=document.getElementById('detail-keywords-wrap');const kwContainer=document.getElementById('detail-keywords');if(ev.keywords&&ev.keywords.trim()){const kws=ev.keywords.trim().split(/[,，]+/).map(s=>s.trim()).filter(Boolean);kwContainer.innerHTML=kws.map(kw=>{return`<span style="display:inline-flex;align-items:center;font-size:0.78rem;font-weight:700;color:#185FA5;background:#E6F1FB;border:0.5px solid #85B7EB;border-radius:99px;padding:4px 12px;cursor:pointer;" onclick="copyPill(this,'${escHtml(kw)}')" title="Copy">${escHtml(kw)}</span>`;}).join('');kwWrap.style.display='block';}else{kwWrap.style.display='none';}
+const mapWrap=document.getElementById('detail-map-wrap');if(ev.map&&ev.map.trim()){mapWrap.style.display='block';const _mapRaw=ev.map.trim();const _iframeMatch=_mapRaw.match(/<iframe[^>]*>[\s\S]*?<\/iframe>|<iframe[^>]*\/>/i);if(_iframeMatch){const _safe=_iframeMatch[0].replace(/width="[^"]*"/gi,'width="100%"').replace(/height="[^"]*"/gi,'height="300"').replace(/onclick\s*=/gi,'data-onclick=').replace(/onload\s*=/gi,'data-onload=').replace(/onerror\s*=/gi,'data-onerror=').replace(/javascript:/gi,'');document.getElementById('detail-map').innerHTML=_safe;}else{mapWrap.style.display='none';}}else mapWrap.style.display='none';const hashWrap=document.getElementById('detail-hashtags-wrap');const hashContainer=document.getElementById('detail-hashtags');if(ev.hashtags&&ev.hashtags.trim()){const tags=ev.hashtags.trim().split(/[,，]+/).map(s=>s.trim()).filter(Boolean);hashContainer.innerHTML=tags.map(tag=>{const display=tag.startsWith('#')?tag:'#'+tag;return`<span style="display:inline-flex;align-items:center;font-size:0.8rem;font-weight:800;color:#5b21b6;background:#ede9fe;border:1px solid #c4b5fd;border-radius:99px;padding:5px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;" onclick="copyPill(this,'${display}')" title="Copy">${escHtml(display)}</span>`;}).join('');hashWrap.style.display='block';}else{hashWrap.style.display='none';}
+const kwWrap=document.getElementById('detail-keywords-wrap');const kwContainer=document.getElementById('detail-keywords');if(ev.keywords&&ev.keywords.trim()){const kws=ev.keywords.trim().split(/[,，]+/).map(s=>s.trim()).filter(Boolean);kwContainer.innerHTML=kws.map(kw=>{return`<span style="display:inline-flex;align-items:center;font-size:0.8rem;font-weight:800;color:#075985;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:99px;padding:5px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;" onclick="copyPill(this,'${escHtml(kw)}')" title="Copy">${escHtml(kw).toUpperCase()}</span>`;}).join('');kwWrap.style.display='block';}else{kwWrap.style.display='none';}
 _dom('detail-modal').style.display='flex';window._currentDetailId=id;const modalBox=document.querySelector('#detail-modal .modal-box');if(modalBox){modalBox.scrollTop=0;modalBox.style.borderTop=`4px solid ${color}`;}
 document.body.style.overflow='hidden';const activePage=document.querySelector('.page.active');if(activePage)activePage.dataset.scrollY=activePage.scrollTop;const shareBtn2=document.getElementById('detail-share-btn');if(shareBtn2)shareBtn2.style.display='flex';debounceLucide();}
 function copyPill(el,text){if(!navigator.clipboard)return;navigator.clipboard.writeText(text).then(()=>{const orig=el.textContent;const origBg=el.style.background;const origColor=el.style.color;el.textContent='Copied!';el.style.background='#111';el.style.color='#fff';setTimeout(()=>{el.textContent=orig;el.style.background=origBg;el.style.color=origColor;},1200);}).catch(e=>{if(e&&e.message!=="AbortError")console.warn("[PPP]",e.message||e);});}
@@ -1049,26 +1326,6 @@ function pppCopyText() {
 }
 
 /* ══════════════════════════════════════════════════════
-   INJECT share button into detail modal (admin only)
-   ══════════════════════════════════════════════════════ */
-const _origOpenDetail = window.openDetailModal;
-window.openDetailModal = function(id) {
-  if (_origOpenDetail) _origOpenDetail(id);
-  if (!window.isAdmin) return; // admin-only
-  setTimeout(() => {
-    const calWrap = document.getElementById('detail-cal-wrap');
-    if (!calWrap || calWrap.querySelector('[data-ppp-share]')) return;
-    const btn = document.createElement('button');
-    btn.setAttribute('data-ppp-share', id);
-    btn.className = 'link-btn';
-    btn.style.cssText = 'cursor:pointer;margin-top:6px;display:inline-flex;align-items:center;gap:7px;';
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share event card`;
-    btn.onclick = (e) => { e.stopPropagation(); pppOpenShare(id); };
-    calWrap.appendChild(btn);
-  }, 80);
-};
-
-/* ══════════════════════════════════════════════════════
    EVENT REMINDER (all users)
    ══════════════════════════════════════════════════════ */
 let _pppReminders = {};
@@ -1143,25 +1400,57 @@ function _pppFireNotif(title, body, id) {
   _pppToast('🔔 ' + title + ' — ' + body, 4000);
 }
 
-/* inject reminder btn into detail modal (all users) */
-const _origOpenDetail2 = window.openDetailModal;
+/* inject share btn (admin only) + reminder btn (all users) into detail modal */
+const _origOpenDetailPPP = window.openDetailModal;
 window.openDetailModal = function(id) {
-  if (_origOpenDetail2) _origOpenDetail2(id);
+  if (_origOpenDetailPPP) _origOpenDetailPPP(id);
   setTimeout(() => {
-    const calWrap = document.getElementById('detail-cal-wrap');
-    if (!calWrap || calWrap.querySelector('.ppp-reminder-btn')) return;
-    const btn = document.createElement('button');
-    btn.className = 'ppp-reminder-btn';
-    btn.style.marginTop = '6px';
-    _pppSetRemBtn(btn, !!_pppReminders[id], id);
-    btn.onclick = (e) => { e.stopPropagation(); pppToggleReminder(id, btn); };
-    calWrap.appendChild(btn);
-  }, 90);
+    /* find a reliable container — use detail-meta parent or fall back to modal body */
+    const modalBody = document.querySelector('#detail-modal .modal-box > div:last-child');
+    if (!modalBody) return;
+
+    /* --- Share button (admin only) --- */
+    if (window.isAdmin && !modalBody.querySelector('[data-ppp-share]')) {
+      const shareBtn = document.createElement('button');
+      shareBtn.setAttribute('data-ppp-share', id);
+      shareBtn.className = 'link-btn';
+      shareBtn.style.cssText = 'cursor:pointer;margin-top:8px;margin-right:8px;display:inline-flex;align-items:center;gap:7px;';
+      shareBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share event card`;
+      shareBtn.onclick = (e) => { e.stopPropagation(); pppOpenShare(id); };
+      /* inject after hashtags/keywords section, or append */
+      const hashWrap = document.getElementById('detail-hashtags-wrap');
+      const kwWrap   = document.getElementById('detail-keywords-wrap');
+      const anchor   = kwWrap || hashWrap;
+      if (anchor && anchor.parentNode === modalBody) {
+        anchor.after(shareBtn);
+      } else {
+        modalBody.appendChild(shareBtn);
+      }
+    }
+
+    /* --- Reminder button (all users) --- */
+    if (!modalBody.querySelector('.ppp-reminder-btn')) {
+      const remBtn = document.createElement('button');
+      remBtn.className = 'ppp-reminder-btn';
+      remBtn.style.cssText = 'margin-top:8px;display:inline-flex;align-items:center;gap:6px;';
+      _pppSetRemBtn(remBtn, !!_pppReminders[id], id);
+      remBtn.onclick = (e) => { e.stopPropagation(); pppToggleReminder(id, remBtn); };
+      const calWrap = document.getElementById('detail-cal-wrap');
+      if (calWrap) {
+        calWrap.style.display = 'block'; // make sure it's visible
+        calWrap.appendChild(remBtn);
+      } else {
+        modalBody.appendChild(remBtn);
+      }
+    }
+  }, 120);
 };
 
 /* inject reminder btn onto event cards */
 function _pppInjectCardRemBtn(eventId) {
-  const card = document.querySelector(`.event-card[data-event-id="${eventId}"]`);
+  /* try both data-event-id and the class selector */
+  const card = document.querySelector(`.event-card[data-event-id="${eventId}"]`)
+             || document.querySelector(`[data-event-id="${eventId}"]`);
   if (!card || card.querySelector('.ppp-reminder-btn')) return;
   const ev = (window.allEvents || []).find(e => e.__backendId === eventId);
   if (!ev || ev._isPast) return;
