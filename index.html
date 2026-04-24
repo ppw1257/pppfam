@@ -277,7 +277,7 @@ _fmtDateCache.clear();}
 async function _fetchAllData(force=false){if(_fetchingAll)return;if(!force&&Cache.isFresh(LC.TS_EV)&&Cache.isFresh(LC.TS_WK)&&allEvents.length>0&&allWorks.length>0)return;if(force){_rateLimit.reset('events');_rateLimit.reset('works');_rateLimit.reset('bdays');_rateLimit.reset('annivs');}
 _fetchingAll=true;try{const res=await fetchAllFromPocketBase();const dataChangedRef={v:false};_applyAllData(res,force,dataChangedRef);hideConnectionError();if(dataChangedRef.v){_vsLastFingerprint='';_calLastFP='';_worksLastFP='';_adminListFP='';_adminWorksListFP='';_trendLastFP='';scheduleRender();renderBirthdayBanners();}
 _scheduleEventStartTimers();}catch(e){console.warn('[PPP] PocketBase fetch failed:',e.message);if(!allEvents.length)showConnectionError();}finally{_fetchingAll=false;}}
-let _pbTokenCache={token:'',expiresAt:0};let _pbTokenInflight=null;async function pbGetToken(){const now=Date.now();if(_pbTokenCache.token&&now<_pbTokenCache.expiresAt)return _pbTokenCache.token;if(_pbTokenInflight)return _pbTokenInflight;_pbTokenInflight=(async()=>{let identity='',password='';try{identity=sessionStorage.getItem('pppPbIdentity')||'';try{const _ep=sessionStorage.getItem('pppAdminPass')||'';password=_ep?decodeURIComponent(escape(atob(_ep))):'';}catch(_){password='';};}catch(e){}
+let _pbTokenCache={token:'',expiresAt:0};let _pbTokenInflight=null;async function pbGetToken(){const now=Date.now();if(_pbTokenCache.token&&now<_pbTokenCache.expiresAt)return _pbTokenCache.token;if(_pbTokenInflight)return _pbTokenInflight;_pbTokenInflight=(async()=>{let identity='',password='';try{identity=localStorage.getItem('pppPbIdentity')||'';try{const _ep=localStorage.getItem('pppAdminPass')||'';password=_ep?decodeURIComponent(escape(atob(_ep))):'';}catch(_){password='';};}catch(e){}
 if(!identity||!password){if(typeof adminLogout==='function')adminLogout();throw new Error('Session expired — please log in again');}
 const res=await fetch(`${PB_URL}/api/collections/_superusers/auth-with-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identity,password})});const data=await res.json();if(!data.token)throw new Error('PocketBase auth failed — check credentials');_pbTokenCache={token:data.token,expiresAt:Date.now()+50*60*1000};try{sessionStorage.setItem('pppPbToken',data.token);}catch(e){}
 return data.token;})().finally(()=>{_pbTokenInflight=null;});return _pbTokenInflight;}
@@ -601,16 +601,16 @@ async function saveBirthday(){const name=(document.getElementById('bday-artist-n
 if(!month||month<1||month>12){showToast('Invalid month');return;}
 if(!day||day<1||day>31){showToast('Invalid day');return;}
 try{await createBirthdayInSheets({artist_name:name,birthday_month:String(month),birthday_day:String(day),color});closeBdayForm();showToast('Birthday saved ✓');allBirthdays.push({__backendId:'tmp_'+Date.now(),artist_name:name,birthday_month:month,birthday_day:day,color:color});_memCache.set('bdays',allBirthdays);Cache.set(LC.BDAYS,allBirthdays);requestAnimationFrame(function(){renderAnniversaryAdmin();renderBirthdayBanners();});_fetchingAll=false;_fetchFreshFromAppsScript().catch(function(){});}catch(e){showToast('An error occurred'+': '+(e.message||''));}}
-async function checkPanelKey(){const p=new URLSearchParams(window.location.search);const key=p.get('panel');if(key){const hash=await hashPassword(key);if(hash===PANEL_KEY_HASH){panelUnlocked=true;try{sessionStorage.setItem(PANL_FLAG,'1');}catch(e){}
-history.replaceState(null,'',window.location.pathname);}}else{try{panelUnlocked=sessionStorage.getItem(PANL_FLAG)==='1';}catch(e){}}}
-function isLoggedIn(){try{return sessionStorage.getItem(SESS_KEY)==='1';}catch(e){return false;}}
-async function doAdminLogin(){const pw=document.getElementById('login-pw-field').value;const err=document.getElementById('login-pw-err');const hash=await hashPassword(pw);if(hash===ADMIN_PASS_HASH){try{sessionStorage.setItem(SESS_KEY,'1');}catch(e){}
-try{sessionStorage.setItem('pppAdminPass',btoa(unescape(encodeURIComponent(pw))));}catch(e){}
-const emailInput=document.getElementById('login-email-field');const pbEmail=emailInput?emailInput.value.trim():'';try{sessionStorage.setItem('pppPbIdentity',pbEmail);}catch(e){}
+async function checkPanelKey(){const p=new URLSearchParams(window.location.search);const key=p.get('panel');if(key){const hash=await hashPassword(key);if(hash===PANEL_KEY_HASH){panelUnlocked=true;try{localStorage.setItem(PANL_FLAG,'1');}catch(e){}
+history.replaceState(null,'',window.location.pathname);}}else{try{panelUnlocked=localStorage.getItem(PANL_FLAG)==='1';}catch(e){}}}
+function isLoggedIn(){try{return localStorage.getItem(SESS_KEY)==='1';}catch(e){return false;}}
+async function doAdminLogin(){const pw=document.getElementById('login-pw-field').value;const err=document.getElementById('login-pw-err');const hash=await hashPassword(pw);if(hash===ADMIN_PASS_HASH){try{localStorage.setItem(SESS_KEY,'1');}catch(e){}
+try{localStorage.setItem('pppAdminPass',btoa(unescape(encodeURIComponent(pw))));}catch(e){}
+const emailInput=document.getElementById('login-email-field');const pbEmail=emailInput?emailInput.value.trim():'';try{localStorage.setItem('pppPbIdentity',pbEmail);}catch(e){}
 isAdmin=true;err.style.display='none';document.getElementById('login-pw-field').value='';const n=_dom('nav-admin-link');if(n)n.style.display='inline-flex';pbGetToken().catch(function(){});_dom('admin-login').style.display='none';_dom('admin-panel').style.display='flex';navigate('admin');renderAdminList();renderAnniversaryAdmin();_currentAdminTab='';switchAdminTab('events');if(worksLoaded)renderAdminWorksList();else loadWorksFromSheets().then(renderAdminWorksList);debounceLucide();}else{err.style.display='block';document.getElementById('login-pw-field').select();}}
-function adminLogout(){isAdmin=false;_pbTokenCache={token:'',expiresAt:0};_pbTokenInflight=null;try{sessionStorage.removeItem(SESS_KEY);}catch(e){}
-try{sessionStorage.removeItem('pppAdminPass');}catch(e){}
-try{sessionStorage.removeItem('pppPbIdentity');}catch(e){}
+function adminLogout(){isAdmin=false;_pbTokenCache={token:'',expiresAt:0};_pbTokenInflight=null;try{localStorage.removeItem(SESS_KEY);}catch(e){}
+try{localStorage.removeItem('pppAdminPass');}catch(e){}
+try{localStorage.removeItem('pppPbIdentity');}catch(e){}
 try{sessionStorage.removeItem('pppPbToken');}catch(e){}
 const emailField=document.getElementById('login-email-field');if(emailField)emailField.value='';_dom('admin-login').style.display='flex';document.getElementById('login-pw-field').value='';document.getElementById('login-pw-err').style.display='none';const navAdmin=_dom('nav-admin-link');if(navAdmin)navAdmin.style.display='none';navigate('home');showToast('Logged out');}
 async function adminRefresh(){const btn=document.getElementById('admin-refresh-btn');if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner" style="border-top-color:#111;"></span>';}
