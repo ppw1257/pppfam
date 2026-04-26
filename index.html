@@ -703,7 +703,7 @@ showToast('Refreshed ✓');}
 const _pageEls={};function _getPageEl(p){if(!_pageEls[p])_pageEls[p]=document.getElementById('page-'+p);return _pageEls[p];}
 const _navEls={};function _getNavEl(p){if(!_navEls[p])_navEls[p]=document.querySelector(`.nav-link[data-page="${p}"]`);return _navEls[p];}
 let _allPageEls=null;let _allNavLinkEls=null;function navigate(page){if(page==='admin'&&(!panelUnlocked||!isLoggedIn()))return;if(currentPage===page)return;currentPage=page;if(!_allPageEls)_allPageEls=Array.from(document.querySelectorAll('.page'));if(!_allNavLinkEls)_allNavLinkEls=Array.from(document.querySelectorAll('.nav-link'));_allPageEls.forEach(p=>p.classList.remove('active'));_allNavLinkEls.forEach(l=>l.classList.remove('active'));const pageEl=_getPageEl(page);if(pageEl){pageEl.scrollTop=0;pageEl.classList.add('active');}
-const navEl=_getNavEl(page);if(navEl)navEl.classList.add('active');if(page==='social'){loadSocialFromPB();loadSocialPostsFromPB();renderSocial();debounceLucide();return;}
+const navEl=_getNavEl(page);if(navEl)navEl.classList.add('active');if(page==='social'){_socialLastFP='';if(allSocialData.length){renderSocial();}loadSocialFromPB(true);loadSocialPostsFromPB(true);debounceLucide();return;}
 if(page==='myschedule'){renderMySchedule();debounceLucide();return;}
 if(page==='trend'){renderTrend();if(!_fetchingAll&&!_optimisticPending&&!Cache.isFresh(LC.TS_EV)){_fetchAllData(false).catch(function(){});}
 debounceLucide();return;}
@@ -914,7 +914,7 @@ function renderSocial() {
   const filterBar = document.getElementById('social-filter-bar');
   if (!content) return;
 
-  const fp = _socialFilter + '|' + allSocialData.map(s => (s.__backendId||'') + (s.artist||'')).join(',') + '|posts:' + allSocialPosts.length;
+  const fp = _socialFilter + '|' + allSocialData.length + '|' + allSocialData.map(s => (s.__backendId||'') + (s.artist||'')).join(',') + '|posts:' + allSocialPosts.length;
   if (fp === _socialLastFP && content.children.length > 0) return;
   _socialLastFP = fp;
 
