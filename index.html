@@ -863,7 +863,7 @@ const SOCIAL_ARTIST_CFG = {
 let _socialLoading = false;
 async function loadSocialFromPB(force=false) {
   if (_socialLoading && !force) return;
-  _socialLoading = false;
+  if (force) _socialLoading = false;
   _socialLoading = true;
   try {
     const res = await fetchFromPocketBase('socials');
@@ -1112,9 +1112,8 @@ async function saveSocialData() {
     closeSocialForm();
     _socialLastFP = '';
     allSocialData = [];
-    _socialLoading = false;
+    renderSocialAdminList();
     await loadSocialFromPB(true);
-    renderSocial();
   } catch(err) {
     showToast('❌ ' + (err.message || 'Error'));
   }
