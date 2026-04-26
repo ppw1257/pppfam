@@ -861,18 +861,40 @@ const SOCIAL_ARTIST_CFG = {
 };
 
 let _socialLoading = false;
+async function _fetchPBWithAuth(collection) {
+  let allItems = [];
+  let page = 1;
+  const perPage = 500;
+  let token = '';
+  try { token = await pbGetToken(); } catch(e) {}
+  while (true) {
+    const url = `${PB_URL}/api/collections/${collection}/records?perPage=${perPage}&page=${page}`;
+    const headers = {'Accept': 'application/json'};
+    if (token) headers['Authorization'] = token;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 15000);
+    let res;
+    try { res = await fetch(url, {signal: ctrl.signal, headers}); clearTimeout(tid); }
+    catch(e) { clearTimeout(tid); throw e; }
+    if (!res.ok) throw new Error(`HTTP ${res.status} on ${collection}`);
+    const data = await res.json();
+    const items = data.items || [];
+    allItems = allItems.concat(items);
+    if (allItems.length >= (data.totalItems || 0) || items.length < perPage) break;
+    page++;
+  }
+  return allItems;
+}
+
 async function loadSocialFromPB(force=false) {
   if (_socialLoading && !force) return;
-  if (force) _socialLoading = false;
   _socialLoading = true;
   try {
-    const res = await fetchFromPocketBase('socials');
-    if (Array.isArray(res)) {
-      allSocialData = res.map(r => Object.assign({__backendId: r.id || ''}, r));
-      _socialLastFP = '';
-      renderSocial();
-      renderSocialAdminList();
-    }
+    const res = await _fetchPBWithAuth('socials');
+    allSocialData = res.map(r => Object.assign({__backendId: r.id || ''}, r));
+    _socialLastFP = '';
+    renderSocial();
+    renderSocialAdminList();
   } catch(e) {
     console.warn('[Social] load failed:', e.message);
   } finally {
@@ -887,14 +909,12 @@ let _socialPostsLoaded = false;
 async function loadSocialPostsFromPB(force=false) {
   if (_socialPostsLoaded && !force) return;
   try {
-    const res = await fetchFromPocketBase('social_posts');
-    if (Array.isArray(res)) {
-      allSocialPosts = res.map(r => Object.assign({__backendId: r.id || ''}, r, {image: _pbFileUrl(r, r.image||'')}));
-      _socialPostsLoaded = true;
-      _socialLastFP = '';
-      renderSocial();
-      renderSocialPostsAdminList();
-    }
+    const res = await _fetchPBWithAuth('social_posts');
+    allSocialPosts = res.map(r => Object.assign({__backendId: r.id || ''}, r, {image: _pbFileUrl(r, r.image||'')}));
+    _socialPostsLoaded = true;
+    _socialLastFP = '';
+    renderSocial();
+    renderSocialPostsAdminList();
   } catch(e) {
     console.warn('[SocialPosts] load failed:', e.message);
   }
