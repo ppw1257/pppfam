@@ -499,75 +499,17 @@
 </button> </div> <div id="anniv-form-wrap" style="display:none;background:#f9fafb;border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid #e5e7eb;"> <p style="font-weight:700;font-size:0.85rem;margin-bottom:1rem;">Add New Anniversary</p> <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;"> <div style="grid-column:1/-1;"> <label class="form-label">Name</label> <input class="form-input" id="anniv-label" placeholder="e.g. PondPhuwin Anniversary"> </div> <div> <label class="form-label">Month (1–12)</label> <input class="form-input" id="anniv-month" type="number" min="1" max="12"> </div> <div> <label class="form-label">Day (1–31)</label> <input class="form-input" id="anniv-day" type="number" min="1" max="31"> </div> <div> <label class="form-label"><span>Start Year</span> <span style="font-weight:400;color:#9ca3af;">(optional)</span></label> <input class="form-input" id="anniv-year" type="number" min="2000" max="2099"> </div> <div> <label class="form-label">Banner Color</label> <input type="color" id="anniv-color" value="#a855f7" style="width:40px;height:36px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;padding:2px;"> </div> </div> <div style="display:flex;gap:8px;justify-content:flex-end;"> <button class="btn-secondary" style="font-size:0.82rem;" onclick="closeAnnivForm()">Cancel</button> <button class="btn-primary" style="font-size:0.82rem;" onclick="saveAnniversary()">Save</button> </div> </div> <div id="anniv-list"></div> </div> </div>
 
  <div id="admin-tab-social" class="admin-tab-panel" style="display:none;">
-  <p style="font-size:0.78rem;color:#9ca3af;margin-bottom:1.25rem;">Social links แสดงเป็นการ์ดด้านล่างทุกหน้า — เพิ่มลิงก์แล้วกด Save</p>
-  <div style="display:flex;flex-direction:column;gap:1.25rem;" id="social-form-wrap">
-   <!-- Pond -->
-   <div style="background:#fff7ed;border-radius:14px;padding:1.25rem;border:1px solid #fed7aa;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
-     <span style="width:10px;height:10px;border-radius:50%;background:#f97316;display:inline-block;flex-shrink:0;"></span>
-     <span style="font-weight:800;font-size:0.95rem;color:#111;">Pond</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-     <div><label class="form-label" style="font-size:0.75rem;">Instagram</label><input class="form-input" id="sl-pond-ig" placeholder="https://instagram.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">X / Twitter</label><input class="form-input" id="sl-pond-x" placeholder="https://x.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">TikTok</label><input class="form-input" id="sl-pond-tt" placeholder="https://tiktok.com/@..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Facebook</label><input class="form-input" id="sl-pond-fb" placeholder="https://facebook.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Weibo (เว่ยป๋อ)</label><input class="form-input" id="sl-pond-wb" placeholder="https://weibo.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Spotify</label><input class="form-input" id="sl-pond-sp" placeholder="https://open.spotify.com/..." style="font-size:0.85rem;"></div>
-    </div>
-   </div>
-   <!-- Phuwin -->
-   <div style="background:#f8fafc;border-radius:14px;padding:1.25rem;border:1px solid #cbd5e1;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
-     <span style="width:10px;height:10px;border-radius:50%;background:#475569;display:inline-block;flex-shrink:0;"></span>
-     <span style="font-weight:800;font-size:0.95rem;color:#111;">Phuwin</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-     <div><label class="form-label" style="font-size:0.75rem;">Instagram</label><input class="form-input" id="sl-phuwin-ig" placeholder="https://instagram.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">X / Twitter</label><input class="form-input" id="sl-phuwin-x" placeholder="https://x.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">TikTok</label><input class="form-input" id="sl-phuwin-tt" placeholder="https://tiktok.com/@..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Facebook</label><input class="form-input" id="sl-phuwin-fb" placeholder="https://facebook.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Weibo (เว่ยป๋อ)</label><input class="form-input" id="sl-phuwin-wb" placeholder="https://weibo.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Spotify</label><input class="form-input" id="sl-phuwin-sp" placeholder="https://open.spotify.com/..." style="font-size:0.85rem;"></div>
-    </div>
-   </div>
-   <!-- Permpoon -->
-   <div style="background:#f0fdf4;border-radius:14px;padding:1.25rem;border:1px solid #bbf7d0;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
-     <span style="width:10px;height:10px;border-radius:50%;background:#16a34a;display:inline-block;flex-shrink:0;"></span>
-     <span style="font-weight:800;font-size:0.95rem;color:#111;">Permpoon</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-     <div><label class="form-label" style="font-size:0.75rem;">Instagram</label><input class="form-input" id="sl-permpoon-ig" placeholder="https://instagram.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">X / Twitter</label><input class="form-input" id="sl-permpoon-x" placeholder="https://x.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">TikTok</label><input class="form-input" id="sl-permpoon-tt" placeholder="https://tiktok.com/@..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Facebook</label><input class="form-input" id="sl-permpoon-fb" placeholder="https://facebook.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Weibo (เว่ยป๋อ)</label><input class="form-input" id="sl-permpoon-wb" placeholder="https://weibo.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Spotify</label><input class="form-input" id="sl-permpoon-sp" placeholder="https://open.spotify.com/..." style="font-size:0.85rem;"></div>
-    </div>
-   </div>
-   <!-- Papawatre -->
-   <div style="background:#f5f3ff;border-radius:14px;padding:1.25rem;border:1px solid #e9d5ff;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
-     <span style="width:10px;height:10px;border-radius:50%;background:#7c3aed;display:inline-block;flex-shrink:0;"></span>
-     <span style="font-weight:800;font-size:0.95rem;color:#111;">Papawatre</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-     <div><label class="form-label" style="font-size:0.75rem;">Instagram</label><input class="form-input" id="sl-papawatre-ig" placeholder="https://instagram.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">X / Twitter</label><input class="form-input" id="sl-papawatre-x" placeholder="https://x.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">TikTok</label><input class="form-input" id="sl-papawatre-tt" placeholder="https://tiktok.com/@..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Facebook</label><input class="form-input" id="sl-papawatre-fb" placeholder="https://facebook.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Weibo (เว่ยป๋อ)</label><input class="form-input" id="sl-papawatre-wb" placeholder="https://weibo.com/..." style="font-size:0.85rem;"></div>
-     <div><label class="form-label" style="font-size:0.75rem;">Spotify</label><input class="form-input" id="sl-papawatre-sp" placeholder="https://open.spotify.com/..." style="font-size:0.85rem;"></div>
-    </div>
-   </div>
-   <div style="display:flex;justify-content:flex-end;">
-    <button class="btn-primary" onclick="saveSocialLinks()" id="social-save-btn" style="min-width:120px;">
-     <span id="social-save-text">Save Social Links</span>
-     <span id="social-save-spin" style="display:none;"><span class="spinner"></span>Saving...</span>
-    </button>
-   </div>
+  <p style="font-size:0.78rem;color:#9ca3af;margin-bottom:1rem;">Social links แสดงเป็นการ์ดด้านล่างทุกหน้า — เพิ่มคน เพิ่มช่องทาง แล้วกด Save</p>
+  <div style="display:flex;gap:8px;margin-bottom:1.25rem;">
+   <button class="btn-primary" onclick="slAddPerson()" style="font-size:0.82rem;padding:6px 14px;display:inline-flex;align-items:center;gap:5px;">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>เพิ่มคน
+   </button>
+   <button class="btn-primary" onclick="saveSocialLinks()" id="social-save-btn" style="min-width:110px;font-size:0.82rem;padding:6px 14px;margin-left:auto;">
+    <span id="social-save-text">Save</span>
+    <span id="social-save-spin" style="display:none;"><span class="spinner"></span>Saving...</span>
+   </button>
   </div>
+  <div id="social-persons-wrap" style="display:flex;flex-direction:column;gap:1rem;"></div>
  </div>
 
 </div> </div> </div> </div>  <div class="modal-backdrop" id="detail-modal" style="display:none;" onclick="closeDetailModalBackdrop(event)"> <div class="modal-box" onclick="event.stopPropagation()" style="max-width:860px;width:100%;background:#fff;border-radius:20px;overflow-y:auto;overflow-x:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);"> <div style="position:relative;line-height:0;"> <div id="detail-img-wrap"></div> <button onclick="closeDetailModal()" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);border:none;border-radius:99px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;"> <i data-lucide="x" style="width:16px;height:16px;color:#fff;stroke-width:2.5;"></i> </button> </div> <div style="padding:1.25rem;"> <div id="detail-artist-badge" style="margin-bottom:0.6rem;"></div> <h2 id="detail-title" style="font-size:1.65rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.7rem;line-height:1.25;"></h2> <div id="detail-meta" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem;"></div> <div id="detail-desc-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.4rem;" >DESCRIPTION</p> <p id="detail-desc" style="font-size:0.88rem;line-height:1.6;color:#374151;"></p> </div> <div id="detail-links-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin-bottom:0.75rem;" >LINKS</p> <div id="detail-links" style="display:flex;flex-wrap:wrap;gap:8px;"></div> </div> <div id="detail-cal-wrap" style="margin-bottom:1.25rem;"> <div style="display:flex;align-items:center;margin-bottom:0.6rem;"> <p style="font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.08em;margin:0;">ADD TO CALENDAR</p> </div> <div id="detail-cal-btns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;"></div> </div> <div id="detail-ticket-wrap" style="display:none;margin-bottom:1.25rem;"> <p style="font-size:0.75rem;font-weight:700;color:#f97316;letter-spacing:0.08em;margin-bottom:0.75rem;"> <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
@@ -871,18 +813,141 @@ if(tab==='bdays')renderAnniversaryAdmin();if(tab==='anniv')renderAnniversaryAdmi
 /* ============================================================
    SOCIAL LINKS — save/load via localStorage + PocketBase key
    ============================================================ */
-const _SL_KEY='ppp_social_links';
-let _socialLinks={Pond:{},Phuwin:{},Permpoon:{},Papawatre:{}};
+const _SL_KEY='ppp_social_links_v2';
+// data format: [{name, color, links:[{label,url}]}]
+let _socialPersons=[];
 
-function _loadSocialLinksFromStorage(){try{const raw=localStorage.getItem(_SL_KEY);if(raw)_socialLinks=Object.assign(_socialLinks,JSON.parse(raw));}catch(e){}}
+function _loadSocialLinksFromStorage(){
+  try{
+    const raw=localStorage.getItem(_SL_KEY);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      if(Array.isArray(parsed)) _socialPersons=parsed;
+    }
+  }catch(e){}
+}
 
-function loadSocialLinksToForm(){_loadSocialLinksFromStorage();const map={pond:'Pond',phuwin:'Phuwin',permpoon:'Permpoon',papawatre:'Papawatre'};const fields=['ig','x','tt','fb','wb','sp'];Object.entries(map).forEach(([k,v])=>{const sl=_socialLinks[v]||{};fields.forEach(f=>{const el=document.getElementById('sl-'+k+'-'+f);if(el)el.value=sl[f]||'';});});}
+// ---- Admin UI ----
+let _slColors=['#f97316','#475569','#16a34a','#7c3aed','#3b82f6','#ec4899','#ef4444','#0ea5e9'];
+let _slColorIdx=0;
 
-async function saveSocialLinks(){const btn=document.getElementById('social-save-btn');const txt=document.getElementById('social-save-text');const spin=document.getElementById('social-save-spin');btn.disabled=true;txt.style.display='none';spin.style.display='inline';try{const map={pond:'Pond',phuwin:'Phuwin',permpoon:'Permpoon',papawatre:'Papawatre'};const fields=['ig','x','tt','fb','wb','sp'];const data={};Object.entries(map).forEach(([k,v])=>{data[v]={};fields.forEach(f=>{data[v][f]=(document.getElementById('sl-'+k+'-'+f)||{}).value||'';});});_socialLinks=data;try{localStorage.setItem(_SL_KEY,JSON.stringify(data));}catch(e){}renderSocialSection();showToast('Social links saved ✓');}catch(err){showToast('❌ '+(err.message||'Error'));}finally{btn.disabled=false;txt.style.display='inline';spin.style.display='none';}}
+function slAddPerson(){
+  _socialPersons.push({name:'',color:_slColors[_slColorIdx%_slColors.length],links:[]});
+  _slColorIdx++;
+  renderSocialAdmin();
+  // focus new name input
+  setTimeout(()=>{const inputs=document.querySelectorAll('.sl-person-name');if(inputs.length)inputs[inputs.length-1].focus();},50);
+}
 
-function _socialIconSvg(type){const icons={x:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.906-5.63z"/></svg>`,ig:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>`,tt:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.5a8.16 8.16 0 004.77 1.52V7.56a4.85 4.85 0 01-1-.87z"/></svg>`,fb:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,wb:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M9.82 15.57c-2.37.24-4.42-.9-4.57-2.55-.16-1.65 1.65-3.19 4.02-3.44 2.37-.25 4.42.9 4.57 2.55.16 1.65-1.64 3.19-4.02 3.44zm5.6-7.38c-.2-.06-.34-.1-.23-.36.23-.57.25-1.06.01-1.41-.46-.67-1.72-.63-3.16.01 0 0-.45.2-.34-.16.22-.84.19-1.54-.18-1.95-.83-.92-3.04.03-4.94 2.14C5.12 8.16 4 10.16 4 11.93c0 3.33 3.4 5.35 6.73 5.35 4.35 0 7.26-2.53 7.26-4.54 0-1.21-.82-1.9-2.57-2.55zm5.46-7.45c-1.82-2.01-4.5-2.75-6.98-2.16-.55.14-.89.7-.76 1.25.14.55.7.89 1.25.76 1.86-.44 3.86.1 5.2 1.6 1.34 1.49 1.69 3.54 1.04 5.33-.2.54.08 1.13.62 1.33.54.2 1.13-.08 1.33-.62.9-2.44.43-5.48-1.7-7.49zm-2.28 2.18c-.87-.96-2.16-1.32-3.35-1.04-.52.12-.84.65-.72 1.17.12.52.65.84 1.17.72.6-.14 1.24.04 1.67.52.43.48.54 1.14.3 1.72-.2.49.04 1.04.52 1.23.49.2 1.04-.03 1.23-.52.47-1.17.2-2.59-.82-3.8z"/></svg>`,sp:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`};return icons[type]||'';}
+function slRemovePerson(i){
+  _socialPersons.splice(i,1);
+  renderSocialAdmin();
+}
 
-function renderSocialSection(){_loadSocialLinksFromStorage();const pages=['page-home','page-calendar','page-works','page-trend','page-myschedule'];const PLATFORM_META={ig:{label:'Instagram',color:'#E1306C'},x:{label:'X',color:'#000'},tt:{label:'TikTok',color:'#010101'},fb:{label:'Facebook',color:'#1877F2'},wb:{label:'Weibo',color:'#DF2026'},sp:{label:'Spotify',color:'#1DB954'}};const artists=[{key:'Pond',color:'#f97316',bg:'#fff7ed',border:'#fed7aa',text:'#7c2d12'},{key:'Phuwin',color:'#475569',bg:'#f8fafc',border:'#cbd5e1',text:'#1e293b'},{key:'Permpoon',color:'#16a34a',bg:'#f0fdf4',border:'#bbf7d0',text:'#14532d'},{key:'Papawatre',color:'#7c3aed',bg:'#f5f3ff',border:'#e9d5ff',text:'#3b0764'}];const platforms=['ig','x','tt','fb','wb','sp'];function _avatarSvg(color,letter){return`<svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" fill="${color}"/><text x="28" y="36" text-anchor="middle" font-size="22" font-weight="500" fill="#fff" font-family="sans-serif">${letter}</text></svg>`;}function _platformIcon(p){const icons={ig:`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#E1306C" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#E1306C" stroke="none"/></svg>`,x:`<svg width="11" height="11" viewBox="0 0 24 24" fill="#000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.906-5.63z"/></svg>`,tt:`<svg width="11" height="11" viewBox="0 0 24 24" fill="#010101"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.5a8.16 8.16 0 004.77 1.52V7.56a4.85 4.85 0 01-1-.87z"/></svg>`,fb:`<svg width="11" height="11" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,wb:`<svg width="11" height="11" viewBox="0 0 24 24" fill="#DF2026"><path d="M9.82 15.57c-2.37.24-4.42-.9-4.57-2.55-.16-1.65 1.65-3.19 4.02-3.44 2.37-.25 4.42.9 4.57 2.55.16 1.65-1.64 3.19-4.02 3.44zm5.6-7.38c-.2-.06-.34-.1-.23-.36.23-.57.25-1.06.01-1.41-.46-.67-1.72-.63-3.16.01 0 0-.45.2-.34-.16.22-.84.19-1.54-.18-1.95-.83-.92-3.04.03-4.94 2.14C5.12 8.16 4 10.16 4 11.93c0 3.33 3.4 5.35 6.73 5.35 4.35 0 7.26-2.53 7.26-4.54 0-1.21-.82-1.9-2.57-2.55zm5.46-7.45c-1.82-2.01-4.5-2.75-6.98-2.16-.55.14-.89.7-.76 1.25.14.55.7.89 1.25.76 1.86-.44 3.86.1 5.2 1.6 1.34 1.49 1.69 3.54 1.04 5.33-.2.54.08 1.13.62 1.33.54.2 1.13-.08 1.33-.62.9-2.44.43-5.48-1.7-7.49zm-2.28 2.18c-.87-.96-2.16-1.32-3.35-1.04-.52.12-.84.65-.72 1.17.12.52.65.84 1.17.72.6-.14 1.24.04 1.67.52.43.48.54 1.14.3 1.72-.2.49.04 1.04.52 1.23.49.2 1.04-.03 1.23-.52.47-1.17.2-2.59-.82-3.8z"/></svg>`,sp:`<svg width="11" height="11" viewBox="0 0 24 24" fill="#1DB954"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`};return icons[p]||'';}function buildSocialFooter(){const hasAny=artists.some(a=>{const sl=_socialLinks[a.key]||{};return platforms.some(p=>isValidUrl(sl[p]));});if(!hasAny)return'';return`<div style="border-top:1px solid #f0f0f0;padding:1.25rem 1rem 0.75rem;width:100%;box-sizing:border-box;"><div style="max-width:900px;margin:0 auto;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;"><span style="font-size:0.82rem;font-weight:800;color:#111;letter-spacing:-0.01em;">Follow</span><span style="flex:1;height:1px;background:#f0f0f0;display:block;"></span></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">${artists.map(a=>{const sl=_socialLinks[a.key]||{};const links=platforms.filter(p=>isValidUrl(sl[p]));if(!links.length)return'';const letter=a.key.charAt(0).toUpperCase();return`<div style="background:${a.bg};border:1px solid ${a.border};border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:56px;height:56px;border-radius:50%;background:${a.color};border:2.5px solid #fff;box-shadow:0 0 0 2px ${a.color};overflow:hidden;flex-shrink:0;">${_avatarSvg(a.color,letter)}</div><span style="font-size:0.82rem;font-weight:800;color:${a.text};">${a.key}</span><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:5px;">${links.map(p=>{const meta=PLATFORM_META[p];return`<a href="${sl[p].trim()}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:99px;background:#fff;color:${a.text};font-size:0.68rem;font-weight:700;text-decoration:none;border:1px solid ${a.border};white-space:nowrap;" onmouseover="this.style.background='${meta.color}';this.style.color='#fff';this.style.borderColor='${meta.color}';" onmouseout="this.style.background='#fff';this.style.color='${a.text}';this.style.borderColor='${a.border}';">${_platformIcon(p)}<span>${meta.label}</span></a>`;}).join('')}</div></div>`;}).join('')}</div></div></div>`;}pages.forEach(pid=>{const page=document.getElementById(pid);if(!page)return;const footer=page.querySelector('footer');if(!footer)return;let sf=page.querySelector('.ppp-social-footer');if(!sf){sf=document.createElement('div');sf.className='ppp-social-footer';footer.parentNode.insertBefore(sf,footer);}sf.innerHTML=buildSocialFooter();});const homeContainer=document.getElementById('home-social-section');if(homeContainer)homeContainer.style.display='none';debounceLucide();}
+function slAddLink(i){
+  _socialPersons[i].links.push({label:'',url:''});
+  renderSocialAdmin();
+}
+
+function slRemoveLink(i,j){
+  _socialPersons[i].links.splice(j,1);
+  renderSocialAdmin();
+}
+
+function slSyncData(){
+  const wrap=document.getElementById('social-persons-wrap');
+  if(!wrap)return;
+  wrap.querySelectorAll('[data-sl-person]').forEach(card=>{
+    const i=parseInt(card.dataset.slPerson);
+    if(!_socialPersons[i])return;
+    const nameEl=card.querySelector('.sl-person-name');
+    const colorEl=card.querySelector('.sl-person-color');
+    if(nameEl)_socialPersons[i].name=nameEl.value;
+    if(colorEl)_socialPersons[i].color=colorEl.value;
+    card.querySelectorAll('[data-sl-link]').forEach(row=>{
+      const j=parseInt(row.dataset.slLink);
+      if(!_socialPersons[i].links[j])return;
+      const lbl=row.querySelector('.sl-link-label');
+      const url=row.querySelector('.sl-link-url');
+      if(lbl)_socialPersons[i].links[j].label=lbl.value;
+      if(url)_socialPersons[i].links[j].url=url.value;
+    });
+  });
+}
+
+function renderSocialAdmin(){
+  const wrap=document.getElementById('social-persons-wrap');
+  if(!wrap)return;
+  wrap.innerHTML='';
+  _socialPersons.forEach((person,i)=>{
+    const card=document.createElement('div');
+    card.dataset.slPerson=i;
+    card.style.cssText='background:#f9fafb;border-radius:14px;padding:1.25rem;border:1px solid #e5e7eb;';
+    const linksHtml=person.links.map((lk,j)=>`
+      <div data-sl-link="${j}" style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;margin-bottom:6px;">
+        <input class="form-input sl-link-label" value="${escHtml(lk.label)}" placeholder="ชื่อ เช่น Instagram" style="font-size:0.82rem;" oninput="slSyncField(${i},${j},'label',this.value)">
+        <input class="form-input sl-link-url" value="${escHtml(lk.url)}" placeholder="https://..." style="font-size:0.82rem;" oninput="slSyncField(${i},${j},'url',this.value)">
+        <button onclick="slRemoveLink(${i},${j})" style="background:#fee2e2;border:none;border-radius:8px;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="ลบ">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`).join('');
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
+        <input type="color" class="sl-person-color" value="${person.color}" style="width:32px;height:32px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;padding:2px;flex-shrink:0;" oninput="slSyncPersonField(${i},'color',this.value)">
+        <input class="form-input sl-person-name" value="${escHtml(person.name)}" placeholder="ชื่อคน เช่น Pond" style="font-weight:700;font-size:0.95rem;" oninput="slSyncPersonField(${i},'name',this.value)">
+        <button onclick="slRemovePerson(${i})" style="background:#fee2e2;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.78rem;font-weight:600;color:#dc2626;white-space:nowrap;flex-shrink:0;">ลบคน</button>
+      </div>
+      <div class="sl-links-wrap">${linksHtml}</div>
+      <button onclick="slAddLink(${i})" style="margin-top:6px;background:none;border:1px dashed #d1d5db;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.78rem;color:#6b7280;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>เพิ่มช่องทาง
+      </button>`;
+    wrap.appendChild(card);
+  });
+  if(_socialPersons.length===0){
+    wrap.innerHTML='<p style="font-size:0.82rem;color:#9ca3af;text-align:center;padding:2rem 0;">ยังไม่มีคน — กด "เพิ่มคน" เพื่อเริ่ม</p>';
+  }
+}
+
+function slSyncPersonField(i,field,val){if(_socialPersons[i])_socialPersons[i][field]=val;}
+function slSyncField(i,j,field,val){if(_socialPersons[i]&&_socialPersons[i].links[j])_socialPersons[i].links[j][field]=val;}
+
+function loadSocialLinksToForm(){_loadSocialLinksFromStorage();renderSocialAdmin();}
+
+async function saveSocialLinks(){
+  slSyncData();
+  const btn=document.getElementById('social-save-btn');
+  const txt=document.getElementById('social-save-text');
+  const spin=document.getElementById('social-save-spin');
+  btn.disabled=true;txt.style.display='none';spin.style.display='inline';
+  try{
+    try{localStorage.setItem(_SL_KEY,JSON.stringify(_socialPersons));}catch(e){}
+    renderSocialSection();
+    showToast('Social links saved ✓');
+  }catch(err){showToast('❌ '+(err.message||'Error'));}
+  finally{btn.disabled=false;txt.style.display='inline';spin.style.display='none';}
+}
+
+function renderSocialSection(){
+  _loadSocialLinksFromStorage();
+  const pages=['page-home','page-calendar','page-works','page-trend','page-myschedule'];
+  function _avatarSvg(color,letter){return`<svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" fill="${color}"/><text x="28" y="36" text-anchor="middle" font-size="22" font-weight="500" fill="#fff" font-family="sans-serif">${letter}</text></svg>`;}
+  function _hexToRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`${r},${g},${b}`;}
+  function buildSocialFooter(){
+    const persons=_socialPersons.filter(p=>p.name&&p.links.some(lk=>isValidUrl(lk.url)));
+    if(!persons.length)return'';
+    return`<div style="border-top:1px solid #f0f0f0;padding:1.25rem 1rem 0.75rem;width:100%;box-sizing:border-box;margin-top:auto;"><div style="max-width:900px;margin:0 auto;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;"><span style="font-size:0.82rem;font-weight:800;color:#111;letter-spacing:-0.01em;">Follow</span><span style="flex:1;height:1px;background:#f0f0f0;display:block;"></span></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">${persons.map(p=>{const c=p.color||'#64748b';const rgb=_hexToRgb(c.length===7?c:'#64748b');const bg=`rgba(${rgb},0.07)`;const border=`rgba(${rgb},0.2)`;const textColor=c;const letter=(p.name||'?').charAt(0).toUpperCase();const validLinks=p.links.filter(lk=>lk.label&&isValidUrl(lk.url));if(!validLinks.length)return'';return`<div style="background:${bg};border:1px solid ${border};border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:56px;height:56px;border-radius:50%;background:${c};border:2.5px solid #fff;box-shadow:0 0 0 2px ${c};overflow:hidden;flex-shrink:0;">${_avatarSvg(c,letter)}</div><span style="font-size:0.82rem;font-weight:800;color:#111;">${escHtml(p.name)}</span><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:5px;">${validLinks.map(lk=>`<a href="${lk.url.trim()}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:99px;background:#fff;color:#374151;font-size:0.68rem;font-weight:700;text-decoration:none;border:1px solid ${border};white-space:nowrap;" onmouseover="this.style.background='${c}';this.style.color='#fff';this.style.borderColor='${c}';" onmouseout="this.style.background='#fff';this.style.color='#374151';this.style.borderColor='${border}';">${escHtml(lk.label)}</a>`).join('')}</div></div>`;}).join('')}</div></div></div>`;
+  }
+  pages.forEach(pid=>{
+    const page=document.getElementById(pid);if(!page)return;
+    const footer=page.querySelector('footer');if(!footer)return;
+    let sf=page.querySelector('.ppp-social-footer');
+    if(!sf){sf=document.createElement('div');sf.className='ppp-social-footer';footer.parentNode.insertBefore(sf,footer);}
+    sf.innerHTML=buildSocialFooter();
+  });
+  const homeContainer=document.getElementById('home-social-section');
+  if(homeContainer)homeContainer.style.display='none';
+  debounceLucide();
+}
 
 function setAdminYear(y){_adminYearFilter=y;_adminOpenMonths.clear();renderAdminYearTabs();renderAdminList();}
 let _adminListFP='';function renderAdminList(){const list=document.getElementById('admin-events-list');const noEv=document.getElementById('admin-no-events');const limitWarn=document.getElementById('admin-limit-warn');if(!list)return;if(limitWarn)limitWarn.style.display=allEvents.length>=999?'block':'none';const _adminEvHash=allEvents.slice(0,200).map(e=>(e.__backendId||'')+(e.dateStart||'')+(e.title||'')+(e.__isOptimistic?'_opt':'')).join(',');const fp=_adminYearFilter+'|'+allEvents.length+'|'+_adminEvHash;if(fp===_adminListFP&&list.children.length>0){renderAdminYearTabs();return;}
