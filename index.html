@@ -814,16 +814,25 @@ if(tab==='bdays')renderAnniversaryAdmin();if(tab==='anniv')renderAnniversaryAdmi
    SOCIAL LINKS — save/load via localStorage + PocketBase key
    ============================================================ */
 const _SL_KEY='ppp_social_links_v2';
+const _SL_PB_KEY='social_links';
 // data format: [{name, color, links:[{label,url}]}]
 let _socialPersons=[];
+let _slPbRecordId=null; // existing PocketBase record id
 
-function _loadSocialLinksFromStorage(){
+async function _loadSocialLinksFromStorage(){
+  // 1) try PocketBase first
+  try{
+    const res=await fetchWithTimeout(`${PB_URL}/api/collections/settings/records?filter=(key='${_SL_PB_KEY}')&perPage=1`);
+    const rec=res.items&&res.items[0];
+    if(rec&&rec.value){
+      const parsed=JSON.parse(rec.value);
+      if(Array.isArray(parsed)){_socialPersons=parsed;_slPbRecordId=rec.id;try{localStorage.setItem(_SL_KEY,rec.value);}catch(e){}return;}
+    }
+  }catch(e){}
+  // 2) fallback localStorage
   try{
     const raw=localStorage.getItem(_SL_KEY);
-    if(raw){
-      const parsed=JSON.parse(raw);
-      if(Array.isArray(parsed)) _socialPersons=parsed;
-    }
+    if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))_socialPersons=parsed;}
   }catch(e){}
 }
 
@@ -911,7 +920,12 @@ function renderSocialAdmin(){
 function slSyncPersonField(i,field,val){if(_socialPersons[i])_socialPersons[i][field]=val;}
 function slSyncField(i,j,field,val){if(_socialPersons[i]&&_socialPersons[i].links[j])_socialPersons[i].links[j][field]=val;}
 
-function loadSocialLinksToForm(){_loadSocialLinksFromStorage();renderSocialAdmin();}
+async function loadSocialLinksToForm(){
+  const wrap=document.getElementById('social-persons-wrap');
+  if(wrap)wrap.innerHTML='<p style="font-size:0.82rem;color:#9ca3af;text-align:center;padding:2rem 0;">กำลังโหลด...</p>';
+  await _loadSocialLinksFromStorage();
+  renderSocialAdmin();
+}
 
 async function saveSocialLinks(){
   slSyncData();
@@ -920,15 +934,31 @@ async function saveSocialLinks(){
   const spin=document.getElementById('social-save-spin');
   btn.disabled=true;txt.style.display='none';spin.style.display='inline';
   try{
-    try{localStorage.setItem(_SL_KEY,JSON.stringify(_socialPersons));}catch(e){}
+    const jsonVal=JSON.stringify(_socialPersons);
+    // save to PocketBase settings collection
+    const token=await pbGetToken();
+    const body=JSON.stringify({key:_SL_PB_KEY,value:jsonVal});
+    const headers={'Content-Type':'application/json','Authorization':token};
+    if(_slPbRecordId){
+      const r=await fetch(`${PB_URL}/api/collections/settings/records/${_slPbRecordId}`,{method:'PATCH',headers,body});
+      const d=await r.json();
+      if(!d.id)throw new Error(d.message||'Update failed');
+    }else{
+      const r=await fetch(`${PB_URL}/api/collections/settings/records`,{method:'POST',headers,body});
+      const d=await r.json();
+      if(!d.id)throw new Error(d.message||'Create failed');
+      _slPbRecordId=d.id;
+    }
+    // also cache locally
+    try{localStorage.setItem(_SL_KEY,jsonVal);}catch(e){}
     renderSocialSection();
     showToast('Social links saved ✓');
-  }catch(err){showToast('❌ '+(err.message||'Error'));}
+  }catch(err){showToast('❌ '+(err.message||'Error'));console.error('[social]',err);}
   finally{btn.disabled=false;txt.style.display='inline';spin.style.display='none';}
 }
 
-function renderSocialSection(){
-  _loadSocialLinksFromStorage();
+async function renderSocialSection(){
+  await _loadSocialLinksFromStorage();
   const pages=['page-home','page-calendar','page-works','page-trend','page-myschedule'];
   function _avatarSvg(color,letter){return`<svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" fill="${color}"/><text x="28" y="36" text-anchor="middle" font-size="22" font-weight="500" fill="#fff" font-family="sans-serif">${letter}</text></svg>`;}
   function _hexToRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`${r},${g},${b}`;}
